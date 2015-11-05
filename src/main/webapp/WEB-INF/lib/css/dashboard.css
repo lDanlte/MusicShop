@@ -1,0 +1,19 @@
+a.acolor {
+    color: #777;
+}
+.margintext {
+    margin-left: 15px;
+    margin-right: 10px;
+}
+div.rowcolor {
+    background-color: #f0f0f0;
+}
+.nav-pills>li>a:hover {
+    background-color: #f6f6f6 !important;
+}
+.nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+    background-color: #f0f0f0 !important;
+}
+.nav-pills a {
+    color: #777 !important;
+}

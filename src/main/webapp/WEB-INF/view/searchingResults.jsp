@@ -1,6 +1,6 @@
 <%-- 
-    Document   : index
-    Created on : 05.10.2015, 15:27:42
+    Document   : searchingResults
+    Created on : 06.11.2015, 2:06:06
     Author     : Dante
 --%>
 
@@ -10,7 +10,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Music Store</title>
+    <title>Результаты поиска</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Music online store">
     <meta name="author" content="Denis Antonov">
@@ -62,63 +62,11 @@
     
     <div class="container-fluid">
         
-        <c:choose>
-            <c:when test="${pageContextStr == 'index'}">
-                
-                <div class="row">
-                    <div class="col-lg-2 col-md-2 col-sm-1"></div>
-                    <div class="col-lg-7 col-md-7 col-sm-9">
-                        <div class="jumbotron" class="carouset-content" style="padding: 5px;">
-                            <div class="conteiner">
-                                <div class="row">
-                                    <div class="col-lg-5 col-md-6 col-sm-7">
-                                        <img class="img-thumbnail" src="<c:url value="/image/music.jpg"/>" style="height: 280px;">
-                                    </div>
-                                    <div class="col-lg-7 col-md-6 col-sm-5">
-                                        <h2>Добро пожаловать!</h2>
-                                        <p style="margin-bottom: 0px;"><em>Данный сервис является большой библиотека музыки.<small> В будущем, может быть :)</small></em></p>
-                                        <p style="margin-top: 0px;"><em>Слушайте любимые песни в одном месте.</em></p>
-                                        <p><small><a href="#" data-toggle="modal" data-target="#myModal">Зарегестрируйтесь</a> и получите возможноть прослушивать любымые треки в любое время.</small></p>
-                                <!--/row-->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--/span-->
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-2"></div>
-                </div>
-                                    
-            </c:when>
-                
-            <c:when test="${pageContextStr == 'author'}">
-                <div class="row">
-                    <div class="col-lg-2 col-md-2 col-sm-1"></div>
-                    <div class="col-lg-7 col-md-7 col-sm-9">
-                        <div class="jumbotron carouset-content" style="padding: 5px;">
-                            <div class="conteiner">
-                                <div class="row">
-                                    <img class="img-rounded" src="<c:url value="/image/music.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
-
-                                    <h4><strong class="margintext">Author's Name</strong></h4>
-                                    <p><h4><em><small class="margintext">desc</small></em></h4>
-                            <!--/row-->
-
-                                </div>
-                            </div>
-                        </div>
-                        <!--/span-->
-                    </div>
-                    <div class="col-lg-3 col-md-3 col-sm-2"></div>
-                </div>
-            </c:when>
-        </c:choose>
-        
-        <c:forEach var="entry" items="${dataMap}">
+        <c:if test="${authors != null}">
             
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
-                <div class="col-lg-8 col-md-8 col-sm-10 content-category"><h3><strong>${entry.key}</strong></h3></div>
+                <div class="col-lg-8 col-md-8 col-sm-10 content-category"><h3><strong>Группы</strong></h3></div>
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
 
@@ -129,7 +77,41 @@
                         <div  class="jcarousel">
                             <ul>
 
-                                <c:forEach begin="0" end="${entry.value}">
+                                <c:forEach begin="0" end="${authors}">
+                                    <li>
+                                        <div class="album" onclick="albumPage(this);">
+                                            <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" height="160">
+                                            <h5 style="margin-top: 10px;">Author name</h5>
+                                        </div>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                            <button class="jcarousel-prev"><</button>
+                            <button class="jcarousel-next">></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+            </div>
+        
+        </c:if>
+        
+        <c:if test="${albums != null}">
+            
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+                <div class="col-lg-8 col-md-8 col-sm-10 content-category"><h3><strong>Альбомы</strong></h3></div>
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+                <div class="col-lg-8 col-md-8 col-sm-10 carouset-content">
+                    <div class='jcarousel-wrapper'>
+                        <div  class="jcarousel">
+                            <ul>
+
+                                <c:forEach begin="0" end="${albums}">
                                     <li>
                                         <div class="album" onclick="albumPage(this);">
                                             <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" width="160" height="160">
@@ -148,7 +130,42 @@
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
         
-        </c:forEach>
+        </c:if>
+        
+        <c:if test="${tracks != null}">
+            
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+                <div class="col-lg-8 col-md-8 col-sm-10 content-category"><h3><strong>Треки</strong></h3></div>
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+                <div class="col-lg-8 col-md-8 col-sm-10 carouset-content">
+                    <div class='jcarousel-wrapper'>
+                        <div  class="jcarousel">
+                            <ul>
+
+                                <c:forEach begin="0" end="${tracks}">
+                                    <li>
+                                        <div class="album" onclick="albumPage(this);">
+                                            <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" width="160" height="160">
+                                            <h5 style="margin-top: 10px;">Track Name</h5>
+                                            <h5 ><small><a href="#" style="color: #777;">Marilyn Manson</a></small></h5>
+                                        </div>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                            <button class="jcarousel-prev"><</button>
+                            <button class="jcarousel-next">></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-1"></div>
+            </div>
+        
+        </c:if>
          
         
     </div>
