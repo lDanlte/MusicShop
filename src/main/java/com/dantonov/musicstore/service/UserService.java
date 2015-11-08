@@ -3,6 +3,7 @@ package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.repository.UserRepository;
+import java.math.BigDecimal;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,14 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
     
-    public User save(User user) {
+    public User saveUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            return null;
+        }
+        if (userRepository.findByLogin(user.getLogin()) != null) {
+            return null;
+        }
+        user.setWallet(BigDecimal.ZERO);
         return userRepository.save(user);
     }
 

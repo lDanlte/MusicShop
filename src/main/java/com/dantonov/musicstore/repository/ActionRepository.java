@@ -8,6 +8,6 @@ import org.springframework.data.repository.CrudRepository;
  *
  * @author Denis Antonov (den007230@gmail.com)
  */
-public interface ActionRepository extends CrudRepository<Action, Long> {
+public interface ActionRepository extends CrudRepository<Action, Byte> {
 
 }

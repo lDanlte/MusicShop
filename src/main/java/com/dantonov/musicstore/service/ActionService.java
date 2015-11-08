@@ -18,7 +18,7 @@ public class ActionService {
     
     
     
-    public Action findById(Long id) {
+    public Action findById(Byte id) {
         return actionRepository.findOne(id);
     }
     

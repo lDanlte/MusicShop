@@ -20,7 +20,7 @@ public class GenreService {
     
     
     
-    public Genre findById(Long id) {
+    public Genre findById(Byte id) {
         return genreRepository.findOne(id);
     }
     

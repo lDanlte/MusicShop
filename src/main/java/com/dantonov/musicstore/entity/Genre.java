@@ -25,7 +25,7 @@ public class Genre {
     @Id
     @Column(name = "genre_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Byte id;
     
     @Column(name = "name", nullable = false, updatable = false, length = 32)
     private String name;
@@ -47,8 +47,8 @@ public class Genre {
 
     
     
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Byte getId() { return id; }
+    public void setId(Byte id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

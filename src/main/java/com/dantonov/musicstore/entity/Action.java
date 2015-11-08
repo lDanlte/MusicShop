@@ -22,7 +22,7 @@ public class Action {
     @Id
     @Column(name = "action_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Byte id;
     
     @Column(name = "description", nullable = false, length = 32)
     private String desc;
@@ -36,13 +36,13 @@ public class Action {
     public Action() {
     }
 
-    public Action(Long id, String desc) {
+    public Action(Byte id, String desc) {
         this.id = id;
         this.desc = desc;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Byte getId() { return id; }
+    public void setId(Byte id) { this.id = id; }
 
     public String getDesc() { return desc; }
     public void setDesc(String desc) { this.desc = desc; }

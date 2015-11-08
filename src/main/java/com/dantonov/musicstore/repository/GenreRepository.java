@@ -9,7 +9,7 @@ import org.springframework.data.repository.CrudRepository;
  *
  * @author Denis Antonov (den007230@gmail.com)
  */
-public interface GenreRepository extends CrudRepository<Genre, Long>{
+public interface GenreRepository extends CrudRepository<Genre, Byte>{
     
     Genre findByName(String name);
     

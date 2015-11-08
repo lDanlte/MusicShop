@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
  *
  * @author Denis Antonov (den007230@gmail.com)
  */
-public interface RoleRepository extends CrudRepository<Role, Long>{
+public interface RoleRepository extends CrudRepository<Role, Byte>{
 
     Role findByRole(String role);
 }

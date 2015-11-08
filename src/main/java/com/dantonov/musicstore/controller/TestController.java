@@ -23,8 +23,8 @@ public class TestController {
     @Autowired
     private ActionService actionService;
     
-    @RequestMapping(value = "/action/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ActionDto getAction(@PathVariable("id") Long id) {
+    /*@RequestMapping(value = "/action/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ActionDto getAction(@PathVariable("id") Byte id) {
         Action action = actionService.findById(id);
         
         if (action == null) return null;
@@ -35,7 +35,7 @@ public class TestController {
         actionDto.setDesc(action.getDesc());
         
         return actionDto;
-    }
+    }*/
     
     @RequestMapping(value = "/action/save", method = RequestMethod.POST)
     public void saveAction(@RequestParam("desc") String desc){

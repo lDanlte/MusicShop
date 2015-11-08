@@ -46,7 +46,7 @@
                     <select id="genreSelect" class="input-sm form-control" title="Категории">
                         <option value="-1">Категории</option>
                         <c:forEach items="${genres}" var="genre" varStatus="status">
-                            <option value="${status.index}">${genre}</option>
+                            <option value="${genre.id}">${genre.name}</option>
                         </c:forEach>
                     </select>
                     
@@ -170,7 +170,7 @@
         
     </div>
         
-    <footer style="margin-left: 15px;">
+     <footer style="padding-left: 15px;">
         <hr>
         <p>&copy; Денис Антонов 2015</p>
     </footer>

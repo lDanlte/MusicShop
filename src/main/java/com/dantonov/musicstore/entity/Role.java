@@ -24,7 +24,7 @@ public class Role {
     @Id
     @Column(name = "role_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    private Byte id;
     
     @Column(name = "role", nullable = false, updatable = false, length = 16)
     private String role;
@@ -46,8 +46,8 @@ public class Role {
 
     
     
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Byte getId() { return id; }
+    public void setId(Byte id) { this.id = id; }
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }

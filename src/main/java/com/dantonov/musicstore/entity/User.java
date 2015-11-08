@@ -65,6 +65,12 @@ public class User {
     
     
     public User() {}
+    
+    public User(String login, String password, String email) {
+        this.login = login;
+        this.password = password;
+        this.email = email;
+    }
 
     public User(String login, String password, String email, Set<Role> roles) {
         this.login = login;
@@ -73,8 +79,8 @@ public class User {
         this.roles = roles;
     }
 
-    
-    
+
+     
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 

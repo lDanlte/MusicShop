@@ -46,7 +46,12 @@
                     <select id="genreSelect" class="input-sm form-control" title="Категории">
                         <option value="-1">Категории</option>
                         <c:forEach items="${genres}" var="genre" varStatus="status">
-                            <option value="${status.index}">${genre}</option>
+                            <option value="${genre.id}" 
+                                <c:if test="${selectedGenreId == genre.id}">
+                                    selected="selected"
+                                </c:if>
+                                >${genre.name}
+                            </option>
                         </c:forEach>
                     </select>
                     
@@ -153,7 +158,7 @@
         
     </div>
         
-    <footer style="margin-left: 15px;">
+    <footer style="padding-left: 15px;">
         <hr>
         <p>&copy; Денис Антонов 2015</p>
     </footer>
@@ -205,7 +210,7 @@
                     <div class="control-group">
                       <label class="control-label" for="Email">Email:</label>
                       <div class="controls">
-                        <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
+                        <input id="newEmail" id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
                       </div>
                     </div>
 
@@ -213,7 +218,7 @@
                     <div class="control-group">
                       <label class="control-label" for="userid">Логин:</label>
                       <div class="controls">
-                        <input id="userid" name="userid" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
+                        <input id="newLogin" name="userid" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
                       </div>
                     </div>
 
@@ -221,7 +226,7 @@
                     <div class="control-group">
                       <label class="control-label" for="password">Пароль:</label>
                       <div class="controls">
-                        <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
+                        <input id="newPass" name="password" class="form-control input-large" type="password" placeholder="********" required="">
                       </div>
                     </div>
 
@@ -229,7 +234,7 @@
                     <div class="control-group">
                       <label class="control-label" for="reenterpassword">Повторите пароль:</label>
                       <div class="controls">
-                        <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
+                        <input id="newPass2" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
                       </div>
                     </div>
 
@@ -238,7 +243,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-              <button type="button" class="btn btn-info">Регистрация</button>
+              <button type="button" class="btn btn-info" onclick="registration();">Регистрация</button>
             </div>
           </div>
         </div>
