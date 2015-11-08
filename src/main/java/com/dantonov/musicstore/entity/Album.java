@@ -35,7 +35,7 @@ public class Album {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
     
-    @Column(name = "title", nullable = false, updatable = false, length = 32)
+    @Column(name = "title", nullable = false, updatable = false, length = 48)
     private String title;
     
     @Column(name = "price", columnDefinition = "money", nullable = false)
@@ -45,8 +45,9 @@ public class Album {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date releaseDate;
     
-    @Column(name = "icon", nullable = false, length = 64)
-    private String icon;
+    @Column(name = "add_date", columnDefinition = "datetime", nullable = false, updatable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date addDate;
     
     @Column(name = "description")
     private String desc;
@@ -67,31 +68,32 @@ public class Album {
     private List<TradeHistory> historys;
     
     @OneToMany(mappedBy = "album", targetEntity = Track.class)
-    private Set<Track> tracks;
+    @OrderBy("pos")
+    private List<Track> tracks;
 
     
     
     public Album() {
     }
 
-    public Album(Author author, String title, Set<Track> tracks, BigDecimal price,
-                 Date releaseDate, String icon) {
+    public Album(Author author, String title, List<Track> tracks, BigDecimal price,
+                 Date releaseDate) {
         this.author = author;
         this.title = title;
         this.tracks = tracks;
         this.price = price;
         this.releaseDate = releaseDate;
-        this.icon = icon;
+        this.addDate = new Date();
     }
 
-    public Album(Author author, String title, Set<Track> tracks, BigDecimal price,
-                 Date releaseDate, String icon, String desc) {
+    public Album(Author author, String title, List<Track> tracks, BigDecimal price,
+                 Date releaseDate, Date addDate, String desc) {
         this.author = author;
         this.title = title;
         this.tracks = tracks;
         this.price = price;
         this.releaseDate = releaseDate;
-        this.icon = icon;
+        this.addDate = addDate;
         this.desc = desc;
     }
 
@@ -109,9 +111,9 @@ public class Album {
     public Date getReleaseDate() { return releaseDate; }
     public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
 
-    public String getIcon() { return icon; }
-    public void setIcon(String icon) { this.icon = icon; }
-
+    public Date getAddDate() { return addDate; }
+    public void setAddDate(Date addDate) { this.addDate = addDate; }
+    
     public String getDesc() { return desc; }
     public void setDesc(String desc) { this.desc = desc; }
 
@@ -127,8 +129,8 @@ public class Album {
     public List<TradeHistory> getHistorys() { return historys; }
     public void setHistorys(List<TradeHistory> historys) { this.historys = historys; }
 
-    public Set<Track> getTracks() { return tracks; }
-    public void setTracks(Set<Track> tracks) { this.tracks = tracks; }
+    public List<Track> getTracks() { return tracks; }
+    public void setTracks(List<Track> tracks) { this.tracks = tracks; }
     
     
 

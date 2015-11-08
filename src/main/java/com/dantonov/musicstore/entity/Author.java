@@ -30,27 +30,27 @@ public class Author {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
     
-    @Column(name = "name", nullable = false, updatable = false, length = 32)
+    @Column(name = "name", nullable = false, updatable = false, length = 48)
     private String name;
     
-    @Column(name = "icon", nullable = false, length = 64)
-    private String icon;
+    @Column(name = "description")
+    private String desc;
     
     @OneToOne(fetch = FetchType.LAZY, targetEntity = User.class)
     @JoinColumn(name = "user_id")
     private User user;
     
     @OneToMany(mappedBy = "author", targetEntity = Album.class)
-    @OrderBy("release_date desc")
+    @OrderBy("add_date desc")
     private List<Album> albums;
 
     
     
     public Author() { }
 
-    public Author(String name, String icon, User user) {
+    public Author(String name, String desc, User user) {
         this.name = name;
-        this.icon = icon;
+        this.desc = desc;
         this.user = user;
     }
     
@@ -62,8 +62,8 @@ public class Author {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public String getIcon() { return icon; }
-    public void setIcon(String icon) { this.icon = icon; }
+    public String getDesc() { return desc; }
+    public void setDesc(String desc) { this.desc = desc; }
 
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }

@@ -27,40 +27,49 @@ public class Track {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
     
+    @Column(name = "name", nullable = false, length = 64)
+    private String name;
+    
     @Column(name = "duration", nullable = false, updatable = false)
     private Integer duration;
     
     @Column(name = "size", nullable = false, updatable = false)
     private Long size;
     
-    @Column(name = "src", nullable = false, length = 64)
-    private String src;
+    @Column(name = "bitrate", nullable = false, updatable = false)
+    private Integer bitrate;
+    
+    @Column(name = "pos", nullable = false, updatable = false)
+    private Byte position;
     
     @ManyToOne(targetEntity = Album.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id", nullable = false, updatable = false)
     private Album album;
     
-    @ManyToOne(targetEntity = Music.class)
-    @JoinColumn(name = "music_id", nullable = false, unique = false)
-    private Music music;
 
     
     
     public Track() {
     }
 
-    public Track(Album album, Music music, Integer duration, Long size, String src) {
-        this.album = album;
-        this.music = music;
+    public Track(Album album, String name, Integer duration, Long size, Integer bitrate, Byte position) {
+        this.name = name;
         this.duration = duration;
         this.size = size;
-        this.src = src;
+        this.bitrate = bitrate;
+        this.position = position;
+        this.album = album;
     }
+
+    
 
     
     
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
     public Integer getDuration() { return duration; }
     public void setDuration(Integer duration) { this.duration = duration; }
@@ -68,14 +77,14 @@ public class Track {
     public Long getSize() { return size; }
     public void setSize(Long size) { this.size = size; }
 
-    public String getSrc() { return src; }
-    public void setSrc(String src) { this.src = src; }
+    public Integer getBitrate() { return bitrate; }
+    public void setBitrate(Integer bitrate) { this.bitrate = bitrate; }
+
+    public Byte getPosition() { return position; }
+    public void setPosition(Byte position) { this.position = position; }
 
     public Album getAlbum() { return album; }
     public void setAlbum(Album album) { this.album = album; }
-
-    public Music getMusic() { return music; }
-    public void setMusic(Music music) { this.music = music; }
     
     
     

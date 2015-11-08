@@ -15,7 +15,7 @@ public interface AlbumRepository extends CrudRepository<Album, UUID>{
     
     List<Album> findByTitleOrderByAuthor_NameAsc(String title);
     
-    List<Album> findByTracks_Music_NameOrderByTitleAsc(String name);
+    List<Album> findByTitleOrderByAddDateDesc(String title);
     
     List<Album> findAll(Pageable pageable);
     

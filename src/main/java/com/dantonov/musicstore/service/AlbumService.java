@@ -30,10 +30,6 @@ public class AlbumService {
         return albumRepository.findByTitleOrderByAuthor_NameAsc(title);
     }
     
-    public List<Album> findByMusicName(String name) {
-        return albumRepository.findByTracks_Music_NameOrderByTitleAsc(name);
-    }
-    
     public List<Album> findNextPage(Pageable pageable) {
         return albumRepository.findAll(pageable);
     }
