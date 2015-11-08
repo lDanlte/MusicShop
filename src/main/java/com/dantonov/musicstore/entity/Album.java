@@ -51,6 +51,9 @@ public class Album {
     
     @Column(name = "description")
     private String desc;
+    
+    @Column(name = "q_sold", nullable = false)
+    private Long qSold;
 
     @ManyToMany(mappedBy = "albums", targetEntity = User.class)
     private Set<User> users;
@@ -84,6 +87,7 @@ public class Album {
         this.price = price;
         this.releaseDate = releaseDate;
         this.addDate = new Date();
+        qSold = 0L;
     }
 
     public Album(Author author, String title, List<Track> tracks, BigDecimal price,
@@ -95,6 +99,7 @@ public class Album {
         this.releaseDate = releaseDate;
         this.addDate = addDate;
         this.desc = desc;
+        qSold = 0L;
     }
 
     
@@ -117,6 +122,9 @@ public class Album {
     public String getDesc() { return desc; }
     public void setDesc(String desc) { this.desc = desc; }
 
+    public Long getqSold() { return qSold; }
+    public void setqSold(Long qSold) { this.qSold = qSold;  }
+    
     public Set<User> getUsers() { return users; }
     public void setUsers(Set<User> users) { this.users = users; }
 
