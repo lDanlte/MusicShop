@@ -41,7 +41,7 @@ public class TradeHistory {
     @JoinColumn(name = "action_id")
     private Action action;
     
-    @ManyToOne(targetEntity = User.class)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
     

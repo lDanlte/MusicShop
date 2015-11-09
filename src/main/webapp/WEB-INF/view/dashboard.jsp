@@ -230,14 +230,14 @@
                                     <div class="control-group" style="margin-top: 10px;">
                                       <label class="control-label" for="Email">Email:</label>
                                       <div class="controls">
-                                        <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
+                                        <input id="authorEmail" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
                                       </div>
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
                                       <label class="control-label" for="login">Логин: </label>
                                       <div class="controls">
-                                        <input id="login" name="login" class="form-control input-large" type="text" placeholder="Логин" required="">
+                                        <input id="authorLogin" name="login" class="form-control input-large" type="text" placeholder="Логин" required="">
                                       </div>
                                     </div>
 
@@ -246,7 +246,7 @@
                                     <div class="control-group" style="margin-top: 10px;">
                                       <label class="control-label" for="password">Пароль:</label>
                                       <div class="controls">
-                                        <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
+                                        <input id="authorPassword" name="password" class="form-control input-large" type="password" placeholder="********" required="">
                                       </div>
                                     </div>
 
@@ -254,7 +254,7 @@
                                     <div class="control-group" style="margin-top: 10px;">
                                       <label class="control-label" for="reenterpassword">Повторите пароль:</label>
                                       <div class="controls">
-                                        <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
+                                        <input id="authorPasswordComf" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
                                       </div>
                                     </div>
 
@@ -267,11 +267,11 @@
 
                                     <div class="control-group" style="margin-top: 10px;">
                                         <label for="exampleInputFile">Постер группы</label>
-                                        <input type="file" id="inputFile" accept="image/*">
+                                        <input type="file" id="authorCover" accept="image/*">
                                     </div>
 
                                     </fieldset>
-                              <button type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
+                              <button id="createAuthorButton" type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
                           </form>
                         </div>
                     
@@ -532,6 +532,9 @@
     <script type="text/javascript" src="<c:url value="/lib/datepicker/js/bootstrap-datepicker.ru.min.js"/>"></script>
     <script type="text/javascript" src="<c:url value="/lib/js/navbar.js"/>"></script>
     <script type="text/javascript" src="<c:url value="/lib/js/dashboard.js"/>"></script>
+    <c:if test="${isAdmin == true}">
+        <script type="text/javascript" src="<c:url value="/lib/js/dashboardAdmin.js"/>"></script>
+    </c:if>
     
 </body>
 

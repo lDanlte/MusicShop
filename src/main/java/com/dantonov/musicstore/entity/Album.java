@@ -4,6 +4,7 @@ package com.dantonov.musicstore.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -140,6 +141,26 @@ public class Album {
     public List<Track> getTracks() { return tracks; }
     public void setTracks(List<Track> tracks) { this.tracks = tracks; }
     
+    
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof Album)) return false;
+        
+        Album album = (Album) obj;
+        if (! id.equals(album.getId())) return false;
+        
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
     
 
 }

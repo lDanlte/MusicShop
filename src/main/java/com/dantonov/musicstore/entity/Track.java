@@ -1,6 +1,7 @@
 
 package com.dantonov.musicstore.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -62,8 +63,6 @@ public class Track {
     }
 
     
-
-    
     
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -86,6 +85,25 @@ public class Track {
     public Album getAlbum() { return album; }
     public void setAlbum(Album album) { this.album = album; }
     
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof Track)) return false;
+        
+        Track track = (Track) obj;
+        if (! id.equals(track.getId())) return false;
+        
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
     
     
 }

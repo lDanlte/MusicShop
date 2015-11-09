@@ -33,7 +33,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
     
-    public User saveUser(User user) {
+    public User save(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null) {
             return null;
         }
@@ -44,4 +44,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User update(User user) {
+        return userRepository.save(user);
+    }
 }

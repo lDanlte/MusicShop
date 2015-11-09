@@ -3,6 +3,7 @@ package com.dantonov.musicstore.entity;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -42,7 +43,7 @@ public class User {
     @Column(name = "email", nullable = false, length = 32)
     private String email;
     
-    @Column(name = "wallet", columnDefinition = "money")
+    @Column(name = "wallet", columnDefinition = "money", scale = 2)
     private BigDecimal wallet;
     
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, targetEntity = Author.class)
@@ -108,6 +109,25 @@ public class User {
     public void setHistorys(List<TradeHistory> historys) { this.historys = historys; }
     public List<TradeHistory> getHistorys() { return historys; }
     
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof User)) return false;
+        
+        User user = (User) obj;
+        if (! id.equals(user.getId())) return false;
+        
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
     
     
 }

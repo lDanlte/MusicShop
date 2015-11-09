@@ -2,6 +2,7 @@
 package com.dantonov.musicstore.entity;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -72,5 +73,23 @@ public class Author {
     public void setAlbums(List<Album> albums) { this.albums = albums; }
     
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj == this) return true;
+        if (!(obj instanceof Author)) return false;
+        
+        Author author = (Author) obj;
+        if (! id.equals(author.getId())) return false;
+        
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
     
 }

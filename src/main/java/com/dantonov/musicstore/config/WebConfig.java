@@ -1,6 +1,7 @@
 
 package com.dantonov.musicstore.config;
 
+import com.fasterxml.jackson.core.JsonEncoding;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.accept.ContentNegotiationManager;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
@@ -75,6 +77,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         return (String viewName, Locale locale) -> {
             MappingJackson2JsonView view = new MappingJackson2JsonView();
             view.setPrettyPrint(true);
+            view.setEncoding(JsonEncoding.UTF8);
             return view;
         };
     }
@@ -87,6 +90,20 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         resolver.setSuffix(".jsp");
         resolver.setViewClass(JstlView.class);
         resolver.setContentType("text/html;charset=UTF-8");
+        
+        return resolver;
+    }
+    
+    @Bean
+    public CommonsMultipartResolver multipartResolver() {
+        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+        
+        long maxFileSize = Long.parseLong(env.getRequiredProperty("fileUpload.maxFileSize"));
+        int maxInMemorySize = Integer.parseInt(env.getRequiredProperty("fileUpload.maxInMemorySize"));
+        
+        resolver.setMaxUploadSizePerFile(maxFileSize);
+        resolver.setMaxInMemorySize(maxInMemorySize);
+        resolver.setDefaultEncoding("utf-8");
         
         return resolver;
     }

@@ -2,7 +2,6 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.service.GenreService;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
