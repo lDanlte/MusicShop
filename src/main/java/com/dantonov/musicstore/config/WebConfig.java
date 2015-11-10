@@ -52,8 +52,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/lib/**").addResourceLocations("/WEB-INF/lib/");
-        registry.addResourceHandler("/image/**").addResourceLocations("/WEB-INF/image/");
+        registry.addResourceHandler("/lib/**").addResourceLocations("/resources/lib/");
+        registry.addResourceHandler("/image/**").addResourceLocations("/resources/image/");
         registry.addResourceHandler("/resource/**").addResourceLocations(env.getRequiredProperty("storage.path"));
     }
     
@@ -86,7 +86,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public ViewResolver jspViewResolver() {
         InternalResourceViewResolver resolver = new InternalResourceViewResolver();
         
-        resolver.setPrefix("/WEB-INF/view/");
+        resolver.setPrefix("/resources/view/");
         resolver.setSuffix(".jsp");
         resolver.setViewClass(JstlView.class);
         resolver.setContentType("text/html;charset=UTF-8");
