@@ -1,7 +1,12 @@
 package com.dantonov.musicstore.controller;
 
+import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
+import com.dantonov.musicstore.service.AlbumService;
+import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.GenreService;
+import com.dantonov.musicstore.service.TrackService;
+import java.text.DecimalFormat;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,10 +27,26 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller("HomeController")
 public class HomeController {
     
-    
+    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
+    static {
+        DEC_FORMAT.setMaximumFractionDigits(2);
+        DEC_FORMAT.setMinimumFractionDigits(2);
+        DEC_FORMAT.setGroupingUsed(false);
+    }
     
     @Autowired
     private GenreService genreService;
+    
+    @Autowired
+    private AlbumService albumService;
+    
+    @Autowired
+    private AuthorService authorService;
+    
+    @Autowired
+    private TrackService trackService;
+    
+    
     
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView home(ModelAndView modelAndView) {
@@ -35,10 +56,12 @@ public class HomeController {
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
         
-        Map<String, Integer> map = new LinkedHashMap<>();
-        map.put("Последние добавленные", 5);
-        map.put("Топ продаж", 8);
+        Map<String, List<Album>> map = new LinkedHashMap<>();
+        map.put("Последние добавленные", albumService.getLastAdded());
+        map.put("Топ продаж", albumService.getTopSales());
         modelAndView.addObject("dataMap", map);
+        
+        modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("index");
         
@@ -51,9 +74,10 @@ public class HomeController {
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
         
-        modelAndView.addObject("authors", 5);
-        modelAndView.addObject("albums", 3);
-        modelAndView.addObject("tracks", 5);
+        modelAndView.addObject("authors", authorService.searchByName(q));
+        modelAndView.addObject("albums", albumService.searchByTitle(q));
+        modelAndView.addObject("tracks", trackService.searchByName(q));
+        modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("searchingResults");
         return modelAndView;
@@ -74,10 +98,12 @@ public class HomeController {
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
         
-        Map<String, Integer> map = new LinkedHashMap<>();
-        map.put("Последние добавленные - " + selectedGenre.getName(), 5);
-        map.put("Топ продаж - " + selectedGenre.getName(), 8);
+        Map<String, List<Album>> map = new LinkedHashMap<>();
+        map.put("Последние добавленные - " + selectedGenre.getName(), albumService.getLastAddedByGenre(selectedGenre));
+        map.put("Топ продаж - " + selectedGenre.getName(), albumService.getTopSalesByGenre(selectedGenre));
         modelAndView.addObject("dataMap", map);
+        
+        modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("index");
         

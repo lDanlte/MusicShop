@@ -5,12 +5,15 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Music Store</title>
+    <title>${album.title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Music online store">
     <meta name="author" content="Denis Antonov">
@@ -39,7 +42,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <div class="col-sm-6 col-md-6">
-                <form class="navbar-form" role="search">
+                <form class="navbar-form" role="search"  action="<c:url value="/search"/>">
                     <div class="input-group col-sm-8 col-md-6">
                         <input type="text" class="form-control" placeholder="Поиск по группам, альбомам, музыке" name="q">
                         <div class="input-group-btn">
@@ -71,22 +74,28 @@
                 <div class="jumbotron carouset-content" style="padding: 5px;">
                     <div class="conteiner">
                         <div class="row">
-                            <img class="img-rounded" src="<c:url value="/resource/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
+                            <img class="img-rounded" src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
 
-                            <h4><strong class="margintext" style="margin-top: 10px;">Album's Name</strong></h4>
+                            <h4><strong class="margintext" style="margin-top: 10px;">${album.title}</strong></h4>
 
                             <p>
                             <div class="margintext" style="display: inline;">
                                 <div style="display: inline-block;">
-                                    <h4><small><a href="#" class="acolor" style="color: #777;">Aurhor's name</a></small></h4>
+                                    <h4><small><a href="<c:url value="/author/${album.author.name}"/>" class="acolor" style="color: #777;">${album.author.name}</a></small></h4>
                                 </div>
                                 <div style="display: inline-block; margin-left: 15px;">
-                                    <h5>27.10.2015</h5>
+                                    <h5>${dateFormat.format(album.releaseDate)}</h5>
                                 </div>
                             </div>
-                            <h5><small><a href="#" class="acolor margintext" style="color: #777;">Genre</a></small></h5>
+                            <h5><small class="margintext">
+                                    <c:set var="size" value="${fn:length(album.genres)}"/>
+                                    <c:forEach items="${album.genres}" var="genre" varStatus="status">
+                                        
+                                        ${genre.name}<c:if test="${status.index != size - 1}">, </c:if>
+                                    </c:forEach>
+                            </small></h5>
                             <p style="margin-top: 40px;">
-                            <h4><small class="margintext" style="color: #000;">desc</small></h4>
+                            <h4><small class="margintext" style="color: #000;">${album.desc}</small></h4>
                             <button type = "button" class="btn btn-info" style="position: absolute; bottom: 45px; right: 40px; 
                                     <c:if test="${isBought == true}">cursor: default;</c:if>" <c:if test="${isBought == true}"> disabled="disabled"</c:if> >
                                 
@@ -95,7 +104,7 @@
                                         Куплено
                                     </c:when>
                                     <c:otherwise>
-                                        Купить за 49.00
+                                        Купить за ${format.format(album.price)}
                                         <span class="glyphicon glyphicon-rub" aria-hidden="true"></span>
                                     </c:otherwise>
                                 </c:choose>
@@ -134,11 +143,16 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <c:forEach begin="1" end="10" varStatus="status">
+                                <c:forEach items="${album.tracks}" var="track">
                                 <tr>
-                                    <td>${status.index}</td>
-                                    <td>musics name ${status.index}</td>
-                                    <td>3:40</td>
+                                    <td>${track.position}</td>
+                                    <td>${track.name}</td>
+                                    
+                                    <td>
+                                        <fmt:formatNumber var="min" value="${track.duration / 60}" maxFractionDigits="0" />
+                                        <c:set var="sec" value="${(track.duration % 60 < 10) ? ('0' + track.duration % 60) : (track.duration % 60)}"/>
+                                        ${min}:${sec}
+                                    </td>
                                 </tr>
                                 </c:forEach>
                             </tbody>
@@ -307,10 +321,10 @@
                         jPlayer: "#jquery_jplayer_1",
                         cssSelectorAncestor: "#jp_container_1"
                 }, [
-                        <c:forEach begin="1" end="6" varStatus="status">
+                        <c:forEach items="${album.tracks}" var="track">
                             {
-                                    title: "TestTrack_${status.index}",
-                                    mp3: "<c:url value="/resource/test.mp3"/>"
+                                    title: "${track.name}",
+                                    mp3: "<c:url value="/resource/${album.author.name}/${album.title}/${track.position}.mp3"/>"
                             },
                         </c:forEach>        
                 ], {

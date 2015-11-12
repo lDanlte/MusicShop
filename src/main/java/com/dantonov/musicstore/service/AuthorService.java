@@ -31,6 +31,10 @@ public class AuthorService {
         return authorRepository.findByName(name);
     }
     
+    public List<Author> searchByName(String namePattern) {
+        return authorRepository.findByNameContainingIgnoreCase(namePattern);
+    }
+    
     public List<Author> findNextPage(Pageable pageable) {
         return authorRepository.findAll(pageable);
     }

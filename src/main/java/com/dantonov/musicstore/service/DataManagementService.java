@@ -103,7 +103,7 @@ public class DataManagementService {
             MultipartFile audioFile =  audioFiles[i];
             fileType = audioFile.getOriginalFilename();
             fileType = fileType.substring(fileType.lastIndexOf('.'));
-            String audioPath = String.format(pathPattern, Byte.toString(i), fileType);
+            String audioPath = String.format(pathPattern, Byte.toString((byte) (i + 1)), fileType);
             
             try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(new File(audioPath)))) {
                 buffStream.write(audioFile.getBytes());

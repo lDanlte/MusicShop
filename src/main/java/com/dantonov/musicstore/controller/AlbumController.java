@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +48,12 @@ public class AlbumController {
     
     private static final Logger log = LoggerFactory.getLogger(AlbumController.class);
     private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-    
+    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
+    static {
+        DEC_FORMAT.setMaximumFractionDigits(2);
+        DEC_FORMAT.setMinimumFractionDigits(2);
+        DEC_FORMAT.setGroupingUsed(false);
+    }
     
     @Autowired
     private GenreService genreService;
@@ -63,14 +69,26 @@ public class AlbumController {
     
     
     @RequestMapping(value = "/{albumName}", method = RequestMethod.GET)
-    public ModelAndView albumPage(@PathVariable("albumName") String albumName, ModelAndView modelAndView) {
-        modelAndView.addObject("isBought", false);
+    public ModelAndView albumPage(@PathVariable("albumName") String albumName,
+                                  @PathVariable("authorName") String authotName,
+                                   ModelAndView modelAndView) {
+        
+        Album album = albumService.findByTitleAndAuthor(albumName, authotName);
+        if (album == null) {
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+        
+        modelAndView.addObject("isBought", true);
         
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
         
-        modelAndView.setViewName("album");
+        modelAndView.addObject("album", album);
+        modelAndView.addObject("dateFormat", REQUEST_DATE_FORMAT);
+        modelAndView.addObject("format", DEC_FORMAT);
         
+        modelAndView.setViewName("album");
         return modelAndView;
     }
     
@@ -177,20 +195,14 @@ public class AlbumController {
             track.setName(titles.get(i));
             track.setPosition((byte)(i + 1));
             track.setSize(tracks[i].getSize());
+            
             ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[0].getBytes());
-            track.setBitrate((int)header.getBitRateAsNumber());
-            track.setDuration(header.getTrackLength());
-           /* try(BufferedInputStream inputStream = new BufferedInputStream(tracks[i].getInputStream())) {
-                AudioInputStream audioStream = AudioSystem.getAudioInputStream(inputStream);
-                AudioFormat audioFormat = audioStream.getFormat();
-                double durationInSeconds = audioStream.getFrameLength() / audioFormat.getFrameRate();
-                int bitrate = (int) ((long) (tracks[i].getSize() / durationInSeconds) >> 10);
-                track.setBitrate(bitrate);
-                track.setDuration((int)(durationInSeconds));
-                track.setAlbum(album);
-                audioStream.close();
-            }*/
+            
+            int bitrate = (int)header.getBitRateAsNumber();
+            track.setBitrate(bitrate);
+            track.setDuration((int)(tracks[i].getSize() >> 10) / bitrate);
             track.setAlbum(album);
+            
             result.add(track);
         }
         return result;

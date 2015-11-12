@@ -13,8 +13,11 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface AuthorRepository extends CrudRepository<Author, UUID> {
     
-    List<Author> findAll(Pageable pageable);
     
     Author findByName(String name);
+    
+    List<Author> findByNameContainingIgnoreCase(String name);
+    
+    List<Author> findAll(Pageable pageable);
 
 }

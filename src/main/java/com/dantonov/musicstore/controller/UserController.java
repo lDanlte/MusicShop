@@ -3,6 +3,7 @@ package com.dantonov.musicstore.controller;
 import com.dantonov.musicstore.dto.TradeHistoryDto;
 import com.dantonov.musicstore.dto.UserDto;
 import com.dantonov.musicstore.entity.Album;
+import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.TradeHistory;
@@ -48,7 +49,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class UserController {
     
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private static final String USER_ROLE = "USER";
+    private static final String USER_ROLE = "User";
+    private static final String AUTHOR_ROLE = "Author";
+    private static final String ADMIN_ROLE = "Admin";
     private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     
     @Autowired
@@ -67,8 +70,21 @@ public class UserController {
     @RequestMapping(value = "/{login}", method = RequestMethod.GET)
     public ModelAndView dashboard(@PathVariable("login") String login, ModelAndView modelAndView) {
         
-        modelAndView.addObject("isAdmin", true);
-        modelAndView.addObject("isAuthor", true);
+        User user = userService.findByLogin(login);
+        if (user == null) {
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+        boolean isAdmin  = false,
+                isAuthor = false;
+        for (Role role : user.getRoles()) {
+            switch (role.getRole()) {
+                case AUTHOR_ROLE: { isAuthor = true; break; }
+                case ADMIN_ROLE: { isAdmin = true; break; }
+            }
+        }
+        modelAndView.addObject("isAdmin", isAdmin);
+        modelAndView.addObject("isAuthor", isAuthor);
         
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
@@ -81,16 +97,28 @@ public class UserController {
     @RequestMapping(value = "/{login}/boughtAlbums", method = RequestMethod.GET)
     public ModelAndView albums(@PathVariable("login") String login, ModelAndView modelAndView) {
         
+        User user = userService.findByLogin(login);
+        if (user == null) {
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+        
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
         
-        Map<String, Integer> map = new LinkedHashMap<>();
-        map.put("AuthorName_1", 5);
-        map.put("AuthorName_2", 8);
-        map.put("AuthorName_3", 2);
-        map.put("AuthorName_4", 3);
-        map.put("AuthorName_5", 2);
-        map.put("AuthorName_6", 19);
+        Map<String, List<Album>> map = new LinkedHashMap<>();
+        
+        for (Album album : user.getAlbums()) {
+            Author author = album.getAuthor();
+            if (map.containsKey(author.getName())) {
+                map.get(author.getName()).add(album);
+            } else {
+                List<Album> albums = new ArrayList<>();
+                albums.add(album);
+                map.put(author.getName(), albums);
+            }
+        }
+        
         modelAndView.addObject("dataMap", map);
         
         modelAndView.setViewName("index");

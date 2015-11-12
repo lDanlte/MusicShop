@@ -3,6 +3,7 @@ package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.Track;
 import com.dantonov.musicstore.repository.TrackRepository;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,10 @@ public class TrackService {
     
     public Track findById(UUID id) {
         return trackRepository.findOne(id);
+    }
+    
+    public List<Track> searchByName(String namePattern) {
+        return trackRepository.findByNameContainingIgnoreCase(namePattern);
     }
     
     @Transactional

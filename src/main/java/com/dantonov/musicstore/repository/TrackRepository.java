@@ -2,6 +2,7 @@
 package com.dantonov.musicstore.repository;
 
 import com.dantonov.musicstore.entity.Track;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 
@@ -11,4 +12,6 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface TrackRepository extends CrudRepository<Track, UUID>{
 
+    List<Track> findByNameContainingIgnoreCase(String name);
+    
 }

@@ -13,9 +13,7 @@ $('.jcarousel').each(function() {
     });
 });
 
-function albumPage(elem) {
-    var e = $(elem);
-    //some stuff doing here
-    location = location + "#";
+function albumPage(author, album) {
+    location = MAIN_URL + "author/" + author + "/album/" + album;
 }
 

@@ -2,6 +2,7 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.dto.AuthorDto;
 import com.dantonov.musicstore.dto.UserDto;
+import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.Role;
@@ -14,6 +15,7 @@ import com.dantonov.musicstore.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,6 +46,12 @@ public class AuthorController {
     private static final Logger log = LoggerFactory.getLogger(AuthorController.class);
     private static final String USER_ROLE = "User";
     private static final String AUTHOR_ROLE = "Author";
+    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
+    static {
+        DEC_FORMAT.setMaximumFractionDigits(2);
+        DEC_FORMAT.setMinimumFractionDigits(2);
+        DEC_FORMAT.setGroupingUsed(false);
+    }
 
     
     @Autowired
@@ -63,16 +71,26 @@ public class AuthorController {
     
     
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
-    public ModelAndView getAuthor(ModelAndView modelAndView) {
+    public ModelAndView getAuthor(@PathVariable("name") String authorName,
+                                  ModelAndView modelAndView) {
+        
+        Author author = authorService.findByName(authorName);
+        if (author == null) {
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+        
         modelAndView.addObject("pageContextStr", "author");
         
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
         
-        Map<String, Integer> map = new LinkedHashMap<>();
-        map.put("Последние добавленные", 1);
-        map.put("Топ продаж", 2);
+        Map<String, List<Album>> map = new LinkedHashMap<>();
+        map.put("Альбомы", author.getAlbums());
         modelAndView.addObject("dataMap", map);
+        
+        modelAndView.addObject("author", author);
+        modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("index");
         

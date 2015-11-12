@@ -35,7 +35,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <div class="col-sm-6 col-md-6">
-                <form class="navbar-form" role="search">
+                <form class="navbar-form" role="search" action="<c:url value="/search"/>">
                     <div class="input-group col-sm-8 col-md-6">
                         <input type="text" class="form-control" placeholder="Поиск по группам, альбомам, музыке" name="q">
                         <div class="input-group-btn">
@@ -62,7 +62,7 @@
     
     <div class="container-fluid">
         
-        <c:if test="${authors != null}">
+        
             
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
@@ -73,30 +73,40 @@
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
                 <div class="col-lg-8 col-md-8 col-sm-10 carouset-content">
-                    <div class='jcarousel-wrapper'>
-                        <div  class="jcarousel">
-                            <ul>
+                    
+                    <c:choose>
+                        
+                     <c:when test="${not empty authors}">
+                         
+                        <div class='jcarousel-wrapper'>
+                            <div  class="jcarousel">
+                                <ul>
 
-                                <c:forEach begin="0" end="${authors}">
-                                    <li>
-                                        <div class="album" onclick="albumPage(this);">
-                                            <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" height="160">
-                                            <h5 style="margin-top: 10px;">Author name</h5>
-                                        </div>
-                                    </li>
-                                </c:forEach>
-                            </ul>
-                            <button class="jcarousel-prev"><</button>
-                            <button class="jcarousel-next">></button>
+                                    <c:forEach  items="${authors}" var="author">
+                                        <li>
+                                            <div class="album" onclick="authorPage('${author.name}'});">
+                                                <img src="<c:url value="/resource/${author.name}/cover.jpg"/>" alt="${author.name}" height="160">
+                                                <h5 style="margin-top: 10px;">${author.name}</h5>
+                                            </div>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                                <button class="jcarousel-prev"><</button>
+                                <button class="jcarousel-next">></button>
+                            </div>
                         </div>
-                    </div>
+                         
+                     </c:when>
+                     
+                        <c:otherwise>Не найдено</c:otherwise>
+                        
+                    </c:choose>
+                    
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
         
-        </c:if>
         
-        <c:if test="${albums != null}">
             
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
@@ -107,32 +117,42 @@
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
                 <div class="col-lg-8 col-md-8 col-sm-10 carouset-content">
-                    <div class='jcarousel-wrapper'>
-                        <div  class="jcarousel">
-                            <ul>
+                    
+                    <c:choose>
+                        
+                        <c:when test="${not empty albums}">
+                            
+                            <div class='jcarousel-wrapper'>
+                                <div  class="jcarousel">
+                                    <ul>
 
-                                <c:forEach begin="0" end="${albums}">
-                                    <li>
-                                        <div class="album" onclick="albumPage(this);">
-                                            <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" width="160" height="160">
-                                            <h5 style="margin-top: 10px;">Eat Me, Drink Me</h5>
-                                            <h5 ><small><a href="#" style="color: #777;">Marilyn Manson</a></small></h5>
-                                            <p class="text-right">45.00 руб</p>
-                                        </div>
-                                    </li>
-                                </c:forEach>
-                            </ul>
-                            <button class="jcarousel-prev"><</button>
-                            <button class="jcarousel-next">></button>
-                        </div>
-                    </div>
+                                        <c:forEach items="${albums}" var="album">
+                                            <li>
+                                                <div class="album" onclick="albumPage('${album.author.name}','${album.title}');">
+                                                    <img src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" alt="${album.title}" width="160" height="160">
+                                                    <h5 style="margin-top: 10px;">${album.title}</h5>
+                                                    <h5 ><small><a href="<c:url value="/author/${album.author.name}"/>" style="color: #777;">${album.author.name}</a></small></h5>
+                                                    <p class="text-right">${format.format(album.price)} руб</p>
+                                                </div>
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                    <button class="jcarousel-prev"><</button>
+                                    <button class="jcarousel-next">></button>
+                                </div>
+                            </div>
+                    
+                        </c:when>
+                        
+                        <c:otherwise>Не найдено</c:otherwise>
+                    
+                    </c:choose>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
         
-        </c:if>
         
-        <c:if test="${tracks != null}">
+        
             
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
@@ -143,29 +163,40 @@
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
                 <div class="col-lg-8 col-md-8 col-sm-10 carouset-content">
-                    <div class='jcarousel-wrapper'>
-                        <div  class="jcarousel">
-                            <ul>
+                    
+                    <c:choose>
+                        
+                        <c:when test="${not empty tracks}">
+                    
+                            <div class='jcarousel-wrapper'>
+                                <div  class="jcarousel">
+                                    <ul>
 
-                                <c:forEach begin="0" end="${tracks}">
-                                    <li>
-                                        <div class="album" onclick="albumPage(this);">
-                                            <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" width="160" height="160">
-                                            <h5 style="margin-top: 10px;">Track Name</h5>
-                                            <h5 ><small><a href="#" style="color: #777;">Marilyn Manson</a></small></h5>
-                                        </div>
-                                    </li>
-                                </c:forEach>
-                            </ul>
-                            <button class="jcarousel-prev"><</button>
-                            <button class="jcarousel-next">></button>
-                        </div>
-                    </div>
+                                        <c:forEach items="${tracks}" var="track">
+                                            <li>
+                                                <div class="album" onclick="albumPage('${track.album.author.name}' ,'${track.album.title}');">
+                                                    <img src="<c:url value="/resource/${track.album.author.name}/${track.album.title}/cover.jpg"/>" alt="${track.name}" width="160" height="160">
+                                                    <h5 style="margin-top: 10px;">${track.name}</h5>
+                                                    <h5 ><small><a href="#" style="color: #777;">${track.album.author.name}</a></small></h5>
+                                                </div>
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                    <button class="jcarousel-prev"><</button>
+                                    <button class="jcarousel-next">></button>
+                                </div>
+                            </div>
+                        
+                        </c:when>
+                        
+                        <c:otherwise>Не найдено</c:otherwise>
+                        
+                  </c:choose> 
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
         
-        </c:if>
+        
          
         
     </div>

@@ -2,11 +2,13 @@
 package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.Album;
+import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.repository.AlbumRepository;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -46,11 +48,35 @@ public class AlbumService {
     }
     
     public Album findByTitleAndAuthor(String title, String authorName) {
-        return albumRepository.findByTitleAndAuthor_Name(title, title);
+        return albumRepository.findByTitleAndAuthor_Name(title, authorName);
     }
     
     public List<Album> findNextPage(Pageable pageable) {
         return albumRepository.findAll(pageable);
+    }
+    
+    public List<Album> getLastAdded() {
+        return albumRepository.findTop20ByOrderByAddDateDesc();
+    }
+    
+    public List<Album> getTopSales() {
+        return albumRepository.findTop20ByOrderByQSoldDesc();
+    }
+    
+    public List<Album> searchByTitle(String titlePattern) {
+        return albumRepository.findByTitleContainingIgnoreCase(titlePattern);
+    }
+    
+    public List<Album> getLastAddedByGenre(Genre genre) {
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+        return albumRepository.findTop20ByGenresOrderByAddDateDesc(genres);
+    }
+    
+    public List<Album> getTopSalesByGenre(Genre genre) {
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+        return albumRepository.findTop20ByGenresOrderByQSoldDesc(genres);
     }
     
     @Transactional

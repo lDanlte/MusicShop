@@ -35,7 +35,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <div class="col-sm-6 col-md-6">
-                <form class="navbar-form" role="search">
+                <form class="navbar-form" role="search" action="<c:url value="/search"/>" >
                     <div class="input-group col-sm-8 col-md-6">
                         <input type="text" class="form-control" placeholder="Поиск по группам, альбомам, музыке" name="q">
                         <div class="input-group-btn">
@@ -103,10 +103,10 @@
                         <div class="jumbotron carouset-content" style="padding: 5px;">
                             <div class="conteiner">
                                 <div class="row">
-                                    <img class="img-rounded" src="<c:url value="/image/music.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
+                                    <img class="img-rounded" src="<c:url value="/resource/${author.name}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
 
-                                    <h4><strong class="margintext">Author's Name</strong></h4>
-                                    <p><h4><em><small class="margintext">desc</small></em></h4>
+                                    <h4><strong class="margintext">${author.name}</strong></h4>
+                                    <p><h4><em><small class="margintext">${author.desc}</small></em></h4>
                             <!--/row-->
 
                                 </div>
@@ -130,25 +130,37 @@
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
                 <div class="col-lg-8 col-md-8 col-sm-10 carouset-content">
-                    <div class='jcarousel-wrapper'>
-                        <div  class="jcarousel">
-                            <ul>
+                    
+                    <c:choose>
+                        
+                        <c:when test="${not empty entry.value}">
+                    
+                            <div class='jcarousel-wrapper'>
+                                <div  class="jcarousel">
+                                    <ul>
 
-                                <c:forEach begin="0" end="${entry.value}">
-                                    <li>
-                                        <div class="album" onclick="albumPage(this);">
-                                            <img src="<c:url value="/resource/cover.jpg"/>" alt="Eat Me, Drink Me" width="160" height="160">
-                                            <h5 style="margin-top: 10px;">Eat Me, Drink Me</h5>
-                                            <h5 ><small><a href="#" style="color: #777;">Marilyn Manson</a></small></h5>
-                                            <p class="text-right">45.00 руб</p>
-                                        </div>
-                                    </li>
-                                </c:forEach>
-                            </ul>
-                            <button class="jcarousel-prev"><</button>
-                            <button class="jcarousel-next">></button>
-                        </div>
-                    </div>
+                                        <c:forEach items="${entry.value}" var="album">
+                                            <li>
+                                                <div class="album" onclick="albumPage('${album.author.name}','${album.title}');">
+                                                    <img src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" alt="${album.title}" width="160" height="160">
+                                                    <h5 style="margin-top: 10px;">${album.title}</h5>
+                                                    <h5 ><small><a href="<c:url value="/author/${album.author.name}"/>" style="color: #777;">${album.author.name}</a></small></h5>
+                                                    <p class="text-right">${format.format(album.price)} руб</p>
+                                                </div>
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                    <button class="jcarousel-prev"><</button>
+                                    <button class="jcarousel-next">></button>
+                                </div>
+                            </div>
+                            
+                        </c:when>
+                        
+                        <c:otherwise>Не найдено</c:otherwise>
+                    
+                    </c:choose>
+                    
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
