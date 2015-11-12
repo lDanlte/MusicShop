@@ -2,10 +2,11 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.service.GenreService;
-import java.util.ArrayList;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

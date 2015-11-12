@@ -198,7 +198,7 @@
                                   <div style="display: inline-block; max-width: 125px;" >
                                       <div class="input-group">
                                           <input type="text" class="form-control" size="7" />
-                                      <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-rub"></i></span>
+                                          <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-rub"></i></span>
                                       </div>
                                   </div>
                                   
@@ -323,6 +323,27 @@
                                               <input id="releaseDate" name="releaseDate" type="text" class="form-control datepicker" style="max-width: 110px;" />
                                           </div>
                                         </div>
+                                        
+                                        <div class="control-group" style="margin-top: 10px;">
+                                          <label class="control-label" for="albumGenres">Жанр(ы): </label>
+                                          <div class="controls">
+                                              <select id="albumGenres" class="input-sm form-control" title="Категории" multiple="true">
+                                                    <c:forEach items="${genres}" var="genre" varStatus="status">
+                                                        <option value="${genre.id}">${genre.name}</option>
+                                                    </c:forEach>
+                                                </select>
+                                          </div>
+                                        </div>
+                                        
+                                        <div class="control-group" style="margin-top: 10px;">
+                                          <label class="control-label" for="albumPrice">Цена: </label>
+                                          <div class="controls">
+                                              <div class="input-group">
+                                                  <input id="albumPrice" type="text" class="form-control" size="7" />
+                                                <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-rub"></i></span>
+                                              </div>
+                                          </div>
+                                        </div>
 
                                         <div class="control-group" style="margin-top: 10px;">
                                           <label class="control-label" for="albumDesc">Описание альбома: </label>
@@ -357,7 +378,7 @@
                                 </button>  
                             </div>
                             <div class="row" style="margin-top: 10px;  margin-left: 15px;">
-                                <button type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px;">Сохранить</button>
+                                <button id="createAlbum" type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px;">Сохранить</button>
                              </div>
                         </div>
 
@@ -534,6 +555,9 @@
     <script type="text/javascript" src="<c:url value="/lib/js/dashboard.js"/>"></script>
     <c:if test="${isAdmin == true}">
         <script type="text/javascript" src="<c:url value="/lib/js/dashboardAdmin.js"/>"></script>
+    </c:if>
+    <c:if test="${isAuthor == true}">
+        <script type="text/javascript" src="<c:url value="/lib/js/dashboardAuthor.js"/>"></script>
     </c:if>
     
 </body>

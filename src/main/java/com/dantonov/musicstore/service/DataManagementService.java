@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
@@ -63,6 +64,57 @@ public class DataManagementService {
         
         logger.info("Получен файл: имя = {}; исходное имя = {}; тип = {};  размер = {} Кб.", file.getName(),
                     file.getOriginalFilename(), file.getContentType(), file.getSize() >> 10);
+        
+    }
+    
+    
+    public void saveAlbumData(String authorName, String albumTitle,
+                              MultipartFile cover, MultipartFile[] audioFiles) {
+        
+        StringBuilder path = new StringBuilder(storagePath);
+        path.append(authorName).append('/').append(albumTitle);
+        
+        File fileSys = new File(path.toString());
+        if (!fileSys.exists()) {
+            fileSys.mkdir();
+        }
+        
+        path.append("/%s%s");
+        String pathPattern = path.toString();
+        
+        
+        String fileType = cover.getOriginalFilename();
+        fileType = fileType.substring(fileType.lastIndexOf('.'));
+        String coverPath = String.format(pathPattern, "cover", fileType);
+        
+        try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(new File(coverPath)))) {
+            
+            buffStream.write(cover.getBytes());
+            logger.info("Получен файл: исходное имя = {}; тип = {};  размер = {} Кб.", 
+                    cover.getOriginalFilename(), cover.getContentType(), cover.getSize() >> 10);
+            
+        } catch (FileNotFoundException ex) {
+            logger.warn("Что-то пошло не так с сохранением обложки альбома", ex);
+        } catch (IOException ex) {
+             logger.warn("Что-то пошло не так с сохранением обложки альбома", ex);
+        }
+        
+        for (byte i = 0; i < audioFiles.length; i++) {
+            MultipartFile audioFile =  audioFiles[i];
+            fileType = audioFile.getOriginalFilename();
+            fileType = fileType.substring(fileType.lastIndexOf('.'));
+            String audioPath = String.format(pathPattern, Byte.toString(i), fileType);
+            
+            try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(new File(audioPath)))) {
+                buffStream.write(audioFile.getBytes());
+                logger.info("Получен файл: исходное имя = {}; тип = {};  размер = {} Кб.", 
+                    audioFile.getOriginalFilename(), audioFile.getContentType(), audioFile.getSize() >> 10);
+            } catch (FileNotFoundException ex) {
+                logger.warn("Что-то пошло не так с сохранением аудио файла", ex);
+            } catch (IOException ex) {
+                 logger.warn("Что-то пошло не так с сохранением обложки аудио файла", ex);
+            }
+        }
         
     }
     

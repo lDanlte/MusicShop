@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -34,6 +35,7 @@ public class AuthorService {
         return authorRepository.findAll(pageable);
     }
     
+    @Transactional
     public Author save(Author author) {
         return authorRepository.save(author);
     }

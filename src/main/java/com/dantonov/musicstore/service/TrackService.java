@@ -6,6 +6,7 @@ import com.dantonov.musicstore.repository.TrackRepository;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -24,6 +25,7 @@ public class TrackService {
         return trackRepository.findOne(id);
     }
     
+    @Transactional
     public Track save(Track track) {
         return trackRepository.save(track);
     }

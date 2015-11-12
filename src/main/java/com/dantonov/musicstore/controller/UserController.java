@@ -7,10 +7,12 @@ import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
+import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.RoleService;
 import com.dantonov.musicstore.service.TradeHistoryService;
 import com.dantonov.musicstore.service.UserService;
+
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,8 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -41,9 +45,9 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller("UserController")
 @RequestMapping(value = "/user")
 public class UserController {
-
-    private static final String USER_ROLE = "USER";
     
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+    private static final String USER_ROLE = "USER";
     private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     
     @Autowired
@@ -59,8 +63,8 @@ public class UserController {
     private TradeHistoryService historyService;
     
     
-    @RequestMapping(value = "/{userName}", method = RequestMethod.GET)
-    public ModelAndView dashboard(@PathVariable("userName") String user, ModelAndView modelAndView) {
+    @RequestMapping(value = "/{login}", method = RequestMethod.GET)
+    public ModelAndView dashboard(@PathVariable("login") String login, ModelAndView modelAndView) {
         
         modelAndView.addObject("isAdmin", true);
         modelAndView.addObject("isAuthor", true);
@@ -134,20 +138,18 @@ public class UserController {
     public void addMoney(@RequestParam("value") String value, @PathVariable("login") String login) {
         
         User user = userService.findByLogin(login);
-        BigDecimal cash = user.getWallet();
-        BigDecimal newValue = new BigDecimal(value); //maybe exception
-        user.setWallet(cash.add(newValue));
-        userService.update(user);
+        userService.addCash(user, new BigDecimal(value));
         
     }
     @RequestMapping(value = "/{login}/discountMoney", method = RequestMethod.PUT)
     public void discountMoney(@RequestParam("value") String value, @PathVariable("login") String login) {
         
-        User user = userService.findByLogin(login);
-        BigDecimal cash = user.getWallet();
-        BigDecimal newValue = new BigDecimal(value); //maybe exception
-        user.setWallet(cash.divide(newValue, 2, BigDecimal.ROUND_FLOOR));
-        userService.update(user);
+        try {
+            User user = userService.findByLogin(login);
+            userService.discountCash(user, new BigDecimal(value));
+        } catch (NotEnoughMoneyException ex) {
+            log.warn("У пользователя недостаточно денег для вывода.");
+        }
         
     }
     
@@ -171,7 +173,7 @@ public class UserController {
             
             return getTHDto(tradeHistories);
         } catch (ParseException ex) {
-            Logger.getLogger(UserController.class.getName()).log(Level.SEVERE, null, ex);
+            log.warn("Задан неправельный формат даты.");
         }
         
         return null;

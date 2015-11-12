@@ -10,6 +10,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -41,6 +42,7 @@ public class TradeHistoryService {
         return historyRepository.findAll(pageable);
     }
     
+    @Transactional
     public TradeHistory save(TradeHistory tradeHistory) {
         return historyRepository.save(tradeHistory);
     }

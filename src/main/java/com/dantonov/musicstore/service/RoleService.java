@@ -5,6 +5,7 @@ import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -31,6 +32,7 @@ public class RoleService {
         return roleRepository.findByRole(name);
     }
     
+    @Transactional
     public Role save(Role role) {
         return roleRepository.save(role);
     }

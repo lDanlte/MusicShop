@@ -162,6 +162,15 @@
             <version>${slf4j.version}</version>
         </dependency>
         
+        
+        <!--Parsing mp3 files-->
+        <dependency>
+            <groupId>org</groupId>
+            <artifactId>jaudiotagger</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+
+        
         <!--JUnit Test-->
         <dependency>
             <groupId>junit</groupId>

@@ -17,7 +17,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
 import javax.persistence.Table;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -46,12 +50,14 @@ public class User {
     @Column(name = "wallet", columnDefinition = "money", scale = 2)
     private BigDecimal wallet;
     
+    @Cascade(CascadeType.ALL)
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, targetEntity = Author.class)
     private Author author;
     
     @ManyToMany(mappedBy = "users", targetEntity = Role.class)
     private Set<Role> roles;
     
+    @PersistenceContext(type = PersistenceContextType.EXTENDED)
     @ManyToMany(targetEntity = Album.class)
     @JoinTable(name = "Users_to_Albums",
                joinColumns = @JoinColumn(name = "user_id", nullable = false),
@@ -59,6 +65,7 @@ public class User {
     @OrderBy("title")
     private List<Album> albums;
     
+    @Cascade(CascadeType.ALL)
     @OneToMany(mappedBy = "user", targetEntity = TradeHistory.class)
     @OrderBy("datetime desc")
     private List<TradeHistory> historys;
