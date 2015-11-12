@@ -100,8 +100,8 @@ public class AuthorController {
     }
     
     @RequestMapping(value = "/{name}/update", method = RequestMethod.PUT)
-    public void updateAuthor(@RequestParam(value = "Desc", required = false) String desc, 
-                             @RequestParam(value = "image", required = false) MultipartFile file,
+    public void updateAuthor(@RequestParam(value = "desc", required = false) String desc, 
+                             @RequestParam(value = "cover") MultipartFile file,
                              @PathVariable("name") String authorName) {
         try {
             Author author = authorService.findByName(authorName);
@@ -111,14 +111,34 @@ public class AuthorController {
                 authorService.save(author);
             }
             
-            if (file != null) {
+            if (file != null && !file.isEmpty()) {
                 dataService.saveAuthorCover(authorName, file);
             }
             
         } catch (Exception ex) {
-            //TODO
+            log.warn("Ошибка при обновлении даннах группы", ex);
         }
     }
+    
+    
+    
+    @RequestMapping(value = "/{name}/update", method = RequestMethod.POST)
+    public void updateAuthor(@RequestParam(value = "desc", required = false) String desc,
+                             @PathVariable("name") String authorName) {
+        try {
+            Author author = authorService.findByName(authorName);
+            
+            if (desc != null) {
+                author.setDesc(desc);
+                authorService.save(author);
+            }
+            
+            
+        } catch (Exception ex) {
+            log.warn("Ошибка при обновлении даннах группы", ex);
+        }
+    }
+    
     
     private User createUser(UserDto userDto) {
         User user = new User();
@@ -126,10 +146,15 @@ public class AuthorController {
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPass());
         
-        Set<Role> genres = new HashSet<>();
-        genres.add(roleService.findByName(USER_ROLE));
-        genres.add(roleService.findByName(AUTHOR_ROLE));
-        user.setRoles(genres);
+        Set<Role> roles = new HashSet<>();
+        Role role = roleService.findByName(USER_ROLE);
+        role.getUsers().add(user);
+        roles.add(role);
+        role = roleService.findByName(AUTHOR_ROLE);
+        role.getUsers().add(user);
+        roles.add(role);
+        roles.add(role);
+        user.setRoles(roles);
         
         return user;
     }

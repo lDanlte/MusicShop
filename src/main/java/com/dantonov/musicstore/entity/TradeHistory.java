@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -30,11 +31,11 @@ public class TradeHistory {
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
     
-    @Column(name = "price", columnDefinition = "money", nullable = false, updatable = false)
+    @Column(name = "price", columnDefinition = "money", nullable = false, updatable = false, scale = 2)
     private BigDecimal price;
     
     @Column(name = "datetime", columnDefinition = "datetime")
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date datetime;
     
     @ManyToOne(targetEntity = Action.class)

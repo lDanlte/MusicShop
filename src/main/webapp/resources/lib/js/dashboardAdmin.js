@@ -1,5 +1,5 @@
 
-$("#createAuthorButton").on("click", function() {
+function createAuthor() {
    var name =  $("#authorName").val(),
        email = $("#authorEmail").val(),
        login = $("#authorLogin").val(),
@@ -42,6 +42,6 @@ $("#createAuthorButton").on("click", function() {
         }
     });
     
-});
+}
 
 

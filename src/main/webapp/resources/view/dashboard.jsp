@@ -161,7 +161,7 @@
                                           <td>Сумма, руб.</td>
                                       </tr>
                                   </thead>
-                                  <tbody>
+                                  <tbody id="historyTableBody">
                                       <tr>
                                           <td>21.10.2015 15:00:00</td>
                                           <td>Пополнение счета</td>
@@ -197,13 +197,13 @@
                                     </div>
                                   <div style="display: inline-block; max-width: 125px;" >
                                       <div class="input-group">
-                                          <input type="text" class="form-control" size="7" />
+                                          <input id="addCash" type="text" class="form-control" size="7" />
                                           <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-rub"></i></span>
                                       </div>
                                   </div>
                                   
                                   <div  style="display: inline-block; margin-left: 10px;">
-                                    <button type="button" class="btn btn-info btn-sm" onclick="showHistoryTable();">Пополнить</button>
+                                    <button type="button" class="btn btn-info btn-sm" onclick="addCash();">Пополнить</button>
                                   </div>
                               </div>
                           </div>
@@ -271,7 +271,7 @@
                                     </div>
 
                                     </fieldset>
-                              <button id="createAuthorButton" type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
+                              <button id="createAuthorButton" type="button" onclick="createAuthor();" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
                           </form>
                         </div>
                     
@@ -287,19 +287,19 @@
                                 <fieldset>
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                        <label for="exampleInputFile">Новый постер группы</label>
-                                        <input type="file" id="inputFile" accept="image/*">
+                                        <label for="updateCover">Новый постер группы</label>
+                                        <input type="file" id="updateCover" accept="image/*">
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                      <label class="control-label" for="authorDesc">Новое описание группы: </label>
+                                      <label class="control-label" for="updateDesc">Новое описание группы: </label>
                                       <div class="controls">
-                                          <textarea id="authorDesc" name="authorDesc" class="form-control" rows="3" placeholder="Описание..." required=""></textarea>
+                                          <textarea id="updateDesc" name="updateDesc" class="form-control" rows="3" placeholder="Описание..." required=""></textarea>
                                       </div>
                                     </div>
 
                                     </fieldset>
-                              <button type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
+                                <button type="button" onclick="updateAuthor();" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
                           </form>
                         </div>
 
@@ -378,7 +378,7 @@
                                 </button>  
                             </div>
                             <div class="row" style="margin-top: 10px;  margin-left: 15px;">
-                                <button id="createAlbum" type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px;">Сохранить</button>
+                                <button id="createAlbum" type="button" onclick="createAlbum();" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px;">Сохранить</button>
                              </div>
                         </div>
 
@@ -431,13 +431,13 @@
                                         </div>
                                       <div style="display: inline-block; max-width: 125px;" >
                                           <div class="input-group">
-                                              <input type="text" class="form-control" size="7" />
+                                              <input id="discountCash" type="text" class="form-control" size="7" />
                                           <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-rub"></i></span>
                                           </div>
                                       </div>
 
                                       <div  style="display: inline-block; margin-left: 10px;">
-                                        <button type="button" class="btn btn-info btn-sm">Снять</button>
+                                          <button type="button" onclick="discountCash();" class="btn btn-info btn-sm">Снять</button>
                                       </div>
                                   </div>
                               </div>

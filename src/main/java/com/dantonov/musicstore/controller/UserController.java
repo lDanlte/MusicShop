@@ -14,6 +14,7 @@ import com.dantonov.musicstore.service.TradeHistoryService;
 import com.dantonov.musicstore.service.UserService;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -187,11 +188,16 @@ public class UserController {
         
         List<TradeHistoryDto> result = new ArrayList<>();
         
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        df.setMinimumFractionDigits(2);
+        df.setGroupingUsed(false);
+        
         for (TradeHistory th : ths) {
             TradeHistoryDto thDto = new TradeHistoryDto();
             
             thDto.setDatetime(th.getDatetime());
-            thDto.setPrice(th.getPrice().toString());
+            thDto.setPrice(df.format(th.getPrice()));
             thDto.setAction(th.getAction().getDesc());
             
             Album album = th.getAlbum();

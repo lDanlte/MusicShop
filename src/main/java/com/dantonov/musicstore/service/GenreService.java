@@ -21,7 +21,7 @@ public class GenreService {
     
     
     
-    public Genre findById(Byte id) {
+    public Genre findById(Integer id) {
         return genreRepository.findOne(id);
     }
     

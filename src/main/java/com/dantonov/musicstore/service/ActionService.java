@@ -19,7 +19,7 @@ public class ActionService {
     
     
     
-    public Action findById(Byte id) {
+    public Action findById(Integer id) {
         return actionRepository.findOne(id);
     }
     

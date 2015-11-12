@@ -13,7 +13,6 @@ import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.UserService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.BufferedInputStream;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -22,11 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
+
 import javax.sound.sampled.UnsupportedAudioFileException;
-import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.ByteArrayMP3AudioHeader;
 
 import org.slf4j.Logger;
@@ -123,7 +119,7 @@ public class AlbumController {
             
             ObjectMapper mapper = new ObjectMapper();
             AlbumDto albumDto = mapper.readValue(albumDtoStr, AlbumDto.class);
-            Album album = createAlbum(albumDto);
+            Album album = createAlbum(albumDto, author);
             album.setAuthor(author);
             album.setTracks(createTrackList(albumDto.getSongsTitles(), tracks, album));
             
@@ -147,7 +143,7 @@ public class AlbumController {
     }
     
     
-    private Album createAlbum(AlbumDto albumDto) throws ParseException {
+    private Album createAlbum(AlbumDto albumDto, Author author) throws ParseException {
         Album result = new Album();
         
         result.setDesc(albumDto.getDesc());
@@ -159,10 +155,11 @@ public class AlbumController {
         String[] genreIds =  albumDto.getGenresIds().split(",");
         List<Genre> genres = new ArrayList<>();
         for(String genreId : genreIds) {
-            Genre genre = genreService.findById(Byte.parseByte(genreId));
+            Genre genre = genreService.findById(Integer.parseInt(genreId));
             if (genre == null) {
-                throw new NullPointerException("Жанр с id = " + Byte.parseByte(genreId) + " не найден.");
+                throw new NullPointerException("Жанр с id = " + Integer.parseInt(genreId) + " не найден.");
             }
+            genre.getAlbums().add(result);
             genres.add(genre);
         }
         

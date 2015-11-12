@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AlbumService {
     
-    private static final Byte BUY_ACTION = 1;
+    private static final Integer BUY_ACTION = 1;
     
     @Autowired
     protected AlbumRepository albumRepository;
@@ -71,10 +71,12 @@ public class AlbumService {
         history.setDatetime(new Date());
         historyService.save(history);
         
-        long qSold = album.getqSold();
-        qSold++;
-        album.setqSold(qSold);
-        albumRepository.save(album);
+        if (price.compareTo(BigDecimal.ZERO) != 0) {
+            long qSold = album.getqSold();
+            qSold++;
+            album.setqSold(qSold);
+            albumRepository.save(album);
+        }
     }
     
     @Transactional
@@ -83,5 +85,9 @@ public class AlbumService {
         album.setAddDate(new Date());
         return albumRepository.save(album);
     }
+    
+     public Album update(Album album) {
+         return albumRepository.save(album);
+     }
 
 }

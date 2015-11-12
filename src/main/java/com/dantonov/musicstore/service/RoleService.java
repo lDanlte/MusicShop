@@ -20,7 +20,7 @@ public class RoleService {
     
     
     
-    public Role findById(Byte id) {
+    public Role findById(Integer id) {
         return roleRepository.findOne(id);
     }
     

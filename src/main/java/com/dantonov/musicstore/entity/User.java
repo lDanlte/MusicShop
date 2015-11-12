@@ -54,10 +54,11 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, targetEntity = Author.class)
     private Author author;
     
+    @Cascade(CascadeType.ALL)
     @ManyToMany(mappedBy = "users", targetEntity = Role.class)
     private Set<Role> roles;
     
-    @PersistenceContext(type = PersistenceContextType.EXTENDED)
+    //@PersistenceContext(type = PersistenceContextType.EXTENDED)
     @ManyToMany(targetEntity = Album.class)
     @JoinTable(name = "Users_to_Albums",
                joinColumns = @JoinColumn(name = "user_id", nullable = false),

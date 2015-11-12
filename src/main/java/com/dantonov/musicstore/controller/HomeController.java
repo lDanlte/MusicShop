@@ -60,7 +60,7 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/category", method = RequestMethod.GET)
-    public ModelAndView categoryPage(@RequestParam("gid") Byte gid, ModelAndView modelAndView) {
+    public ModelAndView categoryPage(@RequestParam("gid") Integer gid, ModelAndView modelAndView) {
         
         Genre selectedGenre = genreService.findById(gid);
         if (selectedGenre == null) {

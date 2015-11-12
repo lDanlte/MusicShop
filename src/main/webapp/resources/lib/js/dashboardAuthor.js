@@ -1,4 +1,4 @@
-$("#createAlbum").on("click", function() {
+function createAlbum() {
    var name =  $("#albumName").val(),
        releaseDate = $("#releaseDate").val(),
        price = $("#albumPrice").val(),
@@ -26,15 +26,17 @@ $("#createAlbum").on("click", function() {
         genresIds: genres,
         songsTitles: trackNames
     }
-    
+    var author = "Tmp Group 6";
     var data = new FormData();
-    data.append("login", "test_group"); /////TMP DELETE AFTER ADDING SECURITY
+    data.append("login", "tmp_group_6"); /////TMP DELETE AFTER ADDING SECURITY
     data.append("album", JSON.stringify(album));
     data.append("cover", cover);
-    data.append("tracks", trackFiles)
+    for(var i = 1; i <= audioCount; i++) {
+      data.append("tracks[]", trackFiles[i - 1]);
+    }
     
     $.ajax({
-        url: MAIN_URL + "/author/Test Group/album/create",
+        url: MAIN_URL + "/author/" + author + "/album/create",
         data: data,
         cache: false,
         contentType: false,
@@ -48,8 +50,59 @@ $("#createAlbum").on("click", function() {
         }
     });
     
-});
+}
 
+
+function discountCash() {
+    var cash = $("#discountCash").val();
+    
+    var login = "tmp_group_6";
+    
+    $.ajax({
+        url: MAIN_URL + "/user/" + login + "/discountMoney" + "?value=" + cash ,
+        method: "PUT",
+        dataType: "json",
+        success: function (data) {
+            alert("success");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("error" + errorThrown);
+        }
+    });
+}
+
+function updateAuthor() {
+    var cover     = $("#updateCover")[0].files[0],
+        albumDesc = $("#updateDesc").val();
+
+     var type = "PUT";
+     
+    var data = new FormData();
+    if (cover !== undefined) {
+        data.append("cover", cover);
+    } else {
+        type = "POST";
+    }
+    if (albumDesc !== undefined) {
+        data.append("desc", albumDesc);
+    }
+
+    var author = "Tmp Group 6";
+    $.ajax({
+        url: MAIN_URL + "/author/" + author + "/update",
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: type,
+        success: function(){
+            alert("Урааааа!!!");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            alert("Упс..." + errorThrown);
+        }
+    });
+}
 
 var audioCount = 1;
 

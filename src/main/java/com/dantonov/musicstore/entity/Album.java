@@ -49,7 +49,7 @@ public class Album {
     private Date releaseDate;
     
     @Column(name = "add_date", columnDefinition = "datetime", nullable = false, updatable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date addDate;
     
     @Column(name = "description")
@@ -61,6 +61,7 @@ public class Album {
     @ManyToMany(mappedBy = "albums", targetEntity = User.class)
     private Set<User> users;
     
+    @Cascade(CascadeType.ALL)
     @ManyToMany(mappedBy = "albums", targetEntity = Genre.class)
     @OrderBy("name")
     private List<Genre> genres;

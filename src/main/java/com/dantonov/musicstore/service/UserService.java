@@ -20,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
     
-    private static final Byte ADD_CASH_ACTION = 2;
-    private static final Byte DISCOUNT_CASH_ACTION = 3;
+    private static final Integer ADD_CASH_ACTION = 2;
+    private static final Integer DISCOUNT_CASH_ACTION = 3;
     
     @Autowired
     protected UserRepository userRepository;
