@@ -175,15 +175,15 @@
         <p>&copy; Денис Антонов 2015</p>
     </footer>
     
-    <div id="popover-content-login" class="hide">
-        <form action="" role="form">
+    <div id="popover-content-login">
+        <form role="form">
             <div class="form-group">
               <label for="user">Логин</label>
-              <input type="text" class="form-control" id="user" placeholder="Логин" />
+              <input name="login" type="text" class="form-control" id="authLogin" placeholder="Логин" />
               <label for="password">Пароль</label>
-              <input type="password" class="form-control" id="password" placeholder="Пароль" />
+              <input name="pass" type="password" class="form-control" id="authPass" placeholder="Пароль" />
             </div>
-            <button type="submit" class="btn btn-default">Вход</button>
+            <button type="button" class="btn btn-default" onclick="auth();">Вход</button>
       </form>
     </div>
     

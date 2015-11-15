@@ -50,6 +50,9 @@ public class User {
     @Column(name = "wallet", columnDefinition = "money", scale = 2)
     private BigDecimal wallet;
     
+    @Column(name = "token", columnDefinition = "BINARY(16)")
+    private UUID token;
+    
     @Cascade(CascadeType.ALL)
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, targetEntity = Author.class)
     private Author author;
@@ -105,6 +108,9 @@ public class User {
     public BigDecimal getWallet() { return wallet; }
     public void setWallet(BigDecimal wallet) {  this.wallet = wallet; }
 
+    public UUID getToken() { return token; }
+    public void setToken(UUID token) { this.token = token; }
+    
     public Author getAuthor() { return author; }
     public void setAuthor(Author author) { this.author = author; }
 

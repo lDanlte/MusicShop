@@ -30,11 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -158,6 +160,20 @@ public class AlbumController {
         } catch (Exception ex) {
             log.warn("Ошибка при добавлени альбома. Xoxoxo.", ex);
         }
+    }
+    
+    @RequestMapping(value = "/{albumName}/track/{trackName}", 
+                    method = RequestMethod.GET)
+    @ResponseBody
+    public FileSystemResource getTrack(@PathVariable("authorName") String author,
+                                       @PathVariable("albumName") String album,
+                                       @PathVariable("trackName") String track) {
+        
+        FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, album, track));
+        if (!trackResource.exists()) {
+            return null;
+        }
+        return trackResource;
     }
     
     

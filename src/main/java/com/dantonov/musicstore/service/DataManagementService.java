@@ -118,4 +118,12 @@ public class DataManagementService {
         
     }
     
+    public File getTrack(String author, String album, String track) {
+        
+        StringBuilder path = new StringBuilder(storagePath);
+        path.append(author).append('/').append(album).append('/').append(track).append(".mp3");
+        
+        return new File(path.toString());
+    }
+    
 }

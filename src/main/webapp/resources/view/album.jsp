@@ -12,8 +12,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <c:set value="${album.author.name}" var="authorName"/>
+    <c:set value="${album.title}" var="albumName"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>${album.title}</title>
+    <title>${albumName}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Music online store">
     <meta name="author" content="Denis Antonov">
@@ -74,14 +76,14 @@
                 <div class="jumbotron carouset-content" style="padding: 5px;">
                     <div class="conteiner">
                         <div class="row">
-                            <img class="img-rounded" src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
+                            <img class="img-rounded" src="<c:url value="/resource/${authorName}/${albumName}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
 
-                            <h4><strong class="margintext" style="margin-top: 10px;">${album.title}</strong></h4>
+                            <h4><strong class="margintext" style="margin-top: 10px;">${albumName}</strong></h4>
 
                             <p>
                             <div class="margintext" style="display: inline;">
                                 <div style="display: inline-block;">
-                                    <h4><small><a href="<c:url value="/author/${album.author.name}"/>" class="acolor" style="color: #777;">${album.author.name}</a></small></h4>
+                                    <h4><small><a href="<c:url value="/author/${authorName}"/>" class="acolor" style="color: #777;">${authorName}</a></small></h4>
                                 </div>
                                 <div style="display: inline-block; margin-left: 15px;">
                                     <h5>${dateFormat.format(album.releaseDate)}</h5>
@@ -143,7 +145,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <c:forEach items="${album.tracks}" var="track">
+                                <c:forEach items="${albumName}" var="track">
                                 <tr>
                                     <td>${track.position}</td>
                                     <td>${track.name}</td>
@@ -324,7 +326,7 @@
                         <c:forEach items="${album.tracks}" var="track">
                             {
                                     title: "${track.name}",
-                                    mp3: "<c:url value="/resource/${album.author.name}/${album.title}/${track.position}.mp3"/>"
+                                    mp3: "<c:url value="/author/${authorName}/album/${albumName}/track/${track.position}.mp3"/>"
                             },
                         </c:forEach>        
                 ], {

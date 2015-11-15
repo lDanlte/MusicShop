@@ -53,3 +53,42 @@ function registration() {
     });
 
 }
+
+function auth() {
+    var login = $(".popover #authLogin").val(),
+        pass  = $(".popover #authPass").val(); //блядь, это какая-то магия. Если искать элемент по id, то val() возвращяет пустую строку.
+    var data = new FormData();
+        data.append("login", login);
+        data.append("pass", pass);
+
+    $.ajax({
+        url: MAIN_URL + "login",
+        method: "POST",
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: data,
+        success: function (data, textStatus, jqXHR) {
+            alert("YEP");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("UPS");
+        }
+    });
+    
+
+       /* var data = 'login=' + login + '&pass=' + pass;
+        $.ajax({
+            data: data,
+            type: 'POST',
+            url: MAIN_URL + '/auth'
+ 
+        }).done(function(data, textStatus, jqXHR) {
+            alert("zaasas");
+ 
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            alert("gdfgdfg");
+        });*/
+
+
+}

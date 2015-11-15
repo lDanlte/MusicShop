@@ -10,7 +10,7 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
  * @author Denis Antonov (den007230@gmail.com)
  */
 public class AppInit extends AbstractAnnotationConfigDispatcherServletInitializer {
-
+    
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class<?>[]{ DataConfig.class };

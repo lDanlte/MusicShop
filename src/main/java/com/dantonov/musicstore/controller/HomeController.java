@@ -1,5 +1,6 @@
 package com.dantonov.musicstore.controller;
 
+import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.service.AlbumService;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -109,4 +111,5 @@ public class HomeController {
         
         return modelAndView;
     }
+    
 }

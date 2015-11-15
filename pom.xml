@@ -13,7 +13,7 @@
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>4.2.2.RELEASE</spring.version>
-        <spring.data>1.9.0.RELEASE</spring.data>
+        <spring.data.version>1.9.0.RELEASE</spring.data.version>
         <fasterxml.version>2.6.1</fasterxml.version>
         <hibernate.version>4.3.11.Final</hibernate.version>
         <slf4j.version>1.7.12</slf4j.version>
@@ -33,6 +33,13 @@
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
             <scope>provided</scope>
+        </dependency>
+        
+        <!-- Encryption Library -->
+        <dependency>
+            <groupId>org.jasypt</groupId>
+            <artifactId>jasypt</artifactId>
+            <version>1.9.2</version>
         </dependency>
         
         
@@ -106,12 +113,12 @@
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
         </dependency>
-        
+         
         <!--Spring Data-->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jpa</artifactId>
-            <version>${spring.data}</version>
+            <version>${spring.data.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
