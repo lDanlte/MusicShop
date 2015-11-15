@@ -2,13 +2,7 @@ var MAIN_URL = "http://localhost:8084/MusicStore/";
 
 $("[data-toggle=popover]").popover({
     html: true, 
-    content: function() {
-        if ($("#login").html() == "Вход") {
-            return $('#popover-content-login').html();
-        } else {
-            return $("#popover-content-user").html();
-        }
-    }
+    content: $('#popover-content').html()
 });
 
 
@@ -69,26 +63,23 @@ function auth() {
         processData: false,
         data: data,
         success: function (data, textStatus, jqXHR) {
-            alert("YEP");
+            alert("Авторизация прошла успешно.");
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert("UPS");
+            alert("Auth faild.");
         }
     });
-    
+}
 
-       /* var data = 'login=' + login + '&pass=' + pass;
-        $.ajax({
-            data: data,
-            type: 'POST',
-            url: MAIN_URL + '/auth'
- 
-        }).done(function(data, textStatus, jqXHR) {
-            alert("zaasas");
- 
-        }).fail(function(jqXHR, textStatus, errorThrown) {
-            alert("gdfgdfg");
-        });*/
-
-
+function logout() {
+    $.ajax({
+        url: MAIN_URL + "logout",
+        method: "POST",
+        success: function (data, textStatus, jqXHR) {
+            alert("logout");
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            alert("logout faild");
+        }
+    });
 }

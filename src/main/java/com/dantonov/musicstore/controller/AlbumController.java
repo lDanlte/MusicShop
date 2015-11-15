@@ -8,6 +8,7 @@ import com.dantonov.musicstore.entity.Track;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.service.AlbumService;
+import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.DataManagementService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.UserService;
@@ -21,6 +22,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -49,6 +51,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class AlbumController {
     
     private static final Logger log = LoggerFactory.getLogger(AlbumController.class);
+    private static final String AUTHOR_ROLE = "AUTHOR";
     private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
     static {
@@ -69,11 +72,15 @@ public class AlbumController {
     @Autowired
     private AlbumService albumService;
     
+    @Autowired
+    private AuthService authService;
+    
     
     @RequestMapping(value = "/{albumName}", method = RequestMethod.GET)
     public ModelAndView albumPage(@PathVariable("albumName") String albumName,
                                   @PathVariable("authorName") String authotName,
-                                   ModelAndView modelAndView) {
+                                   ModelAndView modelAndView,
+                                   HttpServletRequest request) {
         
         Album album = albumService.findByTitleAndAuthor(albumName, authotName);
         if (album == null) {
@@ -81,7 +88,13 @@ public class AlbumController {
             return modelAndView;
         }
         
-        modelAndView.addObject("isBought", true);
+        User user = authService.getUser(request);
+        if (user != null) {
+            modelAndView.addObject("user", user);
+            modelAndView.addObject("isBought", user.hasAlbum(album));
+        } else {
+            modelAndView.addObject("isBought", false);
+        }
         
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
@@ -97,21 +110,21 @@ public class AlbumController {
     @RequestMapping(value = "/{albumName}/buy", method = RequestMethod.PUT) 
     public void buy(@PathVariable("authorName") String authorName,
                     @PathVariable("albumName") String albumName,
-                    @RequestParam("login") String login) { ///***TEMP VARIABLE. DELETE AFTER ADDING SECURITY***///
+                    HttpServletRequest request) {
         
-        User user = userService.findByLogin(login);
+        User user = authService.getUser(request);
         if (user == null) {
-            log.warn("Ошибка при покупке. Пользователь с логином {} не найден.", login);
+            log.warn("Ошибка при покупке. Пользователь с логином не найден.");
             return;
         }
-        
+        //проверка на то, что альбом уже куплен
         Album album = albumService.findByTitleAndAuthor(albumName, authorName);
         
         try {
             albumService.buy(album, user, album.getPrice());
         } catch (NotEnoughMoneyException ex) {
             log.warn("У пользователя {} недостаточно денег({}р) для покупки альбома({}p)", 
-                       login, user.getWallet(), album.getPrice());
+                       user.getLogin(), user.getWallet(), album.getPrice());
         }
             
             
@@ -119,22 +132,26 @@ public class AlbumController {
     }
     
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public void createAlbum(@RequestParam("login") String login, ///***TEMP VARIABLE. DELETE AFTER ADDING SECURITY***///
-                            @RequestParam("album") String albumDtoStr,
+    public void createAlbum(@RequestParam("album") String albumDtoStr,
                             @RequestParam("cover") MultipartFile cover,
-                            @RequestParam("tracks[]") MultipartFile[] tracks) {
+                            @RequestParam("tracks[]") MultipartFile[] tracks,
+                            HttpServletRequest request) {
         
         try {
-            User user = userService.findByLogin(login);
+            User user = authService.getUser(request);
             if (user == null) {
-                log.warn("Ошибка при добавлени альбома. Пользователь с логином {} не найден.", login);
+                log.warn("Ошибка при добавлени альбома. Пользователь с логином не найден.");
                 return;
             }
             
             Author author = user.getAuthor();
             if (author == null) {
-                log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не принадлежит группе.", login);
+                log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не принадлежит группе.", user.getLogin());
                 return;
+            }
+            
+            if (!user.hasRole(AUTHOR_ROLE)) {
+                log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не содержит роль AUTHOR.", user.getLogin());
             }
             
             ObjectMapper mapper = new ObjectMapper();
@@ -166,10 +183,24 @@ public class AlbumController {
                     method = RequestMethod.GET)
     @ResponseBody
     public FileSystemResource getTrack(@PathVariable("authorName") String author,
-                                       @PathVariable("albumName") String album,
-                                       @PathVariable("trackName") String track) {
+                                       @PathVariable("albumName") String albumTitle,
+                                       @PathVariable("trackName") String track,
+                                       HttpServletRequest request) {
+        User user = authService.getUser(request);
+        if (user == null) {
+            return null;
+        }
         
-        FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, album, track));
+        Album album = albumService.findByTitleAndAuthor(author, albumTitle);
+        if (album == null) {
+            return null;
+        }
+        
+        if (!user.hasAlbum(album)) {
+            return null;
+        }
+        
+        FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, albumTitle, track));
         if (!trackResource.exists()) {
             return null;
         }

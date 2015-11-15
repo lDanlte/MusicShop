@@ -7,6 +7,7 @@ import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.User;
+import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.DataManagementService;
 import com.dantonov.musicstore.service.GenreService;
@@ -21,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,7 @@ public class AuthorController {
     private static final Logger log = LoggerFactory.getLogger(AuthorController.class);
     private static final String USER_ROLE = "User";
     private static final String AUTHOR_ROLE = "Author";
+    private static final String ADMIN_ROLE = "Admin";
     private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
     static {
         DEC_FORMAT.setMaximumFractionDigits(2);
@@ -69,10 +72,18 @@ public class AuthorController {
     @Autowired
     private AuthorService authorService;
     
+    @Autowired
+    private AuthService authService;
     
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     public ModelAndView getAuthor(@PathVariable("name") String authorName,
-                                  ModelAndView modelAndView) {
+                                  ModelAndView modelAndView,
+                                  HttpServletRequest request) {
+        
+        User user = authService.getUser(request);
+        if (user != null) {
+            modelAndView.addObject("user", user);
+        }
         
         Author author = authorService.findByName(authorName);
         if (author == null) {
@@ -99,8 +110,16 @@ public class AuthorController {
     
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public void createAuthor(@RequestParam("author") String authorDtoStr, 
-                           @RequestParam("image") MultipartFile file) {
+                             @RequestParam("image") MultipartFile file,
+                             HttpServletRequest request) {
         
+        User user = authService.getUser(request);
+        if (user == null) {
+            return;
+        }
+        if (!user.hasRole(ADMIN_ROLE)) {
+            return;
+        }
         try {
             ObjectMapper mapper = new ObjectMapper();
             AuthorDto authorDto = mapper.readValue(authorDtoStr, AuthorDto.class);
@@ -120,10 +139,25 @@ public class AuthorController {
     @RequestMapping(value = "/{name}/update", method = RequestMethod.PUT)
     public void updateAuthor(@RequestParam(value = "desc", required = false) String desc, 
                              @RequestParam(value = "cover") MultipartFile file,
-                             @PathVariable("name") String authorName) {
+                             @PathVariable("name") String authorName,
+                             HttpServletRequest request) {
+        
+        User user = authService.getUser(request);
+        if (user == null) {
+            log.warn("Ошибка при обновлении даннах группы. Пользователь не авторизирован.");
+            return;
+        }
+        if (!user.hasRole(AUTHOR_ROLE)) {
+            log.warn("Ошибка при обновлении даннах группы. Пользователь не обладает правами автора.");
+            return;
+        }
+        
         try {
             Author author = authorService.findByName(authorName);
-            
+            if (!user.getAuthor().equals(author)) {
+                log.warn("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
+                return;
+            }
             if (desc != null) {
                 author.setDesc(desc);
                 authorService.save(author);

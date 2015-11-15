@@ -17,8 +17,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceContextType;
 import javax.persistence.Table;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -143,5 +141,27 @@ public class User {
         return hash;
     }
     
+    public boolean hasRole(String roleName) {
+        
+        for (Role role : roles) {
+            if (roleName.equalsIgnoreCase(role.getRole())) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public boolean hasAlbum(Album album) {
+        
+        UUID uuid = album.getId();
+        for (Album a  : albums) {
+            if (uuid.equals(a.getId())) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
     
 }

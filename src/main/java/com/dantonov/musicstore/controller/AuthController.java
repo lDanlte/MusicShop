@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  *
  * @author Antonov Denis (den007230@gmail.com)
  */
+
 @Controller
-@RequestMapping("/login")
-public class AjaxLoginController {
+public class AuthController {
 
     @Autowired
     private  AuthService authService;
@@ -28,7 +28,7 @@ public class AjaxLoginController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ResponseBody
     public String performLogin(@RequestParam("login") String username,
                                @RequestParam("pass") String password,
@@ -43,5 +43,10 @@ public class AjaxLoginController {
         }
         authService.login(user, response);
         return "Login.";
+    }
+    
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        authService.logout(request, response);
     }
 }

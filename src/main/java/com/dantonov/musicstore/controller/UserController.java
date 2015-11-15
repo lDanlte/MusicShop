@@ -9,6 +9,7 @@ import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
+import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.RoleService;
 import com.dantonov.musicstore.service.TradeHistoryService;
@@ -25,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,23 +68,40 @@ public class UserController {
     @Autowired
     private TradeHistoryService historyService;
     
+    @Autowired
+    private AuthService authService;
+    
     
     @RequestMapping(value = "/{login}", method = RequestMethod.GET)
-    public ModelAndView dashboard(@PathVariable("login") String login, ModelAndView modelAndView) {
+    public ModelAndView dashboard(@PathVariable("login") String login,
+                                  ModelAndView modelAndView,
+                                  HttpServletRequest request) {
         
         User user = userService.findByLogin(login);
         if (user == null) {
+            log.warn("Ошибка доступа к лк. Нет такого пользователя.");
             modelAndView.setViewName("redirect:/");
             return modelAndView;
         }
-        boolean isAdmin  = false,
-                isAuthor = false;
-        for (Role role : user.getRoles()) {
-            switch (role.getRole()) {
-                case AUTHOR_ROLE: { isAuthor = true; break; }
-                case ADMIN_ROLE: { isAdmin = true; break; }
-            }
+        
+        User authUser = authService.getUser(request);
+        if (authUser != null) {
+            modelAndView.addObject("user", authUser);
+        } else {
+            log.warn("Ошибка доступа к лк. Пользователь не авторизирован");
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
         }
+        
+        if (!authUser.equals(user)) {
+            log.warn("Ошибка доступа к лк. Доступ к лк другого пользователя");
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+       
+        boolean isAdmin  = user.hasRole(ADMIN_ROLE),
+                isAuthor = user.hasRole(AUTHOR_ROLE);
+        
         modelAndView.addObject("isAdmin", isAdmin);
         modelAndView.addObject("isAuthor", isAuthor);
         
@@ -95,10 +114,28 @@ public class UserController {
     }
     
     @RequestMapping(value = "/{login}/boughtAlbums", method = RequestMethod.GET)
-    public ModelAndView albums(@PathVariable("login") String login, ModelAndView modelAndView) {
+    public ModelAndView albums(@PathVariable("login") String login,
+                                ModelAndView modelAndView,
+                                HttpServletRequest request) {
         
         User user = userService.findByLogin(login);
         if (user == null) {
+            log.warn("Ошибка доступа к купленным альбомам. Такого пользователя нет.");
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+        
+        User authUser = authService.getUser(request);
+        if (authUser != null) {
+            modelAndView.addObject("user", authUser);
+        } else {
+            log.warn("Ошибка доступа к купленным альбомам. Пользователь не авторизорован.");
+            modelAndView.setViewName("redirect:/");
+            return modelAndView;
+        }
+        
+        if (!authUser.equals(user)) {
+            log.warn("Ошибка доступа к купленным альбомам. Доступ к лк другого пользователя");
             modelAndView.setViewName("redirect:/");
             return modelAndView;
         }
@@ -142,21 +179,38 @@ public class UserController {
     
     @RequestMapping(value = "/{login}/changeData", method = RequestMethod.PUT,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void changeUserData(@RequestBody UserDto data, @PathVariable("login") String login ) {
+    public void changeUserData(@RequestBody UserDto data,
+                               @PathVariable("login") String login,
+                               HttpServletRequest request) {
+        
+        User user = userService.findByLogin(login);
+        if (user == null) {
+            log.warn("Ошибка доступа к смене данных. Такого пользователя нет.");
+            return;
+        }
+        
+        User authUser = authService.getUser(request);
+        if (authUser == null) {
+            log.warn("Ошибка доступа к смене данных. Пользователь не авторизорован.");
+           return;
+        }
+        
+        if (!authUser.equals(user)) {
+            log.warn("Ошибка доступа к смене данных. Доступ к данныи другого пользователя");
+            return;
+        }
         
         if (data.getEmail()!= null) {
             if (userService.findByEmail(data.getEmail()) != null) {
                 //пользователь с таким email уже существует
                 return;
             } else {
-                User user = userService.findByLogin(login);
                 user.setEmail(data.getEmail());
                 userService.update(user);
             }
         }
         
         if (data.getPass() != null) {
-            User user = userService.findByLogin(login);
             user.setPassword(data.getPass());
             userService.update(user);
         }
@@ -164,17 +218,52 @@ public class UserController {
     
     
     @RequestMapping(value = "/{login}/addMoney", method = RequestMethod.PUT)
-    public void addMoney(@RequestParam("value") String value, @PathVariable("login") String login) {
+    public void addMoney(@RequestParam("value") String value,
+                         @PathVariable("login") String login,
+                         HttpServletRequest request) {
         
         User user = userService.findByLogin(login);
+        if (user == null) {
+            log.warn("Ошибка доступа к данным. Такого пользователя нет.");
+            return;
+        }
+        
+        User authUser = authService.getUser(request);
+        if (authUser == null) {
+            log.warn("Ошибка доступа к данным. Пользователь не авторизорован.");
+           return;
+        }
+        
+        if (!authUser.equals(user)) {
+            log.warn("Ошибка доступа к данным. Доступ к данныи другого пользователя.");
+            return;
+        }
+
         userService.addCash(user, new BigDecimal(value));
         
     }
     @RequestMapping(value = "/{login}/discountMoney", method = RequestMethod.PUT)
-    public void discountMoney(@RequestParam("value") String value, @PathVariable("login") String login) {
+    public void discountMoney(@RequestParam("value") String value,
+                              @PathVariable("login") String login,
+                              HttpServletRequest request) {
         
+        User user = userService.findByLogin(login);
+        if (user == null) {
+            log.warn("Ошибка доступа к данным. Такого пользователя нет.");
+            return;
+        }
+        
+        User authUser = authService.getUser(request);
+        if (authUser == null) {
+            log.warn("Ошибка доступа к данным. Пользователь не авторизорован.");
+           return;
+        }
+        
+        if (!authUser.equals(user)) {
+            log.warn("Ошибка доступа к данным. Доступ к данныи другого пользователя.");
+            return;
+        }
         try {
-            User user = userService.findByLogin(login);
             userService.discountCash(user, new BigDecimal(value));
         } catch (NotEnoughMoneyException ex) {
             log.warn("У пользователя недостаточно денег для вывода.");
@@ -186,15 +275,30 @@ public class UserController {
                     produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TradeHistoryDto> getTradeHistory(@PathVariable("login") String  login,
                                              @RequestParam("from") String from,
-                                             @RequestParam("to") String to) {
+                                             @RequestParam("to") String to,
+                                             HttpServletRequest request) {
+        
+        User user = userService.findByLogin(login);
+        if (user == null) {
+            log.warn("Ошибка доступа к данным. Такого пользователя нет.");
+            return null;
+        }
+        
+        User authUser = authService.getUser(request);
+        if (authUser == null) {
+            log.warn("Ошибка доступа к данным. Пользователь не авторизорован.");
+           return null;
+        }
+        
+        if (!authUser.equals(user)) {
+            log.warn("Ошибка доступа к данным. Доступ к данныи другого пользователя.");
+            return null;
+        }
         
         try {
             Date fromDate = REQUEST_DATE_FORMAT.parse(from),
                    toDate = REQUEST_DATE_FORMAT.parse(to);
-            User user = userService.findByLogin(login);
-            if (user == null) {
-                return null;
-            }
+
             List<TradeHistory> tradeHistories = historyService.findBetweenDays(user, fromDate, toDate);
             if (tradeHistories == null || tradeHistories.isEmpty()) {
                 return null;

@@ -34,7 +34,7 @@ public class AuthService {
             if (cookie.getName().equals(TOKEN_NAME)) {
                 token = cookie.getValue();
             } else if (cookie.getName().equals(LOGIN_NAME)) {
-                login = cookie.getName();
+                login = cookie.getValue();
             }
         }
         

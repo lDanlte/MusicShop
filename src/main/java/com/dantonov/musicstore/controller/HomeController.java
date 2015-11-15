@@ -3,7 +3,9 @@ package com.dantonov.musicstore.controller;
 import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
+import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.service.AlbumService;
+import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.TrackService;
@@ -12,9 +14,9 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -48,10 +50,18 @@ public class HomeController {
     @Autowired
     private TrackService trackService;
     
+    @Autowired
+    private AuthService authService;
+    
     
     
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView home(ModelAndView modelAndView) {
+    public ModelAndView home(ModelAndView modelAndView, HttpServletRequest request) {
+        
+        User user = authService.getUser(request);
+        if (user != null) {
+            modelAndView.addObject("user", user);
+        }
         
         modelAndView.addObject("pageContextStr", "index");
         
@@ -71,7 +81,14 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public ModelAndView searchingPage(@RequestParam("q") String q, ModelAndView modelAndView) {
+    public ModelAndView searchingPage(@RequestParam("q") String q,
+                                      ModelAndView modelAndView,
+                                      HttpServletRequest request) {
+        
+        User user = authService.getUser(request);
+        if (user != null) {
+            modelAndView.addObject("user", user);
+        }
         
         List<Genre> genres = genreService.findAll();
         modelAndView.addObject("genres", genres);
@@ -86,7 +103,14 @@ public class HomeController {
     }
     
     @RequestMapping(value = "/category", method = RequestMethod.GET)
-    public ModelAndView categoryPage(@RequestParam("gid") Integer gid, ModelAndView modelAndView) {
+    public ModelAndView categoryPage(@RequestParam("gid") Integer gid, 
+                                     ModelAndView modelAndView, 
+                                     HttpServletRequest request) {
+        
+        User user = authService.getUser(request);
+        if (user != null) {
+            modelAndView.addObject("user", user);
+        }
         
         Genre selectedGenre = genreService.findById(gid);
         if (selectedGenre == null) {

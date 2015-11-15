@@ -206,7 +206,7 @@
         <p>&copy; Денис Антонов 2015</p>
     </footer>
     
-    <div id="popover-content-login" class="hide">
+    <div <c:if test="${user == null}"> id="popover-content" </c:if> class="hide">
         <form action="" role="form">
             <div class="form-group">
               <label for="user">Логин</label>
@@ -214,27 +214,27 @@
               <label for="password">Пароль</label>
               <input type="password" class="form-control" id="password" placeholder="Пароль" />
             </div>
-            <button type="submit" class="btn btn-default">Вход</button>
+            <button type="button" class="btn btn-default" onclick="auth();">Вход</button>
       </form>
     </div>
     
-    <div id="popover-content-user" class="hide">
-        <p style="margin-top: 10px;"><a href="#">Личный кабинет</a></p>
+    <div <c:if test="${user != null}"> id="popover-content" </c:if> class="hide">
+        <p style="margin-top: 10px;"><a href="<c:if test="${user != null}"><c:url value="/user/${user.login}"/></c:if>">Личный кабинет</a></p>
         
-        <p><a href="#">Мои альбомы</a></p>
+        <p><a href="<c:if test="${user != null}"><c:url value="/user/${user.login}/boughtAlbums"/></c:if>">Мои альбомы</a></p>
         <div style="display: inline;">
             <div style="display: inline-block;">
                 Баланс: 
             </div>
             <div style="display: inline-block;">
-                0.00 
+                <c:if test="${user != null}">${format.format(user.wallet)}</c:if>
             </div>
             <div style="display: inline-block;">
                 р. 
             </div>
         </div>
         <p>
-        <button type="button" class="btn btn-default" style="margin-top: 10px;">Выйти</button>
+            <button type="button" class="btn btn-default" style="margin-top: 10px;" onclick="logout();">Выйти</button>
     </div>
     
     
