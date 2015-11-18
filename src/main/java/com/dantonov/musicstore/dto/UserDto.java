@@ -18,6 +18,8 @@ public class UserDto {
     @JsonProperty("email")
     private String email;
 
+    
+    
     public UserDto() {
     }
 
@@ -27,6 +29,7 @@ public class UserDto {
         this.email = email;
     }
 
+    
     public String getLogin() { return login; }
     public void setLogin(String login) { this.login = login; }
 
@@ -35,7 +38,6 @@ public class UserDto {
 
     public String getPass() {  return pass; }
     public void setPass(String pass) { this.pass = pass; }
-    
     
     
 }

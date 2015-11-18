@@ -2,8 +2,6 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
-import com.dantonov.musicstore.entity.User;
-import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AlbumService;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.GenreService;
@@ -13,7 +11,6 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +34,7 @@ public class HomeController {
         DEC_FORMAT.setGroupingUsed(false);
     }
     
+    
     @Autowired
     private GenreService genreService;
     
@@ -49,6 +47,7 @@ public class HomeController {
     @Autowired
     private TrackService trackService;
         
+    
     
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView home(ModelAndView modelAndView) {
@@ -106,5 +105,6 @@ public class HomeController {
         
         return modelAndView;
     }
+    
     
 }

@@ -1,6 +1,7 @@
 package com.dantonov.musicstore.annotation;
 
 import com.dantonov.musicstore.util.RoleEnum;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

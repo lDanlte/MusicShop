@@ -67,6 +67,7 @@ public class AuthorController {
     private AuthorService authorService;
     
     
+    
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     public ModelAndView getAuthor(@PathVariable("name") String authorName,
                                   ModelAndView modelAndView,
@@ -187,4 +188,6 @@ public class AuthorController {
     private Author createAuthor(AuthorDto authorDto, User user) {
         return new Author(authorDto.getName(), authorDto.getDesc(), user);
     }
+    
+    
 }

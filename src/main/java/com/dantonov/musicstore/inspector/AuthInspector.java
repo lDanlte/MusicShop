@@ -4,11 +4,11 @@ import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.GenreService;
-import javax.servlet.ServletContext;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -21,6 +21,7 @@ public class AuthInspector extends HandlerInterceptorAdapter {
     
     public static final String USER_ATTRIBUTE = "user";
 
+    
     @Autowired
     protected AuthService authService;
     

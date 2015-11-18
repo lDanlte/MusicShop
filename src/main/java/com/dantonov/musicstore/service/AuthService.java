@@ -1,11 +1,15 @@
 package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.User;
+
 import java.util.UUID;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +23,11 @@ public class AuthService {
     private static final String TOKEN_NAME = "AUTH-TOKEN";
     private static final String LOGIN_NAME = "LOGIN";
     private static final int MAX_COOKIE_AGE = 30 * 24 * 60 * 60;
-    //private static final String 
+    
     
     @Autowired
     protected UserService userService;
+    
     
     
     public User getUser(HttpServletRequest request) {

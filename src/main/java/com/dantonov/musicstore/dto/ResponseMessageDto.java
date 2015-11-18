@@ -14,6 +14,8 @@ public class ResponseMessageDto {
     @JsonProperty("msg")
     private String msg;
 
+    
+    
     public ResponseMessageDto() {
     }
 
@@ -22,6 +24,7 @@ public class ResponseMessageDto {
         this.msg = msg;
     }
 
+    
     public Byte getCode() { return code; }
     public void setCode(Byte code) { this.code = code; }
 

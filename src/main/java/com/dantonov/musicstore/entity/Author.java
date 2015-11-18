@@ -4,6 +4,7 @@ package com.dantonov.musicstore.entity;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -55,7 +57,6 @@ public class Author {
         this.user = user;
     }
     
-    
 
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
@@ -91,5 +92,6 @@ public class Author {
         hash = 53 * hash + Objects.hashCode(this.id);
         return hash;
     }
+    
     
 }

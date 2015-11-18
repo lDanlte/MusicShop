@@ -2,6 +2,7 @@
 package com.dantonov.musicstore.repository;
 
 import com.dantonov.musicstore.entity.Role;
+
 import org.springframework.data.repository.CrudRepository;
 
 /**
@@ -11,4 +12,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface RoleRepository extends CrudRepository<Role, Integer>{
 
     Role findByRoleIgnoreCase(String role);
+    
 }

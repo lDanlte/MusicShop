@@ -2,13 +2,17 @@
 package com.dantonov.musicstore.config;
 
 import com.dantonov.musicstore.inspector.AuthInspector;
+
 import com.fasterxml.jackson.core.JsonEncoding;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,14 +38,15 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
  * @author Denis Antonov (den007230@gmail.com)
  */
 @Configuration
-@ComponentScan(basePackages = {"com.dantonov.musicstore.controller",
-                               "com.dantonov.musicstore.service"})
+@ComponentScan(basePackages = {"com.dantonov.musicstore.controller", "com.dantonov.musicstore.service"})
 @EnableWebMvc
 @PropertySource("classpath:app.properties")
 public class WebConfig extends WebMvcConfigurerAdapter {
     
     @Resource
     private Environment env;
+    
+    
     
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {

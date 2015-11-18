@@ -3,10 +3,11 @@ package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.repository.AuthorRepository;
+
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,10 +34,6 @@ public class AuthorService {
     
     public List<Author> searchByName(String namePattern) {
         return authorRepository.findByNameContainingIgnoreCase(namePattern);
-    }
-    
-    public List<Author> findNextPage(Pageable pageable) {
-        return authorRepository.findAll(pageable);
     }
     
     @Transactional

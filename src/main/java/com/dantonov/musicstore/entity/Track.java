@@ -3,6 +3,7 @@ package com.dantonov.musicstore.entity;
 
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -46,7 +48,6 @@ public class Track {
     @ManyToOne(targetEntity = Album.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id", nullable = false, updatable = false)
     private Album album;
-    
 
     
     
@@ -62,7 +63,6 @@ public class Track {
         this.album = album;
     }
 
-    
     
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }

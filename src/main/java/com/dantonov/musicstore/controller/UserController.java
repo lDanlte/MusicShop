@@ -59,7 +59,6 @@ public class UserController {
     }
     
     
-    
     @Autowired
     private UserService userService;
     
@@ -116,8 +115,6 @@ public class UserController {
         modelAndView.setViewName("index");
         return modelAndView;
     }
-    
-    
     
     @RequestMapping(value = "/", method = RequestMethod.POST,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -208,7 +205,6 @@ public class UserController {
     }
          
     
-    
     private List<TradeHistoryDto> getTHDto(List<TradeHistory> ths) {
         
         List<TradeHistoryDto> result = new ArrayList<>();
@@ -235,5 +231,6 @@ public class UserController {
         
         return result;
     }
+    
     
 }

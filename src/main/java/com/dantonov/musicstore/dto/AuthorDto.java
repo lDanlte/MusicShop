@@ -17,6 +17,8 @@ public class AuthorDto {
     @JsonProperty("user")
     private UserDto user;
 
+    
+    
     public AuthorDto() {
     }
 
@@ -26,6 +28,7 @@ public class AuthorDto {
         this.user = user;
     }
 
+    
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
@@ -34,7 +37,6 @@ public class AuthorDto {
 
     public UserDto getUser() { return user; }
     public void setUser(UserDto user) { this.user = user; }
-    
     
     
 }

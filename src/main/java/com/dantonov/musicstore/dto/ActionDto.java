@@ -12,6 +12,8 @@ public class ActionDto {
     @JsonProperty("desc")
     private String desc;
 
+    
+    
     public ActionDto() {
     }
 
@@ -20,8 +22,8 @@ public class ActionDto {
     }
     
     
-
     public String getDesc() { return desc; }
     public void setDesc(String desc) { this.desc = desc; }
 
+    
 }

@@ -5,9 +5,11 @@ import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.repository.UserRepository;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,7 @@ public class UserService {
     private static final Integer ADD_CASH_ACTION = 2;
     private static final Integer DISCOUNT_CASH_ACTION = 3;
     
+    
     @Autowired
     protected UserRepository userRepository;
     
@@ -31,6 +34,7 @@ public class UserService {
     
     @Autowired
     protected TradeHistoryService historyService;
+    
     
     
     public User findById(UUID id) {

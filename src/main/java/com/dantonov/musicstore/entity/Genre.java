@@ -2,6 +2,7 @@
 package com.dantonov.musicstore.entity;
 
 import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -46,7 +47,6 @@ public class Genre {
     }
 
     
-    
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -57,5 +57,4 @@ public class Genre {
     public void setAlbums(List<Album> albums) { this.albums = albums; }
     
     
-
 }

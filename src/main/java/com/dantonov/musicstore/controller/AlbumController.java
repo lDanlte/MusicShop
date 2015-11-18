@@ -60,6 +60,7 @@ public class AlbumController {
         DEC_FORMAT.setGroupingUsed(false);
     }
     
+    
     @Autowired
     private GenreService genreService;
     
@@ -68,6 +69,7 @@ public class AlbumController {
     
     @Autowired
     private AlbumService albumService;
+    
     
     
     @RequestMapping(value = "/{albumName}", method = RequestMethod.GET)
@@ -234,4 +236,6 @@ public class AlbumController {
         }
         return result;
     }
+    
+    
 }

@@ -7,11 +7,13 @@ import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.repository.AlbumRepository;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,7 @@ public class AlbumService {
     
     private static final Integer BUY_ACTION = 1;
     
+    
     @Autowired
     protected AlbumRepository albumRepository;
     
@@ -38,6 +41,8 @@ public class AlbumService {
     
     @Autowired
     protected TradeHistoryService historyService;
+    
+    
     
     public Album findById(UUID id) {
         return albumRepository.findOne(id);

@@ -4,6 +4,7 @@ package com.dantonov.musicstore.entity;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -70,9 +72,6 @@ public class TradeHistory {
     }
     
     
-    
-    
-    
     public UUID getId() { return id; }
     public void setId(UUID id) { this.id = id; }
 
@@ -90,5 +89,6 @@ public class TradeHistory {
 
     public Album getAlbum() { return album; }
     public void setAlbum(Album album) { this.album = album; }
+    
     
 }

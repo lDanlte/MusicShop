@@ -21,6 +21,8 @@ public class TradeHistoryDto {
     @JsonProperty("album")
     private String album;
 
+    
+    
     public TradeHistoryDto() {
     }
 
@@ -31,6 +33,7 @@ public class TradeHistoryDto {
         this.album = album;
     }
 
+    
     public Date getDatetime() { return datetime; }
     public void setDatetime(Date datetime) { this.datetime = datetime; }
 
