@@ -29,7 +29,7 @@ public class RoleService {
     }
     
     public Role findByName(String name) {
-        return roleRepository.findByRole(name);
+        return roleRepository.findByRoleIgnoreCase(name);
     }
     
     @Transactional

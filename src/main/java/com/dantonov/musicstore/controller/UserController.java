@@ -1,19 +1,19 @@
 package com.dantonov.musicstore.controller;
 
+import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.dto.TradeHistoryDto;
 import com.dantonov.musicstore.dto.UserDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Author;
-import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
-import com.dantonov.musicstore.service.AuthService;
-import com.dantonov.musicstore.service.GenreService;
+import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.RoleService;
 import com.dantonov.musicstore.service.TradeHistoryService;
 import com.dantonov.musicstore.service.UserService;
+import com.dantonov.musicstore.util.RoleEnum;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,10 +50,15 @@ import org.springframework.web.servlet.ModelAndView;
 public class UserController {
     
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private static final String USER_ROLE = "User";
-    private static final String AUTHOR_ROLE = "Author";
-    private static final String ADMIN_ROLE = "Admin";
     private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
+    static {
+        DEC_FORMAT.setMaximumFractionDigits(2);
+        DEC_FORMAT.setMinimumFractionDigits(2);
+        DEC_FORMAT.setGroupingUsed(false);
+    }
+    
+    
     
     @Autowired
     private UserService userService;
@@ -63,85 +67,35 @@ public class UserController {
     private RoleService roleService;
     
     @Autowired
-    private GenreService genreService;
-    
-    @Autowired
     private TradeHistoryService historyService;
     
-    @Autowired
-    private AuthService authService;
     
     
-    @RequestMapping(value = "/{login}", method = RequestMethod.GET)
-    public ModelAndView dashboard(@PathVariable("login") String login,
-                                  ModelAndView modelAndView,
+    @Secured
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ModelAndView dashboard(ModelAndView modelAndView,
                                   HttpServletRequest request) {
         
-        User user = userService.findByLogin(login);
-        if (user == null) {
-            log.warn("Ошибка доступа к лк. Нет такого пользователя.");
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
-        }
-        
-        User authUser = authService.getUser(request);
-        if (authUser != null) {
-            modelAndView.addObject("user", authUser);
-        } else {
-            log.warn("Ошибка доступа к лк. Пользователь не авторизирован");
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
-        }
-        
-        if (!authUser.equals(user)) {
-            log.warn("Ошибка доступа к лк. Доступ к лк другого пользователя");
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
-        }
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
        
-        boolean isAdmin  = user.hasRole(ADMIN_ROLE),
-                isAuthor = user.hasRole(AUTHOR_ROLE);
+        boolean isAdmin  = user.hasRole(RoleEnum.ADMIN.getRole()),
+                isAuthor = user.hasRole(RoleEnum.AUTHOR.getRole());
         
         modelAndView.addObject("isAdmin", isAdmin);
         modelAndView.addObject("isAuthor", isAuthor);
-        
-        List<Genre> genres = genreService.findAll();
-        modelAndView.addObject("genres", genres);
-        
+        modelAndView.addObject("format", DEC_FORMAT);
+
         modelAndView.setViewName("dashboard");
         
         return modelAndView;
     }
     
-    @RequestMapping(value = "/{login}/boughtAlbums", method = RequestMethod.GET)
-    public ModelAndView albums(@PathVariable("login") String login,
-                                ModelAndView modelAndView,
+    @Secured
+    @RequestMapping(value = "/boughtAlbums", method = RequestMethod.GET)
+    public ModelAndView albums(ModelAndView modelAndView,
                                 HttpServletRequest request) {
         
-        User user = userService.findByLogin(login);
-        if (user == null) {
-            log.warn("Ошибка доступа к купленным альбомам. Такого пользователя нет.");
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
-        }
-        
-        User authUser = authService.getUser(request);
-        if (authUser != null) {
-            modelAndView.addObject("user", authUser);
-        } else {
-            log.warn("Ошибка доступа к купленным альбомам. Пользователь не авторизорован.");
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
-        }
-        
-        if (!authUser.equals(user)) {
-            log.warn("Ошибка доступа к купленным альбомам. Доступ к лк другого пользователя");
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
-        }
-        
-        List<Genre> genres = genreService.findAll();
-        modelAndView.addObject("genres", genres);
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         Map<String, List<Album>> map = new LinkedHashMap<>();
         
@@ -157,6 +111,7 @@ public class UserController {
         }
         
         modelAndView.addObject("dataMap", map);
+        modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("index");
         return modelAndView;
@@ -164,41 +119,26 @@ public class UserController {
     
     
     
-    @RequestMapping(value = "/registration", method = RequestMethod.POST,
+    @RequestMapping(value = "/", method = RequestMethod.POST,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
     public void addUser(@RequestBody UserDto newUser) {
         
         User user = new User(newUser.getLogin(), newUser.getPass(), newUser.getEmail());
         
         Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByName(USER_ROLE));
+        roles.add(roleService.findByName(RoleEnum.USER.getRole()));
         user.setRoles(roles);
         
         userService.save(user);
     }
     
-    @RequestMapping(value = "/{login}/changeData", method = RequestMethod.PUT,
+    @Secured
+    @RequestMapping(value = "/changeData", method = RequestMethod.PUT,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
     public void changeUserData(@RequestBody UserDto data,
-                               @PathVariable("login") String login,
                                HttpServletRequest request) {
         
-        User user = userService.findByLogin(login);
-        if (user == null) {
-            log.warn("Ошибка доступа к смене данных. Такого пользователя нет.");
-            return;
-        }
-        
-        User authUser = authService.getUser(request);
-        if (authUser == null) {
-            log.warn("Ошибка доступа к смене данных. Пользователь не авторизорован.");
-           return;
-        }
-        
-        if (!authUser.equals(user)) {
-            log.warn("Ошибка доступа к смене данных. Доступ к данныи другого пользователя");
-            return;
-        }
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         if (data.getEmail()!= null) {
             if (userService.findByEmail(data.getEmail()) != null) {
@@ -216,53 +156,23 @@ public class UserController {
         }
     }
     
-    
-    @RequestMapping(value = "/{login}/addMoney", method = RequestMethod.PUT)
+    @Secured
+    @RequestMapping(value = "/addMoney", method = RequestMethod.PUT)
     public void addMoney(@RequestParam("value") String value,
-                         @PathVariable("login") String login,
                          HttpServletRequest request) {
         
-        User user = userService.findByLogin(login);
-        if (user == null) {
-            log.warn("Ошибка доступа к данным. Такого пользователя нет.");
-            return;
-        }
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
-        User authUser = authService.getUser(request);
-        if (authUser == null) {
-            log.warn("Ошибка доступа к данным. Пользователь не авторизорован.");
-           return;
-        }
-        
-        if (!authUser.equals(user)) {
-            log.warn("Ошибка доступа к данным. Доступ к данныи другого пользователя.");
-            return;
-        }
-
         userService.addCash(user, new BigDecimal(value));
-        
     }
-    @RequestMapping(value = "/{login}/discountMoney", method = RequestMethod.PUT)
+    
+    @Secured(role = RoleEnum.AUTHOR)
+    @RequestMapping(value = "/discountMoney", method = RequestMethod.PUT)
     public void discountMoney(@RequestParam("value") String value,
-                              @PathVariable("login") String login,
                               HttpServletRequest request) {
         
-        User user = userService.findByLogin(login);
-        if (user == null) {
-            log.warn("Ошибка доступа к данным. Такого пользователя нет.");
-            return;
-        }
-        
-        User authUser = authService.getUser(request);
-        if (authUser == null) {
-            log.warn("Ошибка доступа к данным. Пользователь не авторизорован.");
-           return;
-        }
-        
-        if (!authUser.equals(user)) {
-            log.warn("Ошибка доступа к данным. Доступ к данныи другого пользователя.");
-            return;
-        }
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+
         try {
             userService.discountCash(user, new BigDecimal(value));
         } catch (NotEnoughMoneyException ex) {
@@ -271,30 +181,15 @@ public class UserController {
         
     }
     
-    @RequestMapping(value = "/{login}/tradehistory", method = RequestMethod.GET, 
+    @Secured
+    @RequestMapping(value = "/tradehistory", method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<TradeHistoryDto> getTradeHistory(@PathVariable("login") String  login,
-                                             @RequestParam("from") String from,
-                                             @RequestParam("to") String to,
-                                             HttpServletRequest request) {
-        
-        User user = userService.findByLogin(login);
-        if (user == null) {
-            log.warn("Ошибка доступа к данным. Такого пользователя нет.");
-            return null;
-        }
-        
-        User authUser = authService.getUser(request);
-        if (authUser == null) {
-            log.warn("Ошибка доступа к данным. Пользователь не авторизорован.");
-           return null;
-        }
-        
-        if (!authUser.equals(user)) {
-            log.warn("Ошибка доступа к данным. Доступ к данныи другого пользователя.");
-            return null;
-        }
-        
+    public List<TradeHistoryDto> getTradeHistory(@RequestParam("from") String from,
+                                                 @RequestParam("to") String to,
+                                                 HttpServletRequest request) {
+       
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+       
         try {
             Date fromDate = REQUEST_DATE_FORMAT.parse(from),
                    toDate = REQUEST_DATE_FORMAT.parse(to);
@@ -312,8 +207,6 @@ public class UserController {
         return null;
     }
          
-    
-    
     
     
     private List<TradeHistoryDto> getTHDto(List<TradeHistory> ths) {

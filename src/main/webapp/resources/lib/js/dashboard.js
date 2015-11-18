@@ -2,11 +2,10 @@ function showHistoryTable() {
 
     var from = $("#histotyDateFrom").val(),
           to = $("#histotyDateTo").val();
-    var login = "tmp_group_6";
-    div = $("#historyTable");
+    var div = $("#historyTable");
     div.addClass("hide");
   $.ajax({
-        url: MAIN_URL + "/user/" + login + "/tradehistory" + "?from=" + from + "&to=" + to ,
+        url: MAIN_URL + "/user/tradehistory" + "?from=" + from + "&to=" + to ,
         method: "GET",
         dataType: "json",
         success: function (dataList) {
@@ -46,10 +45,8 @@ function showHistoryTable() {
 function addCash() {
     var cash = $("#addCash").val();
     
-    var login = "tmp_group_6";
-    
     $.ajax({
-        url: MAIN_URL + "/user/" + login + "/addMoney" + "?value=" + cash ,
+        url: MAIN_URL + "/user/addMoney" + "?value=" + cash ,
         method: "PUT",
         dataType: "json",
         success: function (data) {

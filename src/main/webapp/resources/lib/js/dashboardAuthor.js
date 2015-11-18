@@ -59,7 +59,7 @@ function discountCash() {
     var login = "tmp_group_6";
     
     $.ajax({
-        url: MAIN_URL + "/user/" + login + "/discountMoney" + "?value=" + cash ,
+        url: MAIN_URL + "/user/discountMoney" + "?value=" + cash ,
         method: "PUT",
         dataType: "json",
         success: function (data) {

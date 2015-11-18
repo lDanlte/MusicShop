@@ -6,7 +6,6 @@ import com.dantonov.musicstore.service.UserService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +45,8 @@ public class AuthController {
     }
     
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
         authService.logout(request, response);
+        return "redirect:/";
     }
 }

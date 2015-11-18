@@ -59,7 +59,12 @@
             </div>
             <ul class="nav navbar-nav navbar-right" style="margin-right: 100px;">
                 <li><a href="#" data-toggle="modal" data-target="#myModal">Регистрация</a></li>
-                <li><a data-placement="bottom" data-toggle="popover" data-container="body" data-html="true" href="#" id="login">Вход</a></li>
+                <li><a data-placement="bottom" data-toggle="popover" data-container="body" data-html="true" href="#" id="login">
+                    <c:choose>
+                        <c:when test="${user != null}">${user.login}</c:when>
+                        <c:otherwise>Вход</c:otherwise>
+                    </c:choose>
+                </a></li>
             </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -188,9 +193,9 @@
     </div>
     
     <div <c:if test="${user != null}"> id="popover-content" </c:if> class="hide">
-        <p style="margin-top: 10px;"><a href="<c:if test="${user != null}"><c:url value="/user/${user.login}"/></c:if>">Личный кабинет</a></p>
+        <p style="margin-top: 10px;"><a href="<c:if test="${user != null}"><c:url value="/user/"/></c:if>">Личный кабинет</a></p>
         
-            <p><a href="<c:if test="${user != null}"><c:url value="/user/${user.login}/boughtAlbums"/></c:if>">Мои альбомы</a></p>
+            <p><a href="<c:if test="${user != null}"><c:url value="/user/boughtAlbums"/></c:if>">Мои альбомы</a></p>
         <div style="display: inline;">
             <div style="display: inline-block;">
                 Баланс: 
@@ -203,7 +208,9 @@
             </div>
         </div>
         <p>
-            <button type="button" class="btn btn-default" style="margin-top: 10px;" onclick="logout();">Выйти</button>
+        <form action="<c:url value="/logout"/>" method="POST">
+            <button type="submit" class="btn btn-default" style="margin-top: 10px;">Выйти</button>
+        </form>
     </div>
     
     

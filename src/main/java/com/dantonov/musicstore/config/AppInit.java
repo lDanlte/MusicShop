@@ -1,7 +1,10 @@
 
 package com.dantonov.musicstore.config;
 
+import java.util.EnumSet;
 import javax.servlet.Filter;
+import javax.servlet.ServletContext;
+import javax.servlet.SessionTrackingMode;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -24,6 +27,12 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
     @Override
     protected String[] getServletMappings() {
         return new String[]{ "/" };
+    }
+    
+     @Override
+    protected void registerDispatcherServlet(ServletContext servletContext) {
+        super.registerDispatcherServlet(servletContext);
+        servletContext.setSessionTrackingModes(EnumSet.of(SessionTrackingMode.COOKIE));
     }
     
     @Override

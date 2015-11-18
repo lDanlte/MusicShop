@@ -1,6 +1,7 @@
 
 package com.dantonov.musicstore.config;
 
+import com.dantonov.musicstore.inspector.AuthInspector;
 import com.fasterxml.jackson.core.JsonEncoding;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
@@ -32,7 +34,8 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
  * @author Denis Antonov (den007230@gmail.com)
  */
 @Configuration
-@ComponentScan(basePackages = {"com.dantonov.musicstore.controller", "com.dantonov.musicstore.service"})
+@ComponentScan(basePackages = {"com.dantonov.musicstore.controller",
+                               "com.dantonov.musicstore.service"})
 @EnableWebMvc
 @PropertySource("classpath:app.properties")
 public class WebConfig extends WebMvcConfigurerAdapter {
@@ -56,6 +59,11 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/image/**").addResourceLocations("/resources/image/");
         registry.addResourceHandler("/resource/*/cover*").addResourceLocations(env.getRequiredProperty("storage.path"));
         registry.addResourceHandler("/resource/*/*/cover*").addResourceLocations(env.getRequiredProperty("storage.path"));
+    }
+    
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInspector());
     }
     
     @Bean
@@ -108,6 +116,12 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         
         return resolver;
     }
+    
+    @Bean
+    public AuthInspector authInspector() {
+        return new AuthInspector();
+    }
+    
     
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

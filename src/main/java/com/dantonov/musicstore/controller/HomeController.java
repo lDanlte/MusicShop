@@ -1,11 +1,10 @@
 package com.dantonov.musicstore.controller;
 
-import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.User;
+import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AlbumService;
-import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.TrackService;
@@ -49,25 +48,13 @@ public class HomeController {
     
     @Autowired
     private TrackService trackService;
-    
-    @Autowired
-    private AuthService authService;
-    
-    
+        
     
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView home(ModelAndView modelAndView, HttpServletRequest request) {
-        
-        User user = authService.getUser(request);
-        if (user != null) {
-            modelAndView.addObject("user", user);
-        }
+    public ModelAndView home(ModelAndView modelAndView) {
         
         modelAndView.addObject("pageContextStr", "index");
-        
-        List<Genre> genres = genreService.findAll();
-        modelAndView.addObject("genres", genres);
-        
+       
         Map<String, List<Album>> map = new LinkedHashMap<>();
         map.put("Последние добавленные", albumService.getLastAdded());
         map.put("Топ продаж", albumService.getTopSales());
@@ -82,35 +69,22 @@ public class HomeController {
     
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ModelAndView searchingPage(@RequestParam("q") String q,
-                                      ModelAndView modelAndView,
-                                      HttpServletRequest request) {
-        
-        User user = authService.getUser(request);
-        if (user != null) {
-            modelAndView.addObject("user", user);
-        }
-        
-        List<Genre> genres = genreService.findAll();
-        modelAndView.addObject("genres", genres);
+                                      ModelAndView modelAndView) {
         
         modelAndView.addObject("authors", authorService.searchByName(q));
         modelAndView.addObject("albums", albumService.searchByTitle(q));
         modelAndView.addObject("tracks", trackService.searchByName(q));
+        
         modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("searchingResults");
+        
         return modelAndView;
     }
     
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     public ModelAndView categoryPage(@RequestParam("gid") Integer gid, 
-                                     ModelAndView modelAndView, 
-                                     HttpServletRequest request) {
-        
-        User user = authService.getUser(request);
-        if (user != null) {
-            modelAndView.addObject("user", user);
-        }
+                                     ModelAndView modelAndView) {
         
         Genre selectedGenre = genreService.findById(gid);
         if (selectedGenre == null) {
@@ -120,9 +94,6 @@ public class HomeController {
         
         modelAndView.addObject("selectedGenreId", selectedGenre.getId());
         modelAndView.addObject("pageContextStr", "index");
-        
-        List<Genre> genres = genreService.findAll();
-        modelAndView.addObject("genres", genres);
         
         Map<String, List<Album>> map = new LinkedHashMap<>();
         map.put("Последние добавленные - " + selectedGenre.getName(), albumService.getLastAddedByGenre(selectedGenre));

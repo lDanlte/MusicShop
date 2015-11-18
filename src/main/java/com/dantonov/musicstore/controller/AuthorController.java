@@ -1,18 +1,18 @@
 package com.dantonov.musicstore.controller;
 
+import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.dto.AuthorDto;
 import com.dantonov.musicstore.dto.UserDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Author;
-import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.User;
-import com.dantonov.musicstore.service.AuthService;
+import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.DataManagementService;
-import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.RoleService;
 import com.dantonov.musicstore.service.UserService;
+import com.dantonov.musicstore.util.RoleEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -46,9 +46,6 @@ import org.springframework.web.servlet.ModelAndView;
 public class AuthorController {
     
     private static final Logger log = LoggerFactory.getLogger(AuthorController.class);
-    private static final String USER_ROLE = "User";
-    private static final String AUTHOR_ROLE = "Author";
-    private static final String ADMIN_ROLE = "Admin";
     private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
     static {
         DEC_FORMAT.setMaximumFractionDigits(2);
@@ -64,37 +61,25 @@ public class AuthorController {
     private UserService userService;
     
     @Autowired
-    private GenreService genreService;
-    
-    @Autowired
     private RoleService roleService;
     
     @Autowired
     private AuthorService authorService;
     
-    @Autowired
-    private AuthService authService;
     
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     public ModelAndView getAuthor(@PathVariable("name") String authorName,
                                   ModelAndView modelAndView,
                                   HttpServletRequest request) {
         
-        User user = authService.getUser(request);
-        if (user != null) {
-            modelAndView.addObject("user", user);
-        }
-        
         Author author = authorService.findByName(authorName);
+        
         if (author == null) {
             modelAndView.setViewName("redirect:/");
             return modelAndView;
         }
         
         modelAndView.addObject("pageContextStr", "author");
-        
-        List<Genre> genres = genreService.findAll();
-        modelAndView.addObject("genres", genres);
         
         Map<String, List<Album>> map = new LinkedHashMap<>();
         map.put("Альбомы", author.getAlbums());
@@ -108,18 +93,10 @@ public class AuthorController {
         return modelAndView;
     }
     
+    @Secured(role = RoleEnum.ADMIN)
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public void createAuthor(@RequestParam("author") String authorDtoStr, 
-                             @RequestParam("image") MultipartFile file,
-                             HttpServletRequest request) {
-        
-        User user = authService.getUser(request);
-        if (user == null) {
-            return;
-        }
-        if (!user.hasRole(ADMIN_ROLE)) {
-            return;
-        }
+                             @RequestParam("image") MultipartFile file) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             AuthorDto authorDto = mapper.readValue(authorDtoStr, AuthorDto.class);
@@ -136,21 +113,14 @@ public class AuthorController {
         }
     }
     
+    @Secured(role = RoleEnum.AUTHOR)
     @RequestMapping(value = "/{name}/update", method = RequestMethod.PUT)
     public void updateAuthor(@RequestParam(value = "desc", required = false) String desc, 
                              @RequestParam(value = "cover") MultipartFile file,
                              @PathVariable("name") String authorName,
                              HttpServletRequest request) {
         
-        User user = authService.getUser(request);
-        if (user == null) {
-            log.warn("Ошибка при обновлении даннах группы. Пользователь не авторизирован.");
-            return;
-        }
-        if (!user.hasRole(AUTHOR_ROLE)) {
-            log.warn("Ошибка при обновлении даннах группы. Пользователь не обладает правами автора.");
-            return;
-        }
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         try {
             Author author = authorService.findByName(authorName);
@@ -172,20 +142,23 @@ public class AuthorController {
         }
     }
     
-    
-    
+    @Secured(role = RoleEnum.AUTHOR)
     @RequestMapping(value = "/{name}/update", method = RequestMethod.POST)
     public void updateAuthor(@RequestParam(value = "desc", required = false) String desc,
-                             @PathVariable("name") String authorName) {
+                             @PathVariable("name") String authorName,
+                             HttpServletRequest request) {
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+        
         try {
             Author author = authorService.findByName(authorName);
-            
+            if (!user.getAuthor().equals(author)) {
+                log.warn("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
+                return;
+            }
             if (desc != null) {
                 author.setDesc(desc);
                 authorService.save(author);
             }
-            
-            
         } catch (Exception ex) {
             log.warn("Ошибка при обновлении даннах группы", ex);
         }
@@ -199,10 +172,10 @@ public class AuthorController {
         user.setPassword(userDto.getPass());
         
         Set<Role> roles = new HashSet<>();
-        Role role = roleService.findByName(USER_ROLE);
+        Role role = roleService.findByName(RoleEnum.USER.getRole());
         role.getUsers().add(user);
         roles.add(role);
-        role = roleService.findByName(AUTHOR_ROLE);
+        role = roleService.findByName(RoleEnum.AUTHOR.getRole());
         role.getUsers().add(user);
         roles.add(role);
         roles.add(role);

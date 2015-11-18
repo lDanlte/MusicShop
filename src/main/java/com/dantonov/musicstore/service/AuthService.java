@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Antonov Denis (den007230@gmail.com)
  */
-@Service
+@Service("authService")
 public class AuthService {
     
     private static final String TOKEN_NAME = "AUTH-TOKEN";
@@ -27,6 +27,10 @@ public class AuthService {
     
     public User getUser(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        
         String login = null,
                token = null;
         
