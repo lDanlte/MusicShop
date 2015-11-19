@@ -7,6 +7,9 @@ import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.User;
+import com.dantonov.musicstore.exception.PageNotFoundException;
+import com.dantonov.musicstore.exception.RequestDataException;
+import com.dantonov.musicstore.exception.UnauthorizedResourceException;
 import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.DataManagementService;
@@ -28,11 +31,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -69,6 +74,7 @@ public class AuthorController {
     
     
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
     public ModelAndView getAuthor(@PathVariable("name") String authorName,
                                   ModelAndView modelAndView,
                                   HttpServletRequest request) {
@@ -76,8 +82,7 @@ public class AuthorController {
         Author author = authorService.findByName(authorName);
         
         if (author == null) {
-            modelAndView.setViewName("redirect:/");
-            return modelAndView;
+            throw new PageNotFoundException();
         }
         
         modelAndView.addObject("pageContextStr", "author");
@@ -96,6 +101,7 @@ public class AuthorController {
     
     @Secured(role = RoleEnum.ADMIN)
     @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public void createAuthor(@RequestParam("author") String authorDtoStr, 
                              @RequestParam("image") MultipartFile file) {
         try {
@@ -109,13 +115,13 @@ public class AuthorController {
             dataService.saveAuthorCover(authorDto.getName(), file);
         } catch (IOException ex) {
             log.warn("Ошибка при добавлении автора", ex);
-        } catch (Exception ex) {
-            log.warn("Ошибка при добавлении автора", ex);
+            throw new RequestDataException("Ошибка при добавлении группы.");
         }
     }
     
     @Secured(role = RoleEnum.AUTHOR)
     @RequestMapping(value = "/{name}/update", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
     public void updateAuthor(@RequestParam(value = "desc", required = false) String desc, 
                              @RequestParam(value = "cover") MultipartFile file,
                              @PathVariable("name") String authorName,
@@ -127,7 +133,7 @@ public class AuthorController {
             Author author = authorService.findByName(authorName);
             if (!user.getAuthor().equals(author)) {
                 log.warn("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
-                return;
+                throw new UnauthorizedResourceException("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
             }
             if (desc != null) {
                 author.setDesc(desc);
@@ -138,30 +144,28 @@ public class AuthorController {
                 dataService.saveAuthorCover(authorName, file);
             }
             
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             log.warn("Ошибка при обновлении даннах группы", ex);
+            throw new RequestDataException("Ошибка при обновлении даннах группы.");
         }
     }
     
     @Secured(role = RoleEnum.AUTHOR)
     @RequestMapping(value = "/{name}/update", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public void updateAuthor(@RequestParam(value = "desc", required = false) String desc,
                              @PathVariable("name") String authorName,
                              HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
-        
-        try {
-            Author author = authorService.findByName(authorName);
-            if (!user.getAuthor().equals(author)) {
-                log.warn("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
-                return;
-            }
-            if (desc != null) {
-                author.setDesc(desc);
-                authorService.save(author);
-            }
-        } catch (Exception ex) {
-            log.warn("Ошибка при обновлении даннах группы", ex);
+
+        Author author = authorService.findByName(authorName);
+        if (!user.getAuthor().equals(author)) {
+            log.warn("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
+            throw new UnauthorizedResourceException("Ошибка при обновлении даннах группы. Польователь не является владельцем этой группы.");
+        }
+        if (desc != null) {
+            author.setDesc(desc);
+            authorService.save(author);
         }
     }
     

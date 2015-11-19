@@ -1,17 +1,17 @@
 package com.dantonov.musicstore.exception;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  *
  * @author Antonov Denis (den007230@gmail.com)
  */
-public class NotEnoughMoneyException extends Exception {
+@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="На счету недостаточно денег.")
+public class NotEnoughMoneyException extends RuntimeException {
 
-    public NotEnoughMoneyException() {
-    }
+    public NotEnoughMoneyException() { }
 
-    public NotEnoughMoneyException(String message) {
-        super(message);
-    }
+    public NotEnoughMoneyException(String message) { super(message); }
     
-
 }

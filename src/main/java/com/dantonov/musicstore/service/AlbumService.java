@@ -88,7 +88,7 @@ public class AlbumService {
     public void buy(Album album, User user, BigDecimal price) throws NotEnoughMoneyException {
         BigDecimal userWallet = user.getWallet();
         if (userWallet.compareTo(price) < 0) {
-            throw new NotEnoughMoneyException();
+            throw new NotEnoughMoneyException("Не достаточно денег на счету.");
         }
         user.setWallet(userWallet.subtract(price));
         user.getAlbums().add(album);

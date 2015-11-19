@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ResponseMessageDto {
 
     @JsonProperty("code")
-    private Byte code;
+    private Integer code;
     
     @JsonProperty("msg")
     private String msg;
@@ -19,14 +19,14 @@ public class ResponseMessageDto {
     public ResponseMessageDto() {
     }
 
-    public ResponseMessageDto(Byte code, String msg) {
+    public ResponseMessageDto(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
     }
 
     
-    public Byte getCode() { return code; }
-    public void setCode(Byte code) { this.code = code; }
+    public Integer getCode() { return code; }
+    public void setCode(Integer code) { this.code = code; }
 
     public String getMsg() { return msg; }
     public void setMsg(String msg) { this.msg = msg; }

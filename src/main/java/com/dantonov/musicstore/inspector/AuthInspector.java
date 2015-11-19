@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
@@ -35,14 +37,24 @@ public class AuthInspector extends HandlerInterceptorAdapter {
         User user = authService.getUser(request);
         
         if (handler.getClass().isAssignableFrom(HandlerMethod.class)) {
-            Secured secured = ((HandlerMethod) handler).getMethodAnnotation(Secured.class);
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Secured secured = handlerMethod.getMethodAnnotation(Secured.class);
             if (secured != null) {
+                Class<?> returnClass = handlerMethod.getReturnType().getClass();
                 if (user == null) {
-                    //add some code here
-                    return false;
+                    if (isResponseBody(returnClass)) {
+                        response.sendRedirect(request.getContextPath() + "/unauthorizedUserBody");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/unauthorizedUserPage");
+                    }
+                    return false; //maybe not allowed
                 }
                 if (!user.hasRole(secured.role().getRole())) {
-                    //add some code here
+                    if (isResponseBody(returnClass)) {
+                        response.sendRedirect(request.getContextPath() + "/userHasNoRoleBody");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/userHasNoRolePage");
+                    }
                     return false;
                 }
             }
@@ -59,4 +71,11 @@ public class AuthInspector extends HandlerInterceptorAdapter {
         request.getSession().removeAttribute(USER_ATTRIBUTE);
     }
     
+    
+    private boolean isResponseBody(Class<?> returnClass) {
+        return !(!returnClass.isAnnotationPresent(ResponseBody.class) ||
+                  returnClass.isAssignableFrom(String.class) || 
+                  returnClass.isAssignableFrom(ModelAndView.class) ||
+                  returnClass.isAssignableFrom(View.class)); 
+    }
 }

@@ -1,6 +1,7 @@
 package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.annotation.Secured;
+import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.dto.TradeHistoryDto;
 import com.dantonov.musicstore.dto.UserDto;
 import com.dantonov.musicstore.entity.Album;
@@ -8,7 +9,10 @@ import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
+import com.dantonov.musicstore.exception.EmailAlreadyExistsException;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
+import com.dantonov.musicstore.exception.RequestDataException;
+import com.dantonov.musicstore.exception.ResourceNotFoundException;
 import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.RoleService;
 import com.dantonov.musicstore.service.TradeHistoryService;
@@ -27,18 +31,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  *
@@ -72,6 +81,7 @@ public class UserController {
     
     @Secured
     @RequestMapping(value = "/", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
     public ModelAndView dashboard(ModelAndView modelAndView,
                                   HttpServletRequest request) {
         
@@ -91,6 +101,7 @@ public class UserController {
     
     @Secured
     @RequestMapping(value = "/boughtAlbums", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
     public ModelAndView albums(ModelAndView modelAndView,
                                 HttpServletRequest request) {
         
@@ -118,6 +129,7 @@ public class UserController {
     
     @RequestMapping(value = "/", method = RequestMethod.POST,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public void addUser(@RequestBody UserDto newUser) {
         
         User user = new User(newUser.getLogin(), newUser.getPass(), newUser.getEmail());
@@ -132,6 +144,7 @@ public class UserController {
     @Secured
     @RequestMapping(value = "/changeData", method = RequestMethod.PUT,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public void changeUserData(@RequestBody UserDto data,
                                HttpServletRequest request) {
         
@@ -139,8 +152,7 @@ public class UserController {
         
         if (data.getEmail()!= null) {
             if (userService.findByEmail(data.getEmail()) != null) {
-                //пользователь с таким email уже существует
-                return;
+                throw new EmailAlreadyExistsException("Пользователь с email " + user.getEmail() + " уже существует.");
             } else {
                 user.setEmail(data.getEmail());
                 userService.update(user);
@@ -155,6 +167,7 @@ public class UserController {
     
     @Secured
     @RequestMapping(value = "/addMoney", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
     public void addMoney(@RequestParam("value") String value,
                          HttpServletRequest request) {
         
@@ -165,22 +178,20 @@ public class UserController {
     
     @Secured(role = RoleEnum.AUTHOR)
     @RequestMapping(value = "/discountMoney", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
     public void discountMoney(@RequestParam("value") String value,
                               HttpServletRequest request) {
         
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
 
-        try {
-            userService.discountCash(user, new BigDecimal(value));
-        } catch (NotEnoughMoneyException ex) {
-            log.warn("У пользователя недостаточно денег для вывода.");
-        }
+        userService.discountCash(user, new BigDecimal(value));
         
     }
     
     @Secured
     @RequestMapping(value = "/tradehistory", method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public List<TradeHistoryDto> getTradeHistory(@RequestParam("from") String from,
                                                  @RequestParam("to") String to,
                                                  HttpServletRequest request) {
@@ -193,17 +204,17 @@ public class UserController {
 
             List<TradeHistory> tradeHistories = historyService.findBetweenDays(user, fromDate, toDate);
             if (tradeHistories == null || tradeHistories.isEmpty()) {
-                return null;
+                throw new ResourceNotFoundException("Ничего не найдено.");
             }
             
             return getTHDto(tradeHistories);
         } catch (ParseException ex) {
             log.warn("Задан неправельный формат даты.");
+            throw new RequestDataException("Задан неправельный формат даты.");
         }
         
-        return null;
     }
-         
+    
     
     private List<TradeHistoryDto> getTHDto(List<TradeHistory> ths) {
         

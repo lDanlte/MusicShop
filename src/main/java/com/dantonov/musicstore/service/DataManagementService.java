@@ -36,7 +36,7 @@ public class DataManagementService {
         storagePath = storagePath.replaceFirst("file:", "");
     }
     
-    public void saveAuthorCover(String authorName, MultipartFile file) {
+    public void saveAuthorCover(String authorName, MultipartFile file) throws IOException {
         
         StringBuilder path = new StringBuilder(storagePath);
         path.append(authorName);
@@ -56,10 +56,6 @@ public class DataManagementService {
         
         try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(fileSys))) {
             buffStream.write(file.getBytes());
-        } catch (FileNotFoundException ex) {
-            logger.warn("Что-то пошло не так с сохранением обложки группы", ex);
-        } catch (IOException ex) {
-             logger.warn("Что-то пошло не так с сохранением обложки группы", ex);
         }
         
         logger.info("Получен файл: имя = {}; исходное имя = {}; тип = {};  размер = {} Кб.", file.getName(),

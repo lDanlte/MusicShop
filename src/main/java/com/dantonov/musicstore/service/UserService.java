@@ -3,6 +3,8 @@ package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
+import com.dantonov.musicstore.exception.EmailAlreadyExistsException;
+import com.dantonov.musicstore.exception.LoginAlreadyExistsException;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.repository.UserRepository;
 
@@ -66,7 +68,7 @@ public class UserService {
     @Transactional
     public void discountCash(User user, BigDecimal cash) throws NotEnoughMoneyException {
         if (user.getWallet().compareTo(cash) < 0) {
-            throw new NotEnoughMoneyException();
+            throw new NotEnoughMoneyException("Не достаточно денег.");
         }
         user.setWallet(user.getWallet().subtract(cash));
         userRepository.save(user);
@@ -83,10 +85,10 @@ public class UserService {
     @Transactional
     public User save(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null) {
-            return null;
+            throw new EmailAlreadyExistsException("Пользователь с email " + user.getEmail() + " уже существует.");
         }
         if (userRepository.findByLogin(user.getLogin()) != null) {
-            return null;
+            throw new LoginAlreadyExistsException("Пользователь с логином " + user.getLogin() + " уже существует.");
         }
         user.setWallet(BigDecimal.ZERO);
         return userRepository.save(user);
@@ -97,4 +99,5 @@ public class UserService {
     public User update(User user) {
         return userRepository.save(user);
     }
+    
 }
