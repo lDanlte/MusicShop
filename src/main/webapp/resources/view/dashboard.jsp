@@ -102,7 +102,7 @@
                                 <div class="control-group">
                                   <label class="control-label" for="Email">Поменять email:</label>
                                   <div class="controls">
-                                    <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
+                                    <input id="newEmail" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
                                   </div>
                                 </div>
 
@@ -111,7 +111,7 @@
                                 <div class="control-group">
                                   <label class="control-label" for="password">Новый пароль:</label>
                                   <div class="controls">
-                                    <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
+                                    <input id="newPassword" name="password" class="form-control input-large" type="password" placeholder="********" required="">
                                   </div>
                                 </div>
 
@@ -119,12 +119,12 @@
                                 <div class="control-group">
                                   <label class="control-label" for="reenterpassword">Повторите новый пароль:</label>
                                   <div class="controls">
-                                    <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
+                                    <input id="newReenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
                                   </div>
                                 </div>
                                 
                                 </fieldset>
-                          <button type="button" class="btn btn-info btn-sm" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
+                          <button type="button" class="btn btn-info btn-sm" onclick="changeUserData();" style="margin-bottom: 20px; margin-top: 20px">Сохранить</button>
                             </form>
                       <div class="col-xs-7"></div>
                     </div>
@@ -285,7 +285,9 @@
                     
                     <c:if test="${isAuthor == true}">
                     
-                        <div id="groupControl" class="tab-pane fade">
+                        <c:set value="${user.author}" var="author"/>
+                        
+                        <div id="groupControl" data-author="${author.name}" class="tab-pane fade">
                             <h3>Управление группой</h3>
 
                             <form class="form-horizontal col-xs-5">
@@ -402,21 +404,15 @@
                                           </tr>
                                       </thead>
                                       <tbody>
-                                          <tr>
-                                              <td>1</td>
-                                              <td><a href="#" style="color: #777;">Album Name</a></td>
-                                              <td>1 000 145</td>
-                                          </tr>
-                                          <tr>
-                                              <td>2</td>
-                                              <td><a href="#" style="color: #777;">Album Name</a></td>
-                                              <td>256 512</td>
-                                          </tr>
-                                          <tr>
-                                              <td>3</td>
-                                              <td><a href="#" style="color: #777;">Album Name</a></td>
-                                              <td>100 752</td>
-                                          </tr>
+                                          
+                                          <c:forEach items="${author.albums}" var="album" varStatus="status">
+                                            <tr>
+                                              <td>${status.index + 1}</td>
+                                              <td><a href="#" style="color: #777;">${album.title}</a></td>
+                                              <td>${album.qSold}</td>
+                                            </tr>
+                                          </c:forEach>
+                                          
                                       </tbody>
                                   </table>
                               </div>
@@ -464,7 +460,7 @@
         <p>&copy; Денис Антонов 2015</p>
     </footer>
     
-    <div <c:if test="${user == null}"> id="popover-content" </c:if> class="hide">
+    <div <c:choose> <c:when test="${user == null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
         <form action="" role="form">
             <div class="form-group">
               <label for="user">Логин</label>
@@ -476,15 +472,15 @@
       </form>
     </div>
     
-    <div <c:if test="${user != null}"> id="popover-content" </c:if> class="hide">
-        <p style="margin-top: 10px;"><a href="<c:if test="${user != null}"><c:url value="/user/"/></c:if>">Личный кабинет</a></p>
+    <div <c:choose> <c:when test="${user != null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
+        <p style="margin-top: 10px;"><a href="<c:url value="/user"/>">Личный кабинет</a></p>
         
-        <p><a href="<c:if test="${user != null}"><c:url value="/user/boughtAlbums"/></c:if>">Мои альбомы</a></p>
+        <p><a href="<c:url value="/user/boughtAlbums"/>">Мои альбомы</a></p>
         <div style="display: inline;">
             <div style="display: inline-block;">
                 Баланс: 
             </div>
-            <div style="display: inline-block;">
+            <div id="wallet" style="display: inline-block;">
                 <c:if test="${user != null}">${format.format(user.wallet)}</c:if>
             </div>
             <div style="display: inline-block;">
@@ -492,7 +488,7 @@
             </div>
         </div>
         <p>
-        <form action="<c:url value="/logout"/>" method="POST">
+        <form id="logout" action="<c:url value="/logout"/>" method="POST">
             <button type="submit" class="btn btn-default" style="margin-top: 10px;">Выйти</button>
         </form>
     </div>
@@ -547,6 +543,21 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
               <button type="button" class="btn btn-info">Регистрация</button>
+            </div>
+          </div>
+        </div>
+    </div>
+            
+    <div class="modal fade" id="modalInfo">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
             </div>
           </div>
         </div>

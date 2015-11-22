@@ -11,7 +11,6 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -40,8 +39,11 @@ public class TradeHistoryService {
         return historyRepository.findBetweenDates(user.getId(), from, to);
     }
     
-    @Transactional
     public TradeHistory save(TradeHistory tradeHistory) {
         return historyRepository.save(tradeHistory);
+    }
+    
+    public void delete(TradeHistory tradeHistory) {
+        historyRepository.delete(tradeHistory);
     }
 }

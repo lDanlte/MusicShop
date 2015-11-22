@@ -10,7 +10,6 @@ import com.dantonov.musicstore.entity.Role;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.EmailAlreadyExistsException;
-import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.exception.ResourceNotFoundException;
 import com.dantonov.musicstore.inspector.AuthInspector;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +42,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  *
@@ -80,7 +76,7 @@ public class UserController {
     
     
     @Secured
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping( method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView dashboard(ModelAndView modelAndView,
                                   HttpServletRequest request) {
@@ -127,32 +123,39 @@ public class UserController {
         return modelAndView;
     }
     
-    @RequestMapping(value = "/", method = RequestMethod.POST,
-                    consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.POST,
+                    consumes = MediaType.APPLICATION_JSON_VALUE,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void addUser(@RequestBody UserDto newUser) {
+    public ResponseMessageDto addUser(@RequestBody UserDto newUser) {
         
         User user = new User(newUser.getLogin(), newUser.getPass(), newUser.getEmail());
         
         Set<Role> roles = new HashSet<>();
-        roles.add(roleService.findByName(RoleEnum.USER.getRole()));
+        
+        Role role = roleService.findByName(RoleEnum.USER.getRole());
+        role.getUsers().add(user);
+        roles.add(role);
+        
         user.setRoles(roles);
         
         userService.save(user);
+        return new ResponseMessageDto(HttpStatus.OK.value(), "Регистрация прошла успешно.");
     }
     
     @Secured
-    @RequestMapping(value = "/changeData", method = RequestMethod.PUT,
-                    consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.PUT,
+                    consumes = MediaType.APPLICATION_JSON_VALUE,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void changeUserData(@RequestBody UserDto data,
-                               HttpServletRequest request) {
+    public ResponseMessageDto changeUserData(@RequestBody UserDto data,
+                                             HttpServletRequest request) {
         
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         if (data.getEmail()!= null) {
             if (userService.findByEmail(data.getEmail()) != null) {
-                throw new EmailAlreadyExistsException("Пользователь с email " + user.getEmail() + " уже существует.");
+                throw new EmailAlreadyExistsException("Пользователь с email " + data.getEmail() + " уже существует.");
             } else {
                 user.setEmail(data.getEmail());
                 userService.update(user);
@@ -163,28 +166,52 @@ public class UserController {
             user.setPassword(data.getPass());
             userService.update(user);
         }
+        
+        return new ResponseMessageDto(HttpStatus.OK.value(), "Обновление данных прошло успешно.");
     }
     
     @Secured
-    @RequestMapping(value = "/addMoney", method = RequestMethod.PUT)
+    @RequestMapping(value = "/addMoney", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void addMoney(@RequestParam("value") String value,
-                         HttpServletRequest request) {
-        
+    public UserDto addMoney(@RequestParam("value") String value,
+                            HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+        BigDecimal bdValue = null;
+        try {
+            bdValue = new BigDecimal(value);
+            if (bdValue.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException();
+            }
+        } catch (Exception ex) {
+            log.warn("Не удалось понолнить счет. Пользователь {} неверно ввел сумму ({}).", user.getLogin(), value);
+            throw new RequestDataException("Некорректно задана сумма.");
+        }
         
-        userService.addCash(user, new BigDecimal(value));
+        user = userService.addCash(user, bdValue);
+        return new UserDto(DEC_FORMAT.format(user.getWallet()));
     }
     
     @Secured(role = RoleEnum.AUTHOR)
-    @RequestMapping(value = "/discountMoney", method = RequestMethod.PUT)
+    @RequestMapping(value = "/discountMoney", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void discountMoney(@RequestParam("value") String value,
-                              HttpServletRequest request) {
+    public UserDto discountMoney(@RequestParam("value") String value, HttpServletRequest request) {
         
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+       User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
 
-        userService.discountCash(user, new BigDecimal(value));
+       BigDecimal bdValue = null;
+        try {
+            bdValue = new BigDecimal(value);
+            if (bdValue.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException();
+            }
+        } catch (Exception ex) {
+            log.warn("Не удалось вывести деньги. Пользователь {} неверно ввел сумму ({}).", user.getLogin(), value);
+            throw new RequestDataException("Некорректно задана сумма.");
+        }
+       
+       user = userService.discountCash(user, bdValue);
+       
+       return new UserDto(DEC_FORMAT.format(user.getWallet()));
         
     }
     
@@ -209,7 +236,7 @@ public class UserController {
             
             return getTHDto(tradeHistories);
         } catch (ParseException ex) {
-            log.warn("Задан неправельный формат даты.");
+            log.warn("Задан неправельный формат даты.", ex);
             throw new RequestDataException("Задан неправельный формат даты.");
         }
         

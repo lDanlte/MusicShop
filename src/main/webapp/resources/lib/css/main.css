@@ -123,3 +123,7 @@ footer {
   padding-left: 15px;
   margin-bottom: 35px;
 }
+
+.popover {
+    z-index: 1040;
+}

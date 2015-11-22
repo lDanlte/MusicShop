@@ -17,7 +17,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  *
@@ -25,8 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 
 @Configuration
-@EnableTransactionManagement
-@ComponentScan(basePackages = "com.dantonov.musicstore.entity")
+@ComponentScan(basePackages = {"com.dantonov.musicstore.entity"})
 @PropertySource("classpath:app.properties")
 @EnableJpaRepositories(basePackages = "com.dantonov.musicstore.repository")
 public class DataConfig {
@@ -65,7 +63,7 @@ public class DataConfig {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
-        
+
         return transactionManager;
     }
     

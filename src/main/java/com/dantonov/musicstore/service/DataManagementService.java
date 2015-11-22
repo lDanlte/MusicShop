@@ -5,11 +5,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import javax.annotation.Resource;
+
+import org.apache.commons.io.FileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -112,6 +113,22 @@ public class DataManagementService {
             }
         }
         
+    }
+    
+    public void deleteAlbum(String authorName, String albumTitle) throws IOException {
+        
+        StringBuilder path = new StringBuilder(storagePath);
+        path.append(authorName).append('/').append(albumTitle);
+        String pathStr = path.toString();
+        File dir = new File(pathStr);
+        if(dir.exists()) {
+            try {
+                FileUtils.deleteDirectory(dir);
+            } catch (IOException ex) {
+                logger.warn("Ошибка при удалении директории " + pathStr, ex);
+                throw ex;
+            }
+        }
     }
     
     public File getTrack(String author, String album, String track) {

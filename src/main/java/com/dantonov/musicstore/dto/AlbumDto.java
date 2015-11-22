@@ -9,22 +9,22 @@ import java.util.List;
  */
 public class AlbumDto {
     
-    @JsonProperty("title")
+    @JsonProperty(value = "title", required = true)
     private String title;
     
-    @JsonProperty("desc")
+    @JsonProperty(value = "desc", required = true)
     private String desc;
     
-    @JsonProperty("price")
+    @JsonProperty(value = "price", required = true)
     private String price;
     
-    @JsonProperty("releaseDate")
+    @JsonProperty(value = "releaseDate", required = true)
     private String releaseDate;
     
-    @JsonProperty("genresIds")
+    @JsonProperty(value = "genresIds", required = true)
     private String genresIds;
     
-    @JsonProperty("songsTitles")
+    @JsonProperty(value = "songsTitles", required = true)
     private List<String> songsTitles;
 
     

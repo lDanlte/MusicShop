@@ -33,7 +33,6 @@ public class RoleService {
         return roleRepository.findByRoleIgnoreCase(name);
     }
     
-    @Transactional
     public Role save(Role role) {
         return roleRepository.save(role);
     }

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Antonov Denis (den007230@gmail.com)
  */
-@Service("authService")
+@Service
 public class AuthService {
     
     private static final String TOKEN_NAME = "AUTH-TOKEN";
@@ -27,7 +27,6 @@ public class AuthService {
     
     @Autowired
     protected UserService userService;
-    
     
     
     public User getUser(HttpServletRequest request) {
@@ -56,7 +55,12 @@ public class AuthService {
         }
         StandardPBEStringEncryptor decryptor = new StandardPBEStringEncryptor();
         decryptor.setPassword(user.getPassword());
-        String uuidStr = decryptor.decrypt(token);
+        String uuidStr = null;
+        try {
+            uuidStr = decryptor.decrypt(token);
+        } catch (Exception e) {
+            return null;
+        }
         UUID uuid = null;
         
         try {
@@ -90,16 +94,27 @@ public class AuthService {
         response.addCookie(tokenCookie);
     }
     
-    public void logout(HttpServletRequest request, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response, User user) {
+        
+        if (user == null) {
+            user = getUser(request);
+        }
+        user.setToken(null);
+        userService.update(user);
         
         Cookie loginCookie = null;
         Cookie tokenCookie = null;
         
         for (Cookie cookie : request.getCookies()) {
-            if (cookie.getName().equals(TOKEN_NAME)) {
-                tokenCookie = cookie;
-            } else if (cookie.getName().equals(LOGIN_NAME)) {
-                loginCookie = cookie;
+            switch (cookie.getName()) {
+                case TOKEN_NAME: {
+                    tokenCookie = cookie;
+                    break;
+                }
+                case LOGIN_NAME: {
+                    loginCookie = cookie;
+                    break;
+                }
             }
         }
         

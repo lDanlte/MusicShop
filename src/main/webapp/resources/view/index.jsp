@@ -180,7 +180,7 @@
         <p>&copy; Денис Антонов 2015</p>
     </footer>
     
-    <div <c:if test="${user == null}"> id="popover-content" </c:if> class="hide">
+    <div <c:choose> <c:when test="${user == null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
         <form role="form">
             <div class="form-group">
               <label for="user">Логин</label>
@@ -192,15 +192,15 @@
       </form>
     </div>
     
-    <div <c:if test="${user != null}"> id="popover-content" </c:if> class="hide">
-        <p style="margin-top: 10px;"><a href="<c:if test="${user != null}"><c:url value="/user/"/></c:if>">Личный кабинет</a></p>
+    <div <c:choose> <c:when test="${user != null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
+        <p style="margin-top: 10px;"><a href="<c:url value="/user"/>">Личный кабинет</a></p>
         
-            <p><a href="<c:if test="${user != null}"><c:url value="/user/boughtAlbums"/></c:if>">Мои альбомы</a></p>
+            <p><a href="<c:url value="/user/boughtAlbums"/>">Мои альбомы</a></p>
         <div style="display: inline;">
             <div style="display: inline-block;">
                 Баланс: 
             </div>
-            <div style="display: inline-block;">
+            <div id="wallet" style="display: inline-block;">
                 <c:if test="${user != null}">${format.format(user.wallet)}</c:if>
             </div>
             <div style="display: inline-block;">
@@ -267,6 +267,21 @@
           </div>
         </div>
     </div>
+            
+<div class="modal fade" id="modalInfo">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Ошибка</h4>
+      </div>
+      <div class="modal-body">${redirectCause}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
     <!--/.fluid-container-->
     <!-- Placed at the end of the document so the pages load faster -->

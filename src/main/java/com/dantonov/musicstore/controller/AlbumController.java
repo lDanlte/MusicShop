@@ -2,6 +2,7 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.dto.AlbumDto;
+import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Genre;
@@ -24,14 +25,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 
-import javax.sound.sampled.UnsupportedAudioFileException;
 import org.jaudiotagger.audio.mp3.ByteArrayMP3AudioHeader;
 
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -108,11 +108,11 @@ public class AlbumController {
     }
     
     @Secured(role = RoleEnum.USER)
-    @RequestMapping(value = "/{albumName}/buy", method = RequestMethod.PUT) 
+    @RequestMapping(value = "/{albumName}/buy", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE) 
     @ResponseStatus(HttpStatus.OK)
-    public void buy(@PathVariable("authorName") String authorName,
-                    @PathVariable("albumName") String albumName,
-                    HttpServletRequest request) {
+    public ResponseMessageDto buy(@PathVariable("authorName") String authorName,
+                                  @PathVariable("albumName") String albumName,
+                                  HttpServletRequest request) {
         
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
@@ -130,46 +130,50 @@ public class AlbumController {
             throw ex;
         }
             
-            
-        
+        return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно куплен.");
     }
     
     @Secured(role = RoleEnum.AUTHOR)
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void createAlbum(@RequestParam("album") String albumDtoStr,
-                            @RequestParam("cover") MultipartFile cover,
-                            @RequestParam("tracks[]") MultipartFile[] tracks,
-                            @PathVariable("authorName") String authorName,
-                            HttpServletRequest request) {
+    public ResponseMessageDto createAlbum(@RequestParam("album") String albumDtoStr,
+                                          @RequestParam("cover") MultipartFile cover,
+                                          @RequestParam("tracks[]") MultipartFile[] tracks,
+                                          @PathVariable("authorName") String authorName,
+                                          HttpServletRequest request) {
         
-        try {
-            User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
-            
-            
-            Author author = user.getAuthor();
-            if (author == null || !author.getName().equals(authorName)) {
-                log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не принадлежит группе.", user.getLogin());
-                throw new UnauthorizedResourceException("Ошибка при добавлени альбома. Аккаунт с логином " + user.getLogin() + " не принадлежит группе.");
-            }
-            
-            ObjectMapper mapper = new ObjectMapper();
-            AlbumDto albumDto = mapper.readValue(albumDtoStr, AlbumDto.class);
-            Album album = createAlbum(albumDto);
-            album.setAuthor(author);
-            album.setTracks(createTrackList(albumDto.getSongsTitles(), tracks, album));
-            
-            albumService.save(album);
-            dataService.saveAlbumData(author.getName(), album.getTitle(), cover, tracks);
-            albumService.buy(album, user, BigDecimal.ZERO);
-            
-        } catch (UnsupportedAudioFileException ex) {
-            log.warn("Ошибка при добавлени альбома. Неверный формат аудио файла.", ex);
-            throw new RequestDataException("Ошибка при добавлени альбома. Неверный формат аудио файла.");
-        } catch (Exception ex) {
-            log.warn("Ошибка при добавлени альбома. Ошибка при обработке запроса.", ex);
-            throw new RequestDataException("Ошибка при добавлени альбома. Ошибка при обработке запроса.");
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+
+
+        Author author = user.getAuthor();
+        if (author == null || !author.getName().equals(authorName)) {
+            log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не является вадельцем группы.", user.getLogin());
+            throw new UnauthorizedResourceException("Ошибка при добавлени альбома. Аккаунт с логином " + user.getLogin() + " не является вадельцем группы.");
         }
+
+        ObjectMapper mapper = new ObjectMapper();
+        AlbumDto albumDto = null;
+        try {
+            albumDto = mapper.readValue(albumDtoStr, AlbumDto.class);
+        } catch (IOException ex) {
+            log.warn("Ошибка при добавлени альбома. Неверные данные.", ex);
+            throw new RequestDataException("Неверно введены данные.");
+        }
+        
+        Album album = createAlbum(albumDto);
+        album.setAuthor(author);
+        try {
+            album.setTracks(createTrackList(albumDto.getSongsTitles(), tracks, album));
+        } catch (IOException ex) {
+             log.warn("Ошибка при добавлени альбома. Ошибка при обработке файлов.", ex);
+             throw new RequestDataException("Ошибка при обработке файлов.");
+        }
+
+        List<Genre> genres = getGenres(albumDto.getGenresIds());
+        
+        albumService.create(album, user, cover, tracks, genres);
+        
+        return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно добавлен.");
     }
     
     @Secured(role = RoleEnum.USER)
@@ -182,7 +186,7 @@ public class AlbumController {
                                        HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
-        Album album = albumService.findByTitleAndAuthor(author, albumTitle);
+        Album album = albumService.findByTitleAndAuthor(albumTitle, author);
         if (album == null) {
             throw new ResourceNotFoundException("Альбом '" + albumTitle + "' группы '" + author + "' не найден.");
         }
@@ -199,51 +203,73 @@ public class AlbumController {
     }
     
     
-    private Album createAlbum(AlbumDto albumDto) throws ParseException {
+    private Album createAlbum(AlbumDto albumDto) {
         Album result = new Album();
         
-        result.setDesc(albumDto.getDesc());
-        result.setPrice(new BigDecimal(albumDto.getPrice()));
-        result.setTitle(albumDto.getTitle());
-        result.setqSold(0L);
-        result.setReleaseDate(REQUEST_DATE_FORMAT.parse(albumDto.getReleaseDate()));
-        
-        String[] genreIds =  albumDto.getGenresIds().split(",");
-        List<Genre> genres = new ArrayList<>();
-        for(String genreId : genreIds) {
-            Genre genre = genreService.findById(Integer.parseInt(genreId));
-            if (genre == null) {
-                throw new NullPointerException("Жанр с id = " + Integer.parseInt(genreId) + " не найден.");
+        BigDecimal bdValue = null;
+        try {
+            bdValue = new BigDecimal(albumDto.getPrice());
+            if (bdValue.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new RuntimeException();
             }
-            genre.getAlbums().add(result);
-            genres.add(genre);
+        } catch (Exception ex) {
+            log.warn("Не удалось сохранить альбом. Пользователь неверно ввел сумму ({}).", albumDto.getPrice(), ex);
+            throw new RequestDataException("Некорректно задана сумма.");
         }
         
-        result.setGenres(genres);
+        result.setDesc(albumDto.getDesc());
+        result.setPrice(bdValue);
+        result.setTitle(albumDto.getTitle());
+        result.setqSold(0L);
+        
+        try {
+            result.setReleaseDate(REQUEST_DATE_FORMAT.parse(albumDto.getReleaseDate()));
+        } catch (Exception ex) {
+            log.warn("Не удалось сохранить альбом. Пользователь неверно задал дату ({}).", albumDto.getReleaseDate());
+            throw new RequestDataException("Некорректно задана сумма.");
+        }
         
         return result;
     }
     
     private List<Track> createTrackList(List<String> titles, MultipartFile[] tracks, Album album)
-                                        throws IOException, UnsupportedAudioFileException {
+                                        throws IOException {
         
         List<Track> result = new ArrayList<>();
-        for (byte i = 0; i < tracks.length; i++) {
-            Track track = new Track();
-            track.setName(titles.get(i));
-            track.setPosition((byte)(i + 1));
-            track.setSize(tracks[i].getSize());
-            
-            ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[0].getBytes());
-            
-            int bitrate = (int)header.getBitRateAsNumber();
-            track.setBitrate(bitrate);
-            track.setDuration((int)(tracks[i].getSize() >> 10) / bitrate);
-            track.setAlbum(album);
-            
-            result.add(track);
+        try {
+            for (byte i = 0; i < tracks.length; i++) {
+                Track track = new Track();
+                track.setName(titles.get(i));
+                track.setPosition((byte)(i + 1));
+                track.setSize(tracks[i].getSize() >> 10);
+
+                ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[0].getBytes());
+                int bitrate = (int)header.getBitRateAsNumber();
+                track.setBitrate(bitrate);
+                track.setDuration(header.getTrackLength());
+                track.setAlbum(album);
+
+                result.add(track);
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Ошибка при добавлени альбома.", ex);
+            throw new RequestDataException("Ошибка при добавлени альбома.");
         }
         return result;
+    }
+    
+    private List<Genre> getGenres(String genres) {
+        String[] genreIds =  genres.split(",");
+        List<Genre> genreList = new ArrayList<>();
+        for(String genreId : genreIds) {
+            Genre genre = genreService.findById(Integer.parseInt(genreId));
+            if (genre == null) {
+                log.warn("Не удалось сохранить альбом. Жанр с id = {} не найден.", Integer.parseInt(genreId));
+                throw new RequestDataException("Жанр не найден.");
+            }
+            genreList.add(genre);
+        }
+        return genreList;
     }
     
     

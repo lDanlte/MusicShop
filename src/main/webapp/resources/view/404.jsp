@@ -16,7 +16,7 @@
         <h1 style="text-align: center; margin-top: 50px;">Ошибка 404. Страница не найдена.</h1>
         <img class="img" src="<c:url value="/image/404.jpeg"/>" style="display: block; margin: 0 auto; margin-top: 30px;"/>
         <h2 style="text-align: center; font-style: italic; margin-top: 30px; color: #919191;">Мы не знаем, как вы попали на эту страницу, но лучше вам вернуться на 
-            <a href="<c:url value="/"/>" style="color: #303030;">главную страницу</a>
+            <a href="<c:url value="/"/>" style="color: #303030;">главную</a>.
         </h2>
     </body>
 </html>

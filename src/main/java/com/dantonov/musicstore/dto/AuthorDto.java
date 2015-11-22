@@ -8,13 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class AuthorDto {
 
-    @JsonProperty("name")
+    @JsonProperty(value = "name", required = true)
     private String name;
     
-    @JsonProperty("desc")
+    @JsonProperty(value = "desc", required = true)
     private String desc;
     
-    @JsonProperty("user")
+    @JsonProperty(value = "user", required = true)
     private UserDto user;
 
     

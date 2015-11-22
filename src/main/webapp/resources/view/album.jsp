@@ -103,7 +103,7 @@
                             </small></h5>
                             <p style="margin-top: 40px;">
                             <h4><small class="margintext" style="color: #000;">${album.desc}</small></h4>
-                            <button type = "button" class="btn btn-info" style="position: absolute; bottom: 45px; right: 40px; 
+                            <button type = "button" class="btn btn-info" onclick="buy();" style="position: absolute; bottom: 45px; right: 40px; 
                                     <c:if test="${isBought == true}">cursor: default;</c:if>" <c:if test="${isBought == true}"> disabled="disabled"</c:if> >
                                 
                                 <c:choose>
@@ -150,14 +150,14 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <c:forEach items="${albumName}" var="track">
+                                <c:forEach items="${album.tracks}" var="track">
                                 <tr>
                                     <td>${track.position}</td>
                                     <td>${track.name}</td>
                                     
                                     <td>
-                                        <fmt:formatNumber var="min" value="${track.duration / 60}" maxFractionDigits="0" />
-                                        <c:set var="sec" value="${(track.duration % 60 < 10) ? ('0' + track.duration % 60) : (track.duration % 60)}"/>
+                                        <fmt:formatNumber var="min" value="${(track.duration - track.duration % 60) / 60}" maxFractionDigits="0" />
+                                        <fmt:formatNumber var="sec" value="${track.duration % 60}" maxFractionDigits="0" pattern="00" />
                                         ${min}:${sec}
                                     </td>
                                 </tr>
@@ -226,7 +226,7 @@
         <p>&copy; Денис Антонов 2015</p>
     </footer>
     
-    <div <c:if test="${user == null}"> id="popover-content" </c:if> class="hide">
+    <div <c:choose> <c:when test="${user == null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
         <form action="" role="form">
             <div class="form-group">
               <label for="user">Логин</label>
@@ -238,10 +238,10 @@
       </form>
     </div>
     
-    <div <c:if test="${user != null}"> id="popover-content" </c:if> class="hide">
-        <p style="margin-top: 10px;"><a href="<c:if test="${user != null}"><c:url value="/user/"/></c:if>">Личный кабинет</a></p>
+    <div <c:choose> <c:when test="${user != null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
+        <p style="margin-top: 10px;"><a href="<c:url value="/user"/>">Личный кабинет</a></p>
         
-        <p><a href="<c:if test="${user != null}"><c:url value="/user/boughtAlbums"/></c:if>">Мои альбомы</a></p>
+        <p><a href="<c:url value="/user/boughtAlbums"/>">Мои альбомы</a></p>
         <div style="display: inline;">
             <div style="display: inline-block;">
                 Баланс: 
@@ -249,7 +249,7 @@
             <div style="display: inline-block;">
                <c:if test="${user != null}">${format.format(user.wallet)}</c:if>
             </div>
-            <div style="display: inline-block;">
+            <div id="wallet" style="display: inline-block;">
                 р. 
             </div>
         </div>
@@ -309,6 +309,21 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
               <button type="button" class="btn btn-info">Регистрация</button>
+            </div>
+          </div>
+        </div>
+    </div>
+            
+    <div class="modal fade" id="modalInfo">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
             </div>
           </div>
         </div>

@@ -1,22 +1,23 @@
 package com.dantonov.musicstore.controller;
 
-import com.dantonov.musicstore.dto.ResponseMessageDto;
+import com.dantonov.musicstore.dto.UserDto;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.RequestDataException;
-import com.dantonov.musicstore.exception.ResourceNotFoundException;
+import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AuthService;
 import com.dantonov.musicstore.service.UserService;
+import java.text.DecimalFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
@@ -26,6 +27,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 public class AuthController {
+    
+    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
+    static {
+        DEC_FORMAT.setMaximumFractionDigits(2);
+        DEC_FORMAT.setMinimumFractionDigits(2);
+        DEC_FORMAT.setGroupingUsed(false);
+    }
 
     @Autowired
     private  AuthService authService;
@@ -35,10 +43,9 @@ public class AuthController {
 
     
     
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public ResponseMessageDto login(@RequestParam("login") String username,
+    public UserDto login(@RequestParam("login") String username,
                                @RequestParam("pass") String password,
                                HttpServletResponse response) {
        
@@ -48,13 +55,17 @@ public class AuthController {
         }
 
         authService.login(user, response);
-        return new ResponseMessageDto(HttpStatus.OK.value(), "Успешный вход.");
+        return new UserDto(user.getLogin(), DEC_FORMAT.format(user.getWallet()));
     }
     
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-        authService.logout(request, response);
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+        
+        if (user != null) {
+            authService.logout(request, response, user);
+        }
+        
         return "redirect:/";
     }
     

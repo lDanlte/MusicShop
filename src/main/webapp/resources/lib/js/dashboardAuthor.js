@@ -1,3 +1,5 @@
+var author = $("#groupControl").data("author");
+
 function createAlbum() {
    var name =  $("#albumName").val(),
        releaseDate = $("#releaseDate").val(),
@@ -26,9 +28,7 @@ function createAlbum() {
         genresIds: genres,
         songsTitles: trackNames
     }
-    var author = "Tmp Group 6";
     var data = new FormData();
-    data.append("login", "tmp_group_6"); /////TMP DELETE AFTER ADDING SECURITY
     data.append("album", JSON.stringify(album));
     data.append("cover", cover);
     for(var i = 1; i <= audioCount; i++) {
@@ -36,17 +36,23 @@ function createAlbum() {
     }
     
     $.ajax({
-        url: MAIN_URL + "/author/" + author + "/album/create",
+        url: MAIN_URL + "author/" + author + "/album",
         data: data,
         cache: false,
         contentType: false,
         processData: false,
+        dataType: "json",
         type: 'POST',
-        success: function(){
-            alert("Урааааа!!!");
+        success: function(respData){
+            showMessage("Инфо", respData.responseMessageDto.msg);
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert("Упс...");
+            var respMessage = jqXHR.responseJSON;
+             if (respMessage === undefined) {
+                showMessage("Внимание", "Произошла неизвестная ошибка. Повторите позднее.");
+            } else {
+                showMessage("Внимание", respMessage.msg);
+            }
         }
     });
     
@@ -56,17 +62,21 @@ function createAlbum() {
 function discountCash() {
     var cash = $("#discountCash").val();
     
-    var login = "tmp_group_6";
-    
     $.ajax({
-        url: MAIN_URL + "/user/discountMoney" + "?value=" + cash ,
+        url: MAIN_URL + "user/discountMoney" + "?value=" + cash ,
         method: "PUT",
         dataType: "json",
         success: function (data) {
-            alert("success");
+            $("#wallet").html(data.userDto.wallet);
+            showMessage("Инфо", "Со счета успешно переведены деньги.");
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert("error" + errorThrown);
+            var respMessage = jqXHR.responseJSON;
+            if (respMessage === undefined) {
+                showMessage("Внимание", "Произошла неизвестная ошибка. Повторите позднее.");
+            } else {
+                showMessage("Внимание", respMessage.msg);
+            }
         }
     });
 }
@@ -75,31 +85,33 @@ function updateAuthor() {
     var cover     = $("#updateCover")[0].files[0],
         albumDesc = $("#updateDesc").val();
 
-     var type = "PUT";
+     var type = "POST";
      
     var data = new FormData();
     if (cover !== undefined) {
         data.append("cover", cover);
     } else {
-        type = "POST";
-    }
-    if (albumDesc !== undefined) {
-        data.append("desc", albumDesc);
+        type = "PUT";
     }
 
-    var author = "Tmp Group 6";
     $.ajax({
-        url: MAIN_URL + "/author/" + author + "/update",
+        url: MAIN_URL + "author/" + author + ((albumDesc != "") ? "?desc=" + albumDesc : ""),
         data: data,
         cache: false,
         contentType: false,
         processData: false,
+        dataType: "json",
         type: type,
-        success: function(){
-            alert("Урааааа!!!");
+        success: function(respData){
+            showMessage("Инфо", respData.responseMessageDto.msg);
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert("Упс..." + errorThrown);
+            var respMessage = jqXHR.responseJSON;
+            if (respMessage === undefined) {
+                showMessage("Внимание", "Произошла неизвестная ошибка. Повторите позднее.");
+            } else {
+                showMessage("Внимание", respMessage.msg);
+            }
         }
     });
 }

@@ -1,8 +1,16 @@
 var MAIN_URL = "http://localhost:8084/MusicStore/";
 
-$("[data-toggle=popover]").popover({
+var popover = $("[data-toggle=popover]").popover({
     html: true, 
     content: $('#popover-content').html()
+});
+
+$(document).ready(function(){
+   var modal = $("#modalInfo");
+   var content = modal.find(".modal-body");
+   if (content.html() != "") {
+       modal.modal();
+   }
 });
 
 
@@ -23,7 +31,7 @@ function registration() {
         passComf = $("#newPass2").val();
 
     if (pass != passComf) {
-        alert("Пароли не совпвдают.");
+        showMessage("Внимание", "Пароли не совпвдают.");
         return;
     }
     
@@ -34,15 +42,21 @@ function registration() {
     }
     
     $.ajax({
-        url: MAIN_URL + "user/registration",
+        url: MAIN_URL + "user",
         method: "POST",
         contentType: "application/json",
+        dataType: "json",
         data: JSON.stringify(newUser),
-        success: function (data, textStatus) {
-            alert("Вы успешно зарегистрированы.");
+        success: function (respData) {
+            showMessage("Инфо", respData.responseMessageDto.msg);
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            alert("Упс... Что-то пошло не так.");
+            var respMessage = jqXHR.responseJSON;
+            if (respMessage === undefined) {
+                showMessage("Ошибка при регистрации", "Произошла неизвестная ошибка. Повторите позднее.");
+            } else {
+                showMessage("Ошибка при регистрации.", respMessage.msg);
+            }
         }
     });
 
@@ -50,7 +64,7 @@ function registration() {
 
 function auth() {
     var login = $(".popover #authLogin").val(),
-        pass  = $(".popover #authPass").val(); //блядь, это какая-то магия. Если искать элемент по id, то val() возвращяет пустую строку.
+        pass  = $(".popover #authPass").val();
     var data = new FormData();
         data.append("login", login);
         data.append("pass", pass);
@@ -62,11 +76,24 @@ function auth() {
         contentType: false,
         processData: false,
         data: data,
-        success: function (data, textStatus, jqXHR) {
-            alert("Авторизация прошла успешно.");
+        success: function (respData, textStatus, jqXHR) {
+            var user = respData.userDto;
+            popover.popover("hide");
+            var oldContent = $("#popover-content");
+            var newContent = $("#popover-content-disable");
+            oldContent.attr("id", "popover-content-disable");
+            newContent.attr("id", "popover-content");
+            $("#login").html(user.login);
+            $("#wallet").html(user.wallet);
+            popover.data('bs.popover').options.content = $('#popover-content').html();
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            alert("Auth faild.");
+        error: function(jqXHR) {
+            var respMessage = jqXHR.responseJSON;
+            if (respMessage === undefined) {
+                showMessage("Ошибка при авторизации.", "Произошла неизвестная ошибка. Повторите позднее.");
+            } else {
+                showMessage("Ошибка при авторизации.", respMessage.msg);
+            }
         }
     });
 }
@@ -76,10 +103,42 @@ function logout() {
         url: MAIN_URL + "logout",
         method: "POST",
         success: function (data, textStatus, jqXHR) {
-            alert("logout");
+            console.log("Логаут прошел успешно.");
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            alert("logout faild");
+            console.log("Ошибка при логауте " + jqXHR.responseText);
         }
     });
+}
+
+function buy() {
+    var url = "http://" + location.host + location.pathname + "/buy";
+    $.ajax({
+        url: url,
+        method: "PUT",
+        dataType: "json",
+        success: function (respData, textStatus, jqXHR) {
+            showMessage("Инфо", respData.responseMessageDto.msg);
+            $("#modalInfo").on('hidden.bs.modal', function (e) { 
+                location.reload(true);
+            });
+        },
+        error: function(jqXHR) {
+            var respMessage = jqXHR.responseJSON;
+            if (respMessage === undefined) {
+                showMessage("Ошибка при регистрации", "Произошла неизвестная ошибка. Повторите позднее.");
+            } else {
+                showMessage("Ошибка при регистрации.", respMessage.msg);
+            }
+        }
+    });
+}
+
+function showMessage(title, message) {
+    var modal = $("#modalInfo");
+    
+    modal.find(".modal-body").html(message);
+    modal.find(".modal-title").html(title);
+    
+    modal.modal();
 }

@@ -17,12 +17,24 @@ public class UserDto {
     
     @JsonProperty("email")
     private String email;
+    
+    @JsonProperty("wallet")
+    private String wallet;
 
     
     
     public UserDto() {
     }
+    
+    public UserDto(String wallet) {
+        this.wallet = wallet;
+    }
 
+    public UserDto(String login, String wallet) {
+        this.login = login;
+        this.wallet = wallet;
+    }
+    
     public UserDto(String login, String pass, String email) {
         this.login = login;
         this.pass = pass;
@@ -38,6 +50,8 @@ public class UserDto {
 
     public String getPass() {  return pass; }
     public void setPass(String pass) { this.pass = pass; }
-    
-    
+
+    public String getWallet() { return wallet; }
+    public void setWallet(String wallet) { this.wallet = wallet; }
+     
 }

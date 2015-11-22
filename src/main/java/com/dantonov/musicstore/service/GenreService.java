@@ -36,7 +36,6 @@ public class GenreService {
     }
     
     
-    @Transactional
     public Genre save(Genre genre) {
         return genreRepository.save(genre);
     }

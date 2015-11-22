@@ -2,6 +2,7 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.dto.AuthorDto;
+import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.dto.UserDto;
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Author;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,19 +102,32 @@ public class AuthorController {
     }
     
     @Secured(role = RoleEnum.ADMIN)
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void createAuthor(@RequestParam("author") String authorDtoStr, 
-                             @RequestParam("image") MultipartFile file) {
+    public ResponseMessageDto createAuthor(@RequestParam("author") String authorDtoStr, 
+                                           @RequestParam("image") MultipartFile file) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             AuthorDto authorDto = mapper.readValue(authorDtoStr, AuthorDto.class);
             
             User newUser = createUser(authorDto.getUser());
             newUser.setAuthor(createAuthor(authorDto, newUser));
+            
+            Set<Role> roles = new HashSet<>();
+            Role role = roleService.findByName(RoleEnum.USER.getRole());
+            role.getUsers().add(newUser);
+            roles.add(role);
+            role = roleService.findByName(RoleEnum.AUTHOR.getRole());
+            role.getUsers().add(newUser);
+            roles.add(role);
+            newUser.setRoles(roles);
+            
             userService.save(newUser);
             
             dataService.saveAuthorCover(authorDto.getName(), file);
+            
+            return new ResponseMessageDto(HttpStatus.OK.value(), "Группа" + authorDto.getName() + " успешно добавлена.");
+                    
         } catch (IOException ex) {
             log.warn("Ошибка при добавлении автора", ex);
             throw new RequestDataException("Ошибка при добавлении группы.");
@@ -120,12 +135,12 @@ public class AuthorController {
     }
     
     @Secured(role = RoleEnum.AUTHOR)
-    @RequestMapping(value = "/{name}/update", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{name}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void updateAuthor(@RequestParam(value = "desc", required = false) String desc, 
-                             @RequestParam(value = "cover") MultipartFile file,
-                             @PathVariable("name") String authorName,
-                             HttpServletRequest request) {
+    public ResponseMessageDto updateAuthor(@RequestParam(value = "desc", required = false) String desc, 
+                                            @RequestParam(value = "cover") MultipartFile file,
+                                            @PathVariable("name") String authorName,
+                                            HttpServletRequest request) {
         
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
@@ -148,14 +163,15 @@ public class AuthorController {
             log.warn("Ошибка при обновлении даннах группы", ex);
             throw new RequestDataException("Ошибка при обновлении даннах группы.");
         }
+        return new ResponseMessageDto(HttpStatus.OK.value(), "Группа " + authorName + " успешно обновлена.");
     }
     
     @Secured(role = RoleEnum.AUTHOR)
-    @RequestMapping(value = "/{name}/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/{name}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void updateAuthor(@RequestParam(value = "desc", required = false) String desc,
-                             @PathVariable("name") String authorName,
-                             HttpServletRequest request) {
+    public ResponseMessageDto updateAuthor(@RequestParam(value = "desc", required = false) String desc,
+                                           @PathVariable("name") String authorName,
+                                           HttpServletRequest request) {
         User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
 
         Author author = authorService.findByName(authorName);
@@ -167,6 +183,7 @@ public class AuthorController {
             author.setDesc(desc);
             authorService.save(author);
         }
+        return new ResponseMessageDto(HttpStatus.OK.value(), "Группа " + authorName + " успешно обновлена.");
     }
     
     

@@ -22,6 +22,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 public class AuthInspector extends HandlerInterceptorAdapter {
     
     public static final String USER_ATTRIBUTE = "user";
+    public static final String FILLDATA_ATTRIBUTE = "isFill";
 
     
     @Autowired
@@ -39,18 +40,19 @@ public class AuthInspector extends HandlerInterceptorAdapter {
         if (handler.getClass().isAssignableFrom(HandlerMethod.class)) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Secured secured = handlerMethod.getMethodAnnotation(Secured.class);
+            Class<?> returnClass = handlerMethod.getReturnType().getParameterType();
+            boolean isResponseBody = isResponseBody(returnClass);
             if (secured != null) {
-                Class<?> returnClass = handlerMethod.getReturnType().getClass();
                 if (user == null) {
-                    if (isResponseBody(returnClass)) {
+                    if (isResponseBody) {
                         response.sendRedirect(request.getContextPath() + "/unauthorizedUserBody");
                     } else {
                         response.sendRedirect(request.getContextPath() + "/unauthorizedUserPage");
                     }
-                    return false; //maybe not allowed
+                    return false;
                 }
                 if (!user.hasRole(secured.role().getRole())) {
-                    if (isResponseBody(returnClass)) {
+                    if (isResponseBody) {
                         response.sendRedirect(request.getContextPath() + "/userHasNoRoleBody");
                     } else {
                         response.sendRedirect(request.getContextPath() + "/userHasNoRolePage");
@@ -58,24 +60,29 @@ public class AuthInspector extends HandlerInterceptorAdapter {
                     return false;
                 }
             }
+            request.getSession(true).setAttribute(FILLDATA_ATTRIBUTE, !isResponseBody);
         }
-        
         request.getSession(true).setAttribute(USER_ATTRIBUTE, user);
         return true;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-        modelAndView.addObject("genres", genreService.findAll());
-        modelAndView.addObject("user", request.getSession().getAttribute(USER_ATTRIBUTE));
+        Boolean tr = (Boolean) request.getSession().getAttribute(FILLDATA_ATTRIBUTE);
+        if (response.getStatus() != 0 && tr ) {
+            modelAndView.addObject("genres", genreService.findAll());
+            modelAndView.addObject("user", request.getSession().getAttribute(USER_ATTRIBUTE));
+        }
         request.getSession().removeAttribute(USER_ATTRIBUTE);
+        request.getSession().removeAttribute(FILLDATA_ATTRIBUTE);
     }
     
     
     private boolean isResponseBody(Class<?> returnClass) {
-        return !(!returnClass.isAnnotationPresent(ResponseBody.class) ||
-                  returnClass.isAssignableFrom(String.class) || 
-                  returnClass.isAssignableFrom(ModelAndView.class) ||
-                  returnClass.isAssignableFrom(View.class)); 
+        boolean b1 = !returnClass.isAnnotationPresent(ResponseBody.class);
+        boolean b2 = returnClass.isAssignableFrom(String.class);
+        boolean b3 = returnClass.isAssignableFrom(ModelAndView.class);
+        boolean b4 = returnClass.isAssignableFrom(View.class);
+        return !((b1 && b2) || b3 || b4);
     }
 }
