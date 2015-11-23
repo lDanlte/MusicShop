@@ -8,6 +8,25 @@ function createAuthor() {
        desc     = $("#authorDesc").val(),
        cover    = $("#authorCover")[0].files[0];
        
+    if (!checkStrs(name, email, login, pass, passComf, desc)) {
+        showMessage("Внимание", "Не заполнено одно из полей.");
+        return;
+    }
+    if (cover === undefined) {
+        showMessage("Внимание", "Не выбрана обложка.");
+        return;
+    }
+       
+    if (cover.type != "image/jpeg") {
+        showMessage("Внимание", "Тип файла обложки должен быть .jpg.");
+        return;
+    }   
+    
+    if (!EMAIL_REG_EXP.test(email)) {
+        showMessage("Внимание", "Неверно записан email.");
+        return;
+    }
+       
     if (pass != passComf) {
         showMessage("Внимание", "Пароли не совпвдают.");
         return;

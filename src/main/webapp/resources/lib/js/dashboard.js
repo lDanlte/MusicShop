@@ -2,9 +2,15 @@ function showHistoryTable() {
 
     var from = $("#histotyDateFrom").val(),
           to = $("#histotyDateTo").val();
+  
+    if (!checkStrs(from, to)) {
+        showMessage("Внимание", "Не заполнено одно из полей.");
+        return;
+    }
+  
     var div = $("#historyTable");
     div.addClass("hide");
-  $.ajax({
+    $.ajax({
         url: MAIN_URL + "user/tradehistory" + "?from=" + from + "&to=" + to ,
         method: "GET",
         dataType: "json",
@@ -50,6 +56,15 @@ function showHistoryTable() {
 function addCash() {
     var cash = $("#addCash").val();
     
+     if (cash == "") {
+        showMessage("Внимание", "Не введена сумма.");
+        return;
+    } 
+    if (cash <= 0) {
+        showMessage("Внимание", "Нверно введена сумма.");
+        return;
+    }
+    
     $.ajax({
         url: MAIN_URL + "user/addMoney" + "?value=" + cash ,
         method: "PUT",
@@ -79,6 +94,12 @@ function changeUserData() {
         showMessage("Внимание", "Все поля пустые.");
         return;
     }
+    
+    if (!EMAIL_REG_EXP.test(email)) {
+        showMessage("Внимание", "Неверно записан email.");
+        return;
+    }
+    
     if (pass != comfPass) {
         showMessage("Внимание", "Пароли не совпвдают.");
         return;

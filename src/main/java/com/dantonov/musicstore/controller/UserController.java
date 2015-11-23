@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ public class UserController {
     
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
+    private static final Pattern EMAIL_REGEX = Pattern.compile("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$");
     private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
     static {
         DEC_FORMAT.setMaximumFractionDigits(2);
@@ -129,6 +131,10 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseMessageDto addUser(@RequestBody UserDto newUser) {
         
+        if (!EMAIL_REGEX.matcher(newUser.getEmail()).matches()) {
+            throw new RequestDataException("Неверно введен email.");
+        }
+        
         User user = new User(newUser.getLogin(), newUser.getPass(), newUser.getEmail());
         
         Set<Role> roles = new HashSet<>();
@@ -157,6 +163,9 @@ public class UserController {
             if (userService.findByEmail(data.getEmail()) != null) {
                 throw new EmailAlreadyExistsException("Пользователь с email " + data.getEmail() + " уже существует.");
             } else {
+                if (!EMAIL_REGEX.matcher(data.getEmail()).matches()) {
+                    throw new RequestDataException("Неверно введен email.");
+                }
                 user.setEmail(data.getEmail());
                 userService.update(user);
             }

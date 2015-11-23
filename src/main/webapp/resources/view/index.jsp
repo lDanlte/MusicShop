@@ -111,7 +111,7 @@
                                     <img class="img-rounded" src="<c:url value="/resource/${author.name}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
 
                                     <h4><strong class="margintext">${author.name}</strong></h4>
-                                    <p><h4><em><small class="margintext">${author.desc}</small></em></h4>
+                                    <p><h4 style="padding-right: 25px;"><em><small class="margintext">${author.desc}</small></em></h4>
                             <!--/row-->
 
                                 </div>
@@ -175,7 +175,7 @@
         
     </div>
         
-    <footer style="padding-left: 15px;">
+    <footer style="padding-left: 15px; padding-top: 30px;">
         <hr>
         <p>&copy; Денис Антонов 2015</p>
     </footer>

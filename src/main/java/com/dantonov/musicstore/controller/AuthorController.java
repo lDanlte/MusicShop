@@ -128,6 +128,8 @@ public class AuthorController {
             
             return new ResponseMessageDto(HttpStatus.OK.value(), "Группа" + authorDto.getName() + " успешно добавлена.");
                     
+        } catch (RequestDataException e) {
+            throw e;
         } catch (IOException ex) {
             log.warn("Ошибка при добавлении автора", ex);
             throw new RequestDataException("Ошибка при добавлении группы.");

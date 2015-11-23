@@ -17,3 +17,6 @@ function albumPage(author, album) {
     location = MAIN_URL + "author/" + author + "/album/" + album;
 }
 
+function authorPage(author) {
+     location = MAIN_URL + "author/" + author ;
+}

@@ -272,7 +272,7 @@
 
                                     <div class="control-group" style="margin-top: 10px;">
                                         <label for="exampleInputFile">Постер группы</label>
-                                        <input type="file" id="authorCover" accept="image/*">
+                                        <input type="file" id="authorCover" accept="image/jpeg">
                                     </div>
 
                                     </fieldset>
@@ -295,7 +295,7 @@
 
                                     <div class="control-group" style="margin-top: 10px;">
                                         <label for="updateCover">Новый постер группы</label>
-                                        <input type="file" id="updateCover" accept="image/*">
+                                        <input type="file" id="updateCover" accept="image/jpeg">
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
@@ -361,7 +361,7 @@
 
                                         <div class="control-group" style="margin-top: 10px;">
                                             <label for="albumCover">Обложка альбома</label>
-                                            <input type="file" id="albumCover" accept="image/*">
+                                            <input type="file" id="albumCover" accept="image/jpeg">
                                         </div>
 
                                     </fieldset>
@@ -375,7 +375,7 @@
                                        <input id="musicName_1" type="text" class="form-control" placeholder="Название песни" style="max-width: 200px; margin-left: 10px; margin-right: 10px;" />
                                     </div>
                                     <div class="control-group" style="display: inline-block;">
-                                    <input type="file" id="music_1" accept="audio/mpeg3">
+                                    <input type="file" id="music_1" accept="audio/mpeg">
                                 </div>
                                 </div>
                             </div>
@@ -455,7 +455,7 @@
     </div>
     
 
-     <footer style="padding-left: 15px;">
+     <footer style="padding-left: 15px; padding-top: 30px;">
         <hr>
         <p>&copy; Денис Антонов 2015</p>
     </footer>

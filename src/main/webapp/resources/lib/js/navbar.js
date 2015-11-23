@@ -1,5 +1,5 @@
 var MAIN_URL = "http://localhost:8084/MusicStore/";
-
+var EMAIL_REG_EXP = new RegExp("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$", "g");
 var popover = $("[data-toggle=popover]").popover({
     html: true, 
     content: $('#popover-content').html()
@@ -30,6 +30,14 @@ function registration() {
         pass = $("#newPass").val(),
         passComf = $("#newPass2").val();
 
+    if (!checkStrs(login, email, pass, passComf)) {
+        showMessage("Внимание", "Не заполнено одно из полей.");
+        return;
+    }
+    if (!EMAIL_REG_EXP.test(email)) {
+        showMessage("Внимание", "Неверно записан email.");
+        return;
+    }
     if (pass != passComf) {
         showMessage("Внимание", "Пароли не совпвдают.");
         return;
@@ -65,6 +73,12 @@ function registration() {
 function auth() {
     var login = $(".popover #authLogin").val(),
         pass  = $(".popover #authPass").val();
+
+    if (!checkStrs(login, pass)) {
+        showMessage("Внимание", "Не заполнено одно из полей.");
+        return;
+    }
+    
     var data = new FormData();
         data.append("login", login);
         data.append("pass", pass);
@@ -141,4 +155,22 @@ function showMessage(title, message) {
     modal.find(".modal-title").html(title);
     
     modal.modal();
+}
+
+function checkUndef() {
+    for (var i = 0; i < arguments.length; i++) {
+        if (arguments[i] === undefined) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function checkStrs() {
+    for (var i = 0; i < arguments.length; i++) {
+        if (arguments[i] == "") {
+            return false;
+        }
+    }
+    return true;
 }

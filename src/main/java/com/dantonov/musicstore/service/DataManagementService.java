@@ -1,5 +1,6 @@
 package com.dantonov.musicstore.service;
 
+import com.dantonov.musicstore.exception.RequestDataException;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class DataManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataManagementService.class);
+    private static final String IMAGE_TYPE = "image/jpeg";
+    private static final String AUDIO_TYPE = "audio/mpeg";
     
     private String storagePath;
     
@@ -38,6 +41,10 @@ public class DataManagementService {
     }
     
     public void saveAuthorCover(String authorName, MultipartFile file) throws IOException {
+        
+        if (!file.getContentType().equals(IMAGE_TYPE)) {
+            throw new RequestDataException("Неверный тип обложки. Должен быть .jpg.");
+        }
         
         StringBuilder path = new StringBuilder(storagePath);
         path.append(authorName);
@@ -67,6 +74,16 @@ public class DataManagementService {
     
     public void saveAlbumData(String authorName, String albumTitle,
                               MultipartFile cover, MultipartFile[] audioFiles) {
+        
+        if (!cover.getContentType().equals(IMAGE_TYPE)) {
+            throw new RequestDataException("Неверный тип обложки. Должен быть .jpg.");
+        }
+        
+        for (byte i = 0; i < audioFiles.length; i++) {
+            if (!audioFiles[i].getContentType().equals(AUDIO_TYPE)) {
+            throw new RequestDataException("Неверный тип файла " + audioFiles[i].getOriginalFilename() + ". Должен быть mp3.");
+        }
+        }
         
         StringBuilder path = new StringBuilder(storagePath);
         path.append(authorName).append('/').append(albumTitle);

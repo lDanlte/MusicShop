@@ -10,14 +10,50 @@ function createAlbum() {
        trackFiles = [],
        cover = $("#albumCover")[0].files[0];
        
+    if (!checkStrs(name, releaseDate, price, albumDesc)) {
+        showMessage("Внимание", "Не заполнено одно из полей.");
+        return;
+    }
+    
+    if (cover === undefined) {
+        showMessage("Внимание", "Не Не выбрана обложка.");
+        return;
+    }
+    
+    if (cover.type != "image/jpeg") {
+        showMessage("Внимание", "Тип файла обложки должен быть .jpg.");
+        return;
+    }
+       
     $('#albumGenres :selected').each(function(i, selected){ 
         genres += $(selected).val() + ',';
     });
+    
+    if (genres == "") {
+        showMessage("Внимание", "Не выбран жанр.");
+        return;
+    }
+    
     genres = genres.substring(0, genres.length - 1);
     
+    
+    
     for(var i = 1; i <= audioCount; i++) {
-        trackNames.push($("#musicName_" + i).val());
-        trackFiles.push($("#music_" + i)[0].files[0]);
+        var musicName = $("#musicName_" + i).val();
+        var music = $("#music_" + i)[0].files[0];
+        if (musicName == "" || music === undefined) {
+            break;
+        }
+        if (music.type != "audio/mpeg") {
+            showMessage("Внимание", music.name + " не является mp3 файлом.");
+            return;
+        }
+        trackNames.push(musicName);
+        trackFiles.push(music);
+    }
+    if (trackNames.length == 0) {
+        showMessage("Внимание", "Не не добавлены песни.");
+        return;
     }
     
     var album = {
@@ -61,6 +97,14 @@ function createAlbum() {
 
 function discountCash() {
     var cash = $("#discountCash").val();
+    if (cash == "") {
+        showMessage("Внимание", "Не введена сумма.");
+        return;
+    } 
+    if (cash <= 0) {
+        showMessage("Внимание", "Нверно введена сумма.");
+        return;
+    }
     
     $.ajax({
         url: MAIN_URL + "user/discountMoney" + "?value=" + cash ,
@@ -84,11 +128,19 @@ function discountCash() {
 function updateAuthor() {
     var cover     = $("#updateCover")[0].files[0],
         albumDesc = $("#updateDesc").val();
-
-     var type = "POST";
+        
+    if (cover === undefined && albumDesc == "") {
+        showMessage("Внимание", "Не введены данные для обновления.");
+        return;
+    }
+    var type = "POST";
      
     var data = new FormData();
     if (cover !== undefined) {
+        if (cover.type != "image/jpeg") {
+            showMessage("Внимание", "Тип файла обложки должен быть .jpg.");
+            return;
+        }
         data.append("cover", cover);
     } else {
         type = "PUT";

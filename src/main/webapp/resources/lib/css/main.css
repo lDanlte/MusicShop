@@ -31,8 +31,10 @@ li {
 }
 
 div.album {
-    width: 162px;
+    //width: 162px;
     height: 235px;
+    min-width: 162px;
+    max-width: 320px;
     margin: 5px;
     background-color: white;
     border-bottom: 2px #dadada solid;

@@ -221,7 +221,7 @@
         
     </div>
                             
-     <footer style="padding-left: 15px;">
+     <footer style="padding-left: 15px; padding-top: 30px;">
         <hr>
         <p>&copy; Денис Антонов 2015</p>
     </footer>

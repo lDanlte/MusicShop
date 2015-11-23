@@ -89,8 +89,8 @@
 
                                     <c:forEach  items="${authors}" var="author">
                                         <li>
-                                            <div class="album" onclick="authorPage('${author.name}'});">
-                                                <img src="<c:url value="/resource/${author.name}/cover.jpg"/>" alt="${author.name}" height="160">
+                                            <div class="album" onclick="authorPage('${author.name}');" style="height: 200px;">
+                                                <img src="<c:url value="/resource/${author.name}/cover.jpg"/>" alt="${author.name}" style="height: 160px;">
                                                 <h5 style="margin-top: 10px;">${author.name}</h5>
                                             </div>
                                         </li>
@@ -206,7 +206,7 @@
         
     </div>
         
-     <footer style="padding-left: 15px;">
+     <footer style="padding-left: 15px; padding-top: 30px;">
         <hr>
         <p>&copy; Денис Антонов 2015</p>
     </footer>
