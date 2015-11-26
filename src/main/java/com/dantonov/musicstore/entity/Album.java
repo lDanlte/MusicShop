@@ -20,6 +20,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -81,6 +82,8 @@ public class Album {
     @OrderBy("pos")
     private List<Track> tracks;
 
+    @Transient
+    private boolean isBought = false;
     
     
     public Album() {
@@ -146,6 +149,10 @@ public class Album {
 
     public List<Track> getTracks() { return tracks; }
     public void setTracks(List<Track> tracks) { this.tracks = tracks; }
+
+    public boolean getIsBought() { return isBought; }
+    public void setIsBought(boolean isBought) { this.isBought = isBought; }
+    
     
     
     @Override

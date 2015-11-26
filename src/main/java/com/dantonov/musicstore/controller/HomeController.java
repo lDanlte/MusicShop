@@ -2,7 +2,9 @@ package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
+import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.PageNotFoundException;
+import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AlbumService;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.GenreService;
@@ -12,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,13 +58,24 @@ public class HomeController {
     
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView home(ModelAndView modelAndView, RedirectAttributes redirectAttributes) {
+    public ModelAndView home(ModelAndView modelAndView,
+                             RedirectAttributes redirectAttributes,
+                             HttpServletRequest request) {
+        
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         modelAndView.addObject("pageContextStr", "index");
        
         Map<String, List<Album>> map = new LinkedHashMap<>();
-        map.put("Последние добавленные", albumService.getLastAdded());
-        map.put("Топ продаж", albumService.getTopSales());
+        List<Album> lastAdded = albumService.getLastAdded();
+        List<Album> topSales = albumService.getTopSales();
+        if (user != null) {
+            setIsBought(lastAdded, user);
+            setIsBought(topSales, user);
+        }
+        
+        map.put("Последние добавленные", lastAdded);
+        map.put("Топ продаж", topSales);
         modelAndView.addObject("dataMap", map);
         
         modelAndView.addObject("format", DEC_FORMAT);
@@ -78,10 +92,17 @@ public class HomeController {
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView searchingPage(@RequestParam("q") String q,
-                                      ModelAndView modelAndView) {
+                                      ModelAndView modelAndView,
+                                      HttpServletRequest request) {
+        
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         modelAndView.addObject("authors", authorService.searchByName(q));
-        modelAndView.addObject("albums", albumService.searchByTitle(q));
+        List<Album> albums = albumService.searchByTitle(q);
+        if (user != null) {
+            setIsBought(albums, user);
+        }
+        modelAndView.addObject("albums", albums);
         modelAndView.addObject("tracks", trackService.searchByName(q));
         
         modelAndView.addObject("format", DEC_FORMAT);
@@ -94,7 +115,10 @@ public class HomeController {
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView categoryPage(@RequestParam("gid") Integer gid, 
-                                     ModelAndView modelAndView) {
+                                     ModelAndView modelAndView,
+                                     HttpServletRequest request) {
+        
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
         
         Genre selectedGenre = genreService.findById(gid);
         if (selectedGenre == null) {
@@ -104,9 +128,16 @@ public class HomeController {
         modelAndView.addObject("selectedGenreId", selectedGenre.getId());
         modelAndView.addObject("pageContextStr", "index");
         
+        List<Album> lastAdded = albumService.getLastAddedByGenre(selectedGenre);
+        List<Album> topSales = albumService.getTopSalesByGenre(selectedGenre);
+        if (user != null) {
+            setIsBought(lastAdded, user);
+            setIsBought(topSales, user);
+        }
+        
         Map<String, List<Album>> map = new LinkedHashMap<>();
-        map.put("Последние добавленные - " + selectedGenre.getName(), albumService.getLastAddedByGenre(selectedGenre));
-        map.put("Топ продаж - " + selectedGenre.getName(), albumService.getTopSalesByGenre(selectedGenre));
+        map.put("Последние добавленные - " + selectedGenre.getName(), lastAdded);
+        map.put("Топ продаж - " + selectedGenre.getName(), topSales);
         modelAndView.addObject("dataMap", map);
         
         modelAndView.addObject("format", DEC_FORMAT);
@@ -114,6 +145,14 @@ public class HomeController {
         modelAndView.setViewName("index");
         
         return modelAndView;
+    }
+    
+    private void setIsBought(List<Album> albums, User user) {
+        for (Album album : albums) {
+            if (user.hasAlbum(album)) {
+                album.setIsBought(true);
+            }
+        }
     }
     
     

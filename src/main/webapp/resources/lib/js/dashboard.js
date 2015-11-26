@@ -147,7 +147,8 @@ $(document).ready(function () {
             format: "dd.mm.yyyy",
             todayHighlight: true,
             language: "ru",
-            endDate: todayDate
+            endDate: todayDate,
+            orientation: "auto bottom"
         });
     });
 });

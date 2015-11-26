@@ -88,7 +88,7 @@
                                         <h2>Добро пожаловать!</h2>
                                         <p style="margin-bottom: 0px;"><em>Данный сервис является большой библиотека музыки.<small> В будущем, может быть :)</small></em></p>
                                         <p style="margin-top: 0px;"><em>Слушайте любимые песни в одном месте.</em></p>
-                                        <p><small><a href="#" data-toggle="modal" data-target="#myModal">Зарегестрируйтесь</a> и получите возможноть прослушивать любымые треки в любое время.</small></p>
+                                        <p><small><a href="#" data-toggle="modal" data-target="#myModal">Зарегестрируйтесь</a> и получите возможноть прослушивать любимые треки в любое время.</small></p>
                                 <!--/row-->
                                     </div>
                                 </div>
@@ -150,7 +150,7 @@
                                                     <img src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" alt="${album.title}" width="160" height="160">
                                                     <h5 style="margin-top: 10px;">${album.title}</h5>
                                                     <h5 ><small><a href="<c:url value="/author/${album.author.name}"/>" style="color: #777;">${album.author.name}</a></small></h5>
-                                                    <p class="text-right">${format.format(album.price)} руб</p>
+                                                    <p class="text-right"><c:choose><c:when test="${album.isBought}">Куплено</c:when><c:otherwise>${format.format(album.price)} руб</c:otherwise></c:choose></p>
                                                 </div>
                                             </li>
                                         </c:forEach>

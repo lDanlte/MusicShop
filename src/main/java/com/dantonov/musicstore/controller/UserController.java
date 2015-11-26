@@ -108,6 +108,7 @@ public class UserController {
         Map<String, List<Album>> map = new LinkedHashMap<>();
         
         for (Album album : user.getAlbums()) {
+            album.setIsBought(true);
             Author author = album.getAuthor();
             if (map.containsKey(author.getName())) {
                 map.get(author.getName()).add(album);

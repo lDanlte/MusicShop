@@ -345,7 +345,7 @@
                                         <div class="control-group" style="margin-top: 10px;">
                                           <label class="control-label" for="albumPrice">Цена: </label>
                                           <div class="controls">
-                                              <div class="input-group">
+                                              <div class="input-group" style="max-width: 110px;">
                                                   <input id="albumPrice" type="text" class="form-control" size="7" />
                                                 <span class="input-group-addon" aria-hidden="true"><i class="glyphicon glyphicon-rub"></i></span>
                                               </div>
@@ -368,13 +368,13 @@
                               </form>
                             </div>
 
-                            <div id="music" class="row" style="margin-top: 20px;">
-                                <div class="control-group" style="display: inline; margin-top: 20px; margin-left: 15px;">
+                            <div id="music" class="row form-inline" style="margin-top: 20px;">
+                                <div class="form-group" style="display: inline; margin-top: 20px; margin-left: 15px;">
                                     <div style="display: inline-block; margin-top: 7px;">1.</div>
                                     <div style="display: inline-block;">
                                        <input id="musicName_1" type="text" class="form-control" placeholder="Название песни" style="max-width: 200px; margin-left: 10px; margin-right: 10px;" />
                                     </div>
-                                    <div class="control-group" style="display: inline-block;">
+                                    <div class="form-group" style="display: inline-block;">
                                     <input type="file" id="music_1" accept="audio/mpeg">
                                 </div>
                                 </div>
@@ -382,6 +382,9 @@
                             <div class="row" style="margin-top: 5px; margin-left: -10px;">
                                 <button type="button" class="btn btn-default" onclick="addAudio();">
                                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                </button>
+                                <button type="button" class="btn btn-default" onclick="deleteAudio();">
+                                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
                                 </button>  
                             </div>
                             <div class="row" style="margin-top: 10px;  margin-left: 15px;">

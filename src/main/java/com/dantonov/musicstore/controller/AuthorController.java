@@ -81,6 +81,8 @@ public class AuthorController {
                                   ModelAndView modelAndView,
                                   HttpServletRequest request) {
         
+        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+        
         Author author = authorService.findByName(authorName);
         
         if (author == null) {
@@ -90,7 +92,13 @@ public class AuthorController {
         modelAndView.addObject("pageContextStr", "author");
         
         Map<String, List<Album>> map = new LinkedHashMap<>();
-        map.put("Альбомы", author.getAlbums());
+        
+        List<Album> albums = author.getAlbums();
+        if (user != null) {
+            setIsBought(albums, user);
+        }
+        
+        map.put("Альбомы", albums);
         modelAndView.addObject("dataMap", map);
         
         modelAndView.addObject("author", author);
@@ -109,6 +117,10 @@ public class AuthorController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             AuthorDto authorDto = mapper.readValue(authorDtoStr, AuthorDto.class);
+            
+            if (authorService.findByName(authorDto.getName()) != null) {
+                throw new RequestDataException("Группа с названием " + authorDto.getName() + " уже существует.");
+            }
             
             User newUser = createUser(authorDto.getUser());
             newUser.setAuthor(createAuthor(authorDto, newUser));
@@ -210,6 +222,14 @@ public class AuthorController {
     
     private Author createAuthor(AuthorDto authorDto, User user) {
         return new Author(authorDto.getName(), authorDto.getDesc(), user);
+    }
+    
+    private void setIsBought(List<Album> albums, User user) {
+        for (Album album : albums) {
+            if (user.hasAlbum(album)) {
+                album.setIsBought(true);
+            }
+        }
     }
     
     

@@ -243,7 +243,7 @@ public class AlbumController {
                 track.setPosition((byte)(i + 1));
                 track.setSize(tracks[i].getSize() >> 10);
 
-                ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[0].getBytes());
+                ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[i].getBytes());
                 int bitrate = (int)header.getBitRateAsNumber();
                 track.setBitrate(bitrate);
                 track.setDuration(header.getTrackLength());

@@ -10,6 +10,11 @@ function createAlbum() {
        trackFiles = [],
        cover = $("#albumCover")[0].files[0];
        
+    if (audioCount == 0) {
+        showMessage("Внимание", "Нужно добавить хотя бы одну песню.");
+        return;
+    }   
+       
     if (!checkStrs(name, releaseDate, price, albumDesc)) {
         showMessage("Внимание", "Не заполнено одно из полей.");
         return;
@@ -44,7 +49,7 @@ function createAlbum() {
         if (musicName == "" || music === undefined) {
             break;
         }
-        if (music.type != "audio/mpeg") {
+        if (music.type != "audio/mp3") {
             showMessage("Внимание", music.name + " не является mp3 файлом.");
             return;
         }
@@ -52,7 +57,7 @@ function createAlbum() {
         trackFiles.push(music);
     }
     if (trackNames.length == 0) {
-        showMessage("Внимание", "Не не добавлены песни.");
+        showMessage("Внимание", "Не добавлены песни.");
         return;
     }
     
@@ -179,8 +184,16 @@ function addAudio() {
                            "<input id='musicName_" + audioCount + "' type='text' class='form-control' placeholder='Название песни' style='max-width: 200px; margin-left: 10px; margin-right: 10px;' />" +
                         "</div>" +
                         "<div class='control-group' style='display: inline-block;'>" +
-                            "<input type='file' id='music_" + audioCount + "' accept='audio/mpeg3'>" + 
+                            "<input type='file' id='music_" + audioCount + "' accept='audio/mpeg'>" + 
                         "</div>" +
                     "</div>";
     elem.append(html);
+}
+
+function deleteAudio() {
+    if (audioCount == 0) {
+        return;
+    }
+    $($($("#musicName_" + audioCount).parent().get(0)).parent().get(0)).remove();
+    audioCount--; 
 }

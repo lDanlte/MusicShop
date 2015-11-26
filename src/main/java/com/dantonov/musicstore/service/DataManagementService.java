@@ -29,7 +29,7 @@ public class DataManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataManagementService.class);
     private static final String IMAGE_TYPE = "image/jpeg";
-    private static final String AUDIO_TYPE = "audio/mpeg";
+    private static final String AUDIO_TYPE = "audio/mp3";
     
     private String storagePath;
     

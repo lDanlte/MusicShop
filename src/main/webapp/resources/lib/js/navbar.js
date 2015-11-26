@@ -19,8 +19,12 @@ $(window).on('resize', function () {
 });
 
 $("#genreSelect").on("change", function() {
-    
-    location = MAIN_URL + "category?gid=" + $("#genreSelect :selected").val();
+    var gid = $("#genreSelect :selected").val();
+    if (gid == -1) {
+        location = MAIN_URL;
+        return;
+    }
+    location = MAIN_URL + "category?gid=" + gid;
     
 });
 
@@ -140,9 +144,9 @@ function buy() {
         error: function(jqXHR) {
             var respMessage = jqXHR.responseJSON;
             if (respMessage === undefined) {
-                showMessage("Ошибка при регистрации", "Произошла неизвестная ошибка. Повторите позднее.");
+                showMessage("Ошибка при покупке", "Произошла неизвестная ошибка. Повторите позднее.");
             } else {
-                showMessage("Ошибка при регистрации.", respMessage.msg);
+                showMessage("Ошибка при покупке.", respMessage.msg);
             }
         }
     });

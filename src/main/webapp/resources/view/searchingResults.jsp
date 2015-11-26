@@ -137,7 +137,7 @@
                                                     <img src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" alt="${album.title}" width="160" height="160">
                                                     <h5 style="margin-top: 10px;">${album.title}</h5>
                                                     <h5 ><small><a href="<c:url value="/author/${album.author.name}"/>" style="color: #777;">${album.author.name}</a></small></h5>
-                                                    <p class="text-right">${format.format(album.price)} руб</p>
+                                                    <p class="text-right"><c:choose><c:when test="${album.isBought}">Куплено</c:when><c:otherwise>${format.format(album.price)} руб</c:otherwise></c:choose></p>
                                                 </div>
                                             </li>
                                         </c:forEach>
@@ -182,7 +182,7 @@
                                                 <div class="album" onclick="albumPage('${track.album.author.name}' ,'${track.album.title}');">
                                                     <img src="<c:url value="/resource/${track.album.author.name}/${track.album.title}/cover.jpg"/>" alt="${track.name}" width="160" height="160">
                                                     <h5 style="margin-top: 10px;">${track.name}</h5>
-                                                    <h5 ><small><a href="#" style="color: #777;">${track.album.author.name}</a></small></h5>
+                                                    <h5 ><small><a href="<c:url value="/author/${track.album.author.name}"/>" style="color: #777;">${track.album.author.name}</a></small></h5>
                                                 </div>
                                             </li>
                                         </c:forEach>

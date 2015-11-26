@@ -13,6 +13,17 @@ $('.jcarousel').each(function() {
     });
 });
 
+$(".album").each(function(){
+    var widthStr = $(this).find("img").css("width");
+    if (widthStr == "") {
+        return;
+    }
+    var width = (parseInt(widthStr, 10) - 5) + "px";
+    $(this).find("h5").each(function() {
+        $(this).css("width", width);
+    })
+});
+
 function albumPage(author, album) {
     location = MAIN_URL + "author/" + author + "/album/" + album;
 }

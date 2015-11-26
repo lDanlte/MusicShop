@@ -102,7 +102,7 @@
                                     </c:forEach>
                             </small></h5>
                             <p style="margin-top: 40px;">
-                            <h4><small class="margintext" style="color: #000;">${album.desc}</small></h4>
+                            <h4><small class="margintext" style="color: #000; padding-right: 20px;">${album.desc}</small></h4>
                             <button type = "button" class="btn btn-info" onclick="buy();" style="position: absolute; bottom: 45px; right: 40px; 
                                     <c:if test="${isBought == true}">cursor: default;</c:if>" <c:if test="${isBought == true}"> disabled="disabled"</c:if> >
                                 
@@ -357,7 +357,9 @@
                         useStateClassSkin: true,
                         autoBlur: false,
                         smoothPlayBar: true,
-                        keyEnabled: true
+                        keyEnabled: true,
+                        swfPath:"<c:url value="/lib/jplayer/js/jquery.jplayer.swf"/>",
+                        solution:"flash, html"
                 });
             
             });
