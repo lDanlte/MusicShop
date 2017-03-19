@@ -29,7 +29,7 @@ public class UserService {
     
     private static final Logger log = LoggerFactory.getLogger(AlbumService.class);
     private static final Integer ADD_CASH_ACTION = 2;
-    private static final Integer DISCOUNT_CASH_ACTION = 3;;
+    private static final Integer DISCOUNT_CASH_ACTION = 3;
     
     @Autowired
     protected UserRepository userRepository;

@@ -24,11 +24,11 @@ import org.hibernate.annotations.GenericGenerator;
  */
 
 @Entity
-@Table(name = "Authors")
+@Table(name = "authors")
 public class Author {
 
     @Id
-    @Column(name = "author_id", columnDefinition = "BINARY(16)")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;

@@ -20,11 +20,11 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "Genres")
+@Table(name = "genres")
 public class Genre {
     
     @Id
-    @Column(name = "genre_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     
@@ -32,7 +32,7 @@ public class Genre {
     private String name;
     
     @ManyToMany(targetEntity = Album.class)
-    @JoinTable(name = "Albums_to_Genres",
+    @JoinTable(name = "album_to_genre",
                joinColumns = @JoinColumn(name = "genre_id", nullable = false),
                inverseJoinColumns = @JoinColumn(name = "album_id", nullable = false))
     @OrderBy("title")

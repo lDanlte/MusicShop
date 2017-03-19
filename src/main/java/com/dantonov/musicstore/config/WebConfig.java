@@ -43,7 +43,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 @ComponentScan(basePackages = {"com.dantonov.musicstore.controller", "com.dantonov.musicstore.service"})
 @EnableWebMvc
 @EnableTransactionManagement
-@PropertySource("classpath:app.properties")
+//@PropertySource("classpath:mysql_mac.properties")
 public class WebConfig extends WebMvcConfigurerAdapter {
     
     @Resource
@@ -65,6 +65,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/lib/**").addResourceLocations("/resources/lib/");
         registry.addResourceHandler("/image/**").addResourceLocations("/resources/image/");
+        System.out.println("asassasa: " + env.getRequiredProperty("storage.path"));
         registry.addResourceHandler("/resource/*/cover*").addResourceLocations(env.getRequiredProperty("storage.path"));
         registry.addResourceHandler("/resource/*/*/cover*").addResourceLocations(env.getRequiredProperty("storage.path"));
     }
@@ -139,5 +140,9 @@ public class WebConfig extends WebMvcConfigurerAdapter {
     private SimpleMappingExceptionResolver SimpleMappingExceptionResolver() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+//    public static void main(String[] args) {
+//        Resource
+//    }
 
 }

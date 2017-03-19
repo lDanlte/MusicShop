@@ -17,11 +17,11 @@ import javax.persistence.Table;
  * @author Denis Antonov (den007230@gmail.com)
  */
 @Entity
-@Table(name = "Actions")
+@Table(name = "actions")
 public class Action {
 
     @Id
-    @Column(name = "action_id", nullable = false)
+    @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     

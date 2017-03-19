@@ -24,16 +24,16 @@ import org.hibernate.annotations.GenericGenerator;
  */
 
 @Entity
-@Table(name = "Trade_History")
+@Table(name = "trade_history")
 public class TradeHistory {
 
     @Id
-    @Column(name = "history_id", columnDefinition = "BINARY(16)")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
     
-    @Column(name = "price", columnDefinition = "money", nullable = false, updatable = false, scale = 2)
+    @Column(name = "price", columnDefinition = "DECIMAL(18,2)", nullable = false, updatable = false, scale = 2)
     private BigDecimal price;
     
     @Column(name = "datetime", columnDefinition = "datetime")

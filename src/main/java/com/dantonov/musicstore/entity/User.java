@@ -29,11 +29,11 @@ import org.hibernate.annotations.GenericGenerator;
  * @author Denis Antonov (den007230@gmail.com)
  */
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User {
     
     @Id
-    @Column(name = "user_id", columnDefinition = "BINARY(16)")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
@@ -47,7 +47,7 @@ public class User {
     @Column(name = "email", nullable = false, length = 32)
     private String email;
     
-    @Column(name = "wallet", columnDefinition = "money", scale = 2)
+    @Column(name = "wallet", columnDefinition = "DECIMAL(25,2)", scale = 2)
     private BigDecimal wallet;
     
     @Column(name = "token", columnDefinition = "BINARY(16)")
@@ -62,7 +62,7 @@ public class User {
     private Set<Role> roles;
     
     @ManyToMany(targetEntity = Album.class)
-    @JoinTable(name = "Users_to_Albums",
+    @JoinTable(name = "user_to_album",
                joinColumns = @JoinColumn(name = "user_id", nullable = false),
                inverseJoinColumns = @JoinColumn(name = "album_id", nullable = false))
     @OrderBy("title")

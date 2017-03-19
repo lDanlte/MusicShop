@@ -19,11 +19,11 @@ import javax.persistence.Table;
  */
 
 @Entity
-@Table(name = "Roles")
+@Table(name = "roles")
 public class Role {
     
     @Id
-    @Column(name = "role_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     
@@ -32,7 +32,7 @@ public class Role {
     
 
     @ManyToMany(targetEntity = User.class)
-    @JoinTable(name = "Users_to_Roles",
+    @JoinTable(name = "user_to_role",
                joinColumns = @JoinColumn(name = "role_id", nullable = false),
                inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
     private Set<User> users;
