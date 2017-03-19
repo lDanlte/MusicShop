@@ -1,14 +1,14 @@
 
 package com.dantonov.musicstore.config;
 
-import java.util.EnumSet;
+import com.dantonov.musicstore.security.config.SecurityConfig;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
+import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.SessionTrackingMode;
-
-import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import java.util.EnumSet;
 
 /**
  *
@@ -18,7 +18,7 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
     
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{ DataConfig.class };
+        return new Class<?>[]{ DataConfig.class, SecurityConfig.class};
     }
 
     @Override
@@ -32,7 +32,7 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
     }
     
      @Override
-    protected void registerDispatcherServlet(ServletContext servletContext) {
+    protected void registerDispatcherServlet(final ServletContext servletContext) {
         super.registerDispatcherServlet(servletContext);
         servletContext.setSessionTrackingModes(EnumSet.of(SessionTrackingMode.COOKIE));
     }

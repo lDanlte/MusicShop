@@ -1,22 +1,22 @@
 
 package com.dantonov.musicstore.config;
 
-import java.util.Properties;
-
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
 import org.hibernate.jpa.HibernatePersistenceProvider;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
+import java.util.Properties;
 
 /**
  *
@@ -27,6 +27,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 @ComponentScan(basePackages = {"com.dantonov.musicstore.entity"})
 @PropertySource("classpath:mysql_mac.properties")
 @EnableJpaRepositories(basePackages = "com.dantonov.musicstore.repository")
+@EnableTransactionManagement
 public class DataConfig {
     
     @Resource
@@ -36,8 +37,9 @@ public class DataConfig {
     
     @Bean
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        
+        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+
+        System.out.println("eeeeeeee   " + env.getRequiredProperty("db.driver"));
         dataSource.setDriverClassName(env.getRequiredProperty("db.driver"));
         dataSource.setUrl(env.getRequiredProperty("db.url"));
         dataSource.setUsername(env.getRequiredProperty("db.username"));
@@ -48,7 +50,7 @@ public class DataConfig {
     
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        final LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         
         entityManagerFactoryBean.setDataSource(dataSource());
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
@@ -60,7 +62,7 @@ public class DataConfig {
     
     @Bean
     public JpaTransactionManager transactionManager() {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        final JpaTransactionManager transactionManager = new JpaTransactionManager();
         
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 
@@ -68,7 +70,7 @@ public class DataConfig {
     }
     
     private Properties getHibernateProperties(){
-        Properties properties = new Properties();
+        final Properties properties = new Properties();
         
         properties.put("hibernate.dialect", env.getRequiredProperty("hibernate.dialect"));
         properties.put("hibernate.show_sql", env.getRequiredProperty("hibernate.show_sql"));

@@ -181,15 +181,17 @@
     </footer>
     
     <div <c:choose> <c:when test="${user == null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
-        <form role="form">
+        <form action="<c:url value="/login"/>" role="form" method="POST">
             <div class="form-group">
-              <label for="user">Логин</label>
-              <input name="login" type="text" class="form-control" id="authLogin" placeholder="Логин" />
-              <label for="password">Пароль</label>
-              <input name="pass" type="password" class="form-control" id="authPass" placeholder="Пароль" />
+                <label for="user">Логин</label>
+                <input type="text" class="form-control" id="user" name="login" placeholder="Логин" />
+                <label for="password">Пароль</label>
+                <input type="password" class="form-control" id="password" name="pass" placeholder="Пароль" />
+                <label for="rememberMe">Запомнить</label>
+                <input type="checkbox" id="rememberMe" name="remember-me"/>
             </div>
-            <button type="button" class="btn btn-default" onclick="auth();">Вход</button>
-      </form>
+            <button type="submit" class="btn btn-default">Вход</button>
+        </form>
     </div>
     
     <div <c:choose> <c:when test="${user != null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">

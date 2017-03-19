@@ -11,15 +11,14 @@ import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.exception.ResourceNotFoundException;
 import com.dantonov.musicstore.exception.UnauthorizedPageException;
 import com.dantonov.musicstore.exception.UnauthorizedResourceException;
-
-import javax.servlet.http.HttpSession;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -42,21 +41,21 @@ public class GlobalControllerExceptionHandler {
                                LoginAlreadyExistsException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseMessageDto badRequestHandler(Exception e) {
+    public ResponseMessageDto badRequestHandler(final Exception e) {
         return new ResponseMessageDto(HttpStatus.BAD_REQUEST.value(), e.getMessage());
     }
     
     @ExceptionHandler(value = UnauthorizedResourceException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public ResponseMessageDto unauthorizedResourceHandler(Exception e) {
+    public ResponseMessageDto unauthorizedResourceHandler(final Exception e) {
         return new ResponseMessageDto(HttpStatus.UNAUTHORIZED.value(), e.getMessage());
     }
     
     @ExceptionHandler(value = UnauthorizedPageException.class)
-    public String unauthorizedPageHandler(RedirectAttributes redirectAttributes,
-                                          HttpSession httpSession,
-                                          Exception e) {
+    public String unauthorizedPageHandler(final RedirectAttributes redirectAttributes,
+                                          final HttpSession httpSession,
+                                          final Exception e) {
         
         redirectAttributes.addFlashAttribute("redirectCause", e.getMessage());
         return "redirect:/";
@@ -65,14 +64,14 @@ public class GlobalControllerExceptionHandler {
     @ExceptionHandler(value = ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseMessageDto resourceNotFoundHandler(Exception e) {
+    public ResponseMessageDto resourceNotFoundHandler(final Exception e) {
         return new ResponseMessageDto(HttpStatus.NOT_FOUND.value(), e.getMessage());
     }
     
     @ExceptionHandler(value = AppSQLException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ResponseMessageDto appSQLExceptionHandler(Exception e) {
+    public ResponseMessageDto appSQLExceptionHandler(final Exception e) {
         return new ResponseMessageDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage());
     }
     

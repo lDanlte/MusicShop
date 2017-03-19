@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
  * @author Antonov Denis (den007230@gmail.com)
  */
 @Service
+@Deprecated
 public class AuthService {
     
     private static final String TOKEN_NAME = "AUTH-TOKEN";
