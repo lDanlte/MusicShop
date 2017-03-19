@@ -1,6 +1,5 @@
 package com.dantonov.musicstore.controller;
 
-import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.dto.AlbumDto;
 import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
@@ -14,32 +13,19 @@ import com.dantonov.musicstore.exception.PageNotFoundException;
 import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.exception.ResourceNotFoundException;
 import com.dantonov.musicstore.exception.UnauthorizedResourceException;
-import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AlbumService;
 import com.dantonov.musicstore.service.DataManagementService;
 import com.dantonov.musicstore.service.GenreService;
-import com.dantonov.musicstore.util.RoleEnum;
-
+import com.dantonov.musicstore.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-
-
 import org.jaudiotagger.audio.mp3.ByteArrayMP3AudioHeader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +35,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -76,22 +69,27 @@ public class AlbumController {
     
     @Autowired
     private AlbumService albumService;
+
+    @Autowired
+    private UserService userService;
     
     
     
     @RequestMapping(value = "/{albumName}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView albumPage(@PathVariable("albumName") String albumName,
-                                  @PathVariable("authorName") String authotName,
-                                   ModelAndView modelAndView,
-                                   HttpServletRequest request) {
+    public ModelAndView albumPage(@PathVariable("albumName") final String albumName,
+                                  @PathVariable("authorName") final String authotName,
+                                  final ModelAndView modelAndView,
+                                  final Authentication authentication) {
         
-        Album album = albumService.findByTitleAndAuthor(albumName, authotName);
+        final Album album = albumService.findByTitleAndAuthor(albumName, authotName);
         if (album == null) {
             throw new PageNotFoundException();
         }
-        
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+
+        final User user = (authentication == null)
+                ? null
+                : userService.findByLogin(authentication.getName());
         
         if (user != null) {
             modelAndView.addObject("isBought", user.hasAlbum(album));
@@ -102,21 +100,22 @@ public class AlbumController {
         modelAndView.addObject("album", album);
         modelAndView.addObject("dateFormat", REQUEST_DATE_FORMAT);
         modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("user", user);
         
         modelAndView.setViewName("album");
         return modelAndView;
     }
-    
-    @Secured(role = RoleEnum.USER)
+
     @RequestMapping(value = "/{albumName}/buy", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE) 
     @ResponseStatus(HttpStatus.OK)
-    public ResponseMessageDto buy(@PathVariable("authorName") String authorName,
-                                  @PathVariable("albumName") String albumName,
-                                  HttpServletRequest request) {
+    public ResponseMessageDto buy(@PathVariable("authorName") final String authorName,
+                                  @PathVariable("albumName") final String albumName,
+                                  final Authentication authentication) {
+
+        final User user = userService.findByLogin(authentication.getName());
         
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
-        
-        Album album = albumService.findByTitleAndAuthor(albumName, authorName);
+        final Album album = albumService.findByTitleAndAuthor(albumName, authorName);
         if (user.hasAlbum(album)) {
             log.warn("У пользователя {} уже куплен альбом {}", user.getLogin(), album.getTitle());
             throw new AlreadyBoughtException("Альбом " + album.getTitle() + "уже куплен.");
@@ -132,26 +131,25 @@ public class AlbumController {
             
         return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно куплен.");
     }
-    
-    @Secured(role = RoleEnum.AUTHOR)
+
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ResponseMessageDto createAlbum(@RequestParam("album") String albumDtoStr,
-                                          @RequestParam("cover") MultipartFile cover,
-                                          @RequestParam("tracks[]") MultipartFile[] tracks,
-                                          @PathVariable("authorName") String authorName,
-                                          HttpServletRequest request) {
-        
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public ResponseMessageDto createAlbum(@RequestParam("album") final String albumDtoStr,
+                                          @RequestParam("cover") final MultipartFile cover,
+                                          @RequestParam("tracks[]") final MultipartFile[] tracks,
+                                          @PathVariable("authorName") final String authorName,
+                                          final Authentication authentication) {
+
+        final User user = userService.findByLogin(authentication.getName());
 
 
-        Author author = user.getAuthor();
+        final Author author = user.getAuthor();
         if (author == null || !author.getName().equals(authorName)) {
             log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не является вадельцем группы.", user.getLogin());
             throw new UnauthorizedResourceException("Ошибка при добавлени альбома. Аккаунт с логином " + user.getLogin() + " не является вадельцем группы.");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
         AlbumDto albumDto = null;
         try {
             albumDto = mapper.readValue(albumDtoStr, AlbumDto.class);
@@ -160,7 +158,7 @@ public class AlbumController {
             throw new RequestDataException("Неверно введены данные.");
         }
         
-        Album album = createAlbum(albumDto);
+        final Album album = createAlbum(albumDto);
         album.setAuthor(author);
         try {
             album.setTracks(createTrackList(albumDto.getSongsTitles(), tracks, album));
@@ -169,24 +167,23 @@ public class AlbumController {
              throw new RequestDataException("Ошибка при обработке файлов.");
         }
 
-        List<Genre> genres = getGenres(albumDto.getGenresIds());
+        final List<Genre> genres = getGenres(albumDto.getGenresIds());
         
         albumService.create(album, user, cover, tracks, genres);
         
         return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно добавлен.");
     }
-    
-    @Secured(role = RoleEnum.USER)
+
     @RequestMapping(value = "/{albumName}/track/{trackName}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public FileSystemResource getTrack(@PathVariable("authorName") String author,
-                                       @PathVariable("albumName") String albumTitle,
-                                       @PathVariable("trackName") String track,
-                                       HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public FileSystemResource getTrack(@PathVariable("authorName") final String author,
+                                       @PathVariable("albumName") final String albumTitle,
+                                       @PathVariable("trackName") final String track,
+                                       final Authentication authentication) {
+        final User user = userService.findByLogin(authentication.getName());
         
-        Album album = albumService.findByTitleAndAuthor(albumTitle, author);
+        final Album album = albumService.findByTitleAndAuthor(albumTitle, author);
         if (album == null) {
             throw new ResourceNotFoundException("Альбом '" + albumTitle + "' группы '" + author + "' не найден.");
         }
@@ -195,7 +192,7 @@ public class AlbumController {
             throw new UnauthorizedResourceException("Альбом '" + albumTitle + "' не кулен");
         }
         
-        FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, albumTitle, track));
+        final FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, albumTitle, track));
         if (!trackResource.exists()) {
             throw new ResourceNotFoundException("Трек '" + track + "' Альбома '" + albumTitle + "' группы '" + author + "' не найден.");
         }
@@ -203,8 +200,8 @@ public class AlbumController {
     }
     
     
-    private Album createAlbum(AlbumDto albumDto) {
-        Album result = new Album();
+    private Album createAlbum(final AlbumDto albumDto) {
+        final Album result = new Album();
         
         BigDecimal bdValue = null;
         try {
@@ -232,19 +229,19 @@ public class AlbumController {
         return result;
     }
     
-    private List<Track> createTrackList(List<String> titles, MultipartFile[] tracks, Album album)
+    private List<Track> createTrackList(final List<String> titles, final MultipartFile[] tracks, final Album album)
                                         throws IOException {
         
-        List<Track> result = new ArrayList<>();
+        final List<Track> result = new ArrayList<>();
         try {
             for (byte i = 0; i < tracks.length; i++) {
-                Track track = new Track();
+                final Track track = new Track();
                 track.setName(titles.get(i));
                 track.setPosition((byte)(i + 1));
                 track.setSize(tracks[i].getSize() >> 10);
 
-                ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[i].getBytes());
-                int bitrate = (int)header.getBitRateAsNumber();
+                final ByteArrayMP3AudioHeader header = new ByteArrayMP3AudioHeader(tracks[i].getBytes());
+                final int bitrate = (int)header.getBitRateAsNumber();
                 track.setBitrate(bitrate);
                 track.setDuration(header.getTrackLength());
                 track.setAlbum(album);
@@ -258,11 +255,11 @@ public class AlbumController {
         return result;
     }
     
-    private List<Genre> getGenres(String genres) {
-        String[] genreIds =  genres.split(",");
-        List<Genre> genreList = new ArrayList<>();
-        for(String genreId : genreIds) {
-            Genre genre = genreService.findById(Integer.parseInt(genreId));
+    private List<Genre> getGenres(final String genres) {
+        final String[] genreIds =  genres.split(",");
+        final List<Genre> genreList = new ArrayList<>();
+        for(final String genreId : genreIds) {
+            final Genre genre = genreService.findById(Integer.parseInt(genreId));
             if (genre == null) {
                 log.warn("Не удалось сохранить альбом. Жанр с id = {} не найден.", Integer.parseInt(genreId));
                 throw new RequestDataException("Жанр не найден.");

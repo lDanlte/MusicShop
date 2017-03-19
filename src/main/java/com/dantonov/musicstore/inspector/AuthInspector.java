@@ -19,6 +19,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
  *
  * @author Antonov Denis (den007230@gmail.com)
  */
+@Deprecated
 public class AuthInspector extends HandlerInterceptorAdapter {
     
     public static final String USER_ATTRIBUTE = "user";

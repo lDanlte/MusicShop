@@ -1,6 +1,5 @@
 package com.dantonov.musicstore.controller;
 
-import com.dantonov.musicstore.annotation.Secured;
 import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.dto.TradeHistoryDto;
 import com.dantonov.musicstore.dto.UserDto;
@@ -12,11 +11,25 @@ import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.EmailAlreadyExistsException;
 import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.exception.ResourceNotFoundException;
-import com.dantonov.musicstore.inspector.AuthInspector;
+import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.RoleService;
 import com.dantonov.musicstore.service.TradeHistoryService;
 import com.dantonov.musicstore.service.UserService;
 import com.dantonov.musicstore.util.RoleEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -30,21 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
  *
@@ -74,46 +72,52 @@ public class UserController {
     
     @Autowired
     private TradeHistoryService historyService;
+
+    @Autowired
+    private GenreService genreService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     
-    
-    @Secured
+
     @RequestMapping( method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView dashboard(ModelAndView modelAndView,
-                                  HttpServletRequest request) {
-        
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public ModelAndView dashboard(final ModelAndView modelAndView,
+                                  final Authentication authentication) {
+
+        final User user = userService.findByLogin(authentication.getName());
        
-        boolean isAdmin  = user.hasRole(RoleEnum.ADMIN.getRole()),
-                isAuthor = user.hasRole(RoleEnum.AUTHOR.getRole());
+        final boolean isAdmin  = user.hasRole(RoleEnum.ADMIN.getRole()),
+                      isAuthor = user.hasRole(RoleEnum.AUTHOR.getRole());
         
         modelAndView.addObject("isAdmin", isAdmin);
         modelAndView.addObject("isAuthor", isAuthor);
         modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("user", user);
 
         modelAndView.setViewName("dashboard");
         
         return modelAndView;
     }
-    
-    @Secured
+
     @RequestMapping(value = "/boughtAlbums", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView albums(ModelAndView modelAndView,
-                                HttpServletRequest request) {
+    public ModelAndView albums(final ModelAndView modelAndView,
+                               final Authentication authentication) {
+
+        final User user = userService.findByLogin(authentication.getName());
         
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+        final Map<String, List<Album>> map = new LinkedHashMap<>();
         
-        Map<String, List<Album>> map = new LinkedHashMap<>();
-        
-        for (Album album : user.getAlbums()) {
+        for (final Album album : user.getAlbums()) {
             album.setIsBought(true);
-            Author author = album.getAuthor();
+            final Author author = album.getAuthor();
             if (map.containsKey(author.getName())) {
                 map.get(author.getName()).add(album);
             } else {
-                List<Album> albums = new ArrayList<>();
+                final List<Album> albums = new ArrayList<>();
                 albums.add(album);
                 map.put(author.getName(), albums);
             }
@@ -121,6 +125,8 @@ public class UserController {
         
         modelAndView.addObject("dataMap", map);
         modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("user", user);
         
         modelAndView.setViewName("index");
         return modelAndView;
@@ -130,17 +136,17 @@ public class UserController {
                     consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ResponseMessageDto addUser(@RequestBody UserDto newUser) {
+    public ResponseMessageDto addUser(@RequestBody final UserDto newUser) {
         
         if (!EMAIL_REGEX.matcher(newUser.getEmail()).matches()) {
             throw new RequestDataException("Неверно введен email.");
         }
         
-        User user = new User(newUser.getLogin(), newUser.getPass(), newUser.getEmail());
+        final User user = new User(newUser.getLogin(), passwordEncoder.encode(newUser.getPass()), newUser.getEmail());
         
-        Set<Role> roles = new HashSet<>();
+        final Set<Role> roles = new HashSet<>();
         
-        Role role = roleService.findByName(RoleEnum.USER.getRole());
+        final Role role = roleService.findByName(RoleEnum.USER.getRole());
         role.getUsers().add(user);
         roles.add(role);
         
@@ -149,16 +155,15 @@ public class UserController {
         userService.save(user);
         return new ResponseMessageDto(HttpStatus.OK.value(), "Регистрация прошла успешно.");
     }
-    
-    @Secured
+
     @RequestMapping(method = RequestMethod.PUT,
                     consumes = MediaType.APPLICATION_JSON_VALUE,
                     produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public ResponseMessageDto changeUserData(@RequestBody UserDto data,
-                                             HttpServletRequest request) {
-        
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public ResponseMessageDto changeUserData(final @RequestBody UserDto data,
+                                             final Authentication authentication) {
+
+        final User user = userService.findByLogin(authentication.getName());
         
         if (data.getEmail()!= null) {
             if (userService.findByEmail(data.getEmail()) != null) {
@@ -179,14 +184,13 @@ public class UserController {
         
         return new ResponseMessageDto(HttpStatus.OK.value(), "Обновление данных прошло успешно.");
     }
-    
-    @Secured
+
     @RequestMapping(value = "/addMoney", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public UserDto addMoney(@RequestParam("value") String value,
-                            HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
-        BigDecimal bdValue = null;
+    public UserDto addMoney(@RequestParam("value") final String value,
+                            final Authentication authentication) {
+        User user = userService.findByLogin(authentication.getName());
+        final BigDecimal bdValue;
         try {
             bdValue = new BigDecimal(value);
             if (bdValue.compareTo(BigDecimal.ZERO) <= 0) {
@@ -200,15 +204,14 @@ public class UserController {
         user = userService.addCash(user, bdValue);
         return new UserDto(DEC_FORMAT.format(user.getWallet()));
     }
-    
-    @Secured(role = RoleEnum.AUTHOR)
+
     @RequestMapping(value = "/discountMoney", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public UserDto discountMoney(@RequestParam("value") String value, HttpServletRequest request) {
+    public UserDto discountMoney(@RequestParam("value") final String value, final Authentication authentication) {
         
-       User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+      User user = userService.findByLogin(authentication.getName());
 
-       BigDecimal bdValue = null;
+       final BigDecimal bdValue;
         try {
             bdValue = new BigDecimal(value);
             if (bdValue.compareTo(BigDecimal.ZERO) <= 0) {
@@ -224,22 +227,21 @@ public class UserController {
        return new UserDto(DEC_FORMAT.format(user.getWallet()));
         
     }
-    
-    @Secured
+
     @RequestMapping(value = "/tradehistory", method = RequestMethod.GET, 
                     produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<TradeHistoryDto> getTradeHistory(@RequestParam("from") String from,
-                                                 @RequestParam("to") String to,
-                                                 HttpServletRequest request) {
-       
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public List<TradeHistoryDto> getTradeHistory(@RequestParam("from") final String from,
+                                                 @RequestParam("to") final String to,
+                                                 final Authentication authentication) {
+
+        final User user = userService.findByLogin(authentication.getName());
        
         try {
-            Date fromDate = REQUEST_DATE_FORMAT.parse(from),
-                   toDate = REQUEST_DATE_FORMAT.parse(to);
+            final Date fromDate = REQUEST_DATE_FORMAT.parse(from),
+                         toDate = REQUEST_DATE_FORMAT.parse(to);
 
-            List<TradeHistory> tradeHistories = historyService.findBetweenDays(user, fromDate, toDate);
+            final List<TradeHistory> tradeHistories = historyService.findBetweenDays(user, fromDate, toDate);
             if (tradeHistories == null || tradeHistories.isEmpty()) {
                 throw new ResourceNotFoundException("Ничего не найдено.");
             }
@@ -253,23 +255,23 @@ public class UserController {
     }
     
     
-    private List<TradeHistoryDto> getTHDto(List<TradeHistory> ths) {
+    private List<TradeHistoryDto> getTHDto(final List<TradeHistory> ths) {
         
-        List<TradeHistoryDto> result = new ArrayList<>();
+        final List<TradeHistoryDto> result = new ArrayList<>();
         
-        DecimalFormat df = new DecimalFormat();
+        final DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         df.setMinimumFractionDigits(2);
         df.setGroupingUsed(false);
         
-        for (TradeHistory th : ths) {
-            TradeHistoryDto thDto = new TradeHistoryDto();
+        for (final TradeHistory th : ths) {
+            final TradeHistoryDto thDto = new TradeHistoryDto();
             
             thDto.setDatetime(th.getDatetime());
             thDto.setPrice(df.format(th.getPrice()));
             thDto.setAction(th.getAction().getDesc());
             
-            Album album = th.getAlbum();
+            final Album album = th.getAlbum();
             if (album != null) {
                 thDto.setAlbum(album.getTitle());
             }

@@ -4,20 +4,14 @@ import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.PageNotFoundException;
-import com.dantonov.musicstore.inspector.AuthInspector;
 import com.dantonov.musicstore.service.AlbumService;
 import com.dantonov.musicstore.service.AuthorService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.TrackService;
-import java.text.DecimalFormat;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-
+import com.dantonov.musicstore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,6 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -53,22 +52,27 @@ public class HomeController {
     
     @Autowired
     private TrackService trackService;
+
+    @Autowired
+    private UserService userService;
         
     
     
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView home(ModelAndView modelAndView,
-                             RedirectAttributes redirectAttributes,
-                             HttpServletRequest request) {
-        
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public ModelAndView home(final ModelAndView modelAndView,
+                             final RedirectAttributes redirectAttributes,
+                             final Authentication authentication) {
+
+        final User user = (authentication == null)
+                ? null
+                : userService.findByLogin(authentication.getName());
         
         modelAndView.addObject("pageContextStr", "index");
        
-        Map<String, List<Album>> map = new LinkedHashMap<>();
-        List<Album> lastAdded = albumService.getLastAdded();
-        List<Album> topSales = albumService.getTopSales();
+        final Map<String, List<Album>> map = new LinkedHashMap<>();
+        final List<Album> lastAdded = albumService.getLastAdded();
+        final List<Album> topSales = albumService.getTopSales();
         if (user != null) {
             setIsBought(lastAdded, user);
             setIsBought(topSales, user);
@@ -77,10 +81,12 @@ public class HomeController {
         map.put("Последние добавленные", lastAdded);
         map.put("Топ продаж", topSales);
         modelAndView.addObject("dataMap", map);
-        
+
+        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("user", user);
         modelAndView.addObject("format", DEC_FORMAT);
         
-        Map<String, ?> atr = redirectAttributes.getFlashAttributes();
+        final Map<String, ?> atr = redirectAttributes.getFlashAttributes();
         if (atr.containsKey("redirectCause")) {
             modelAndView.addObject("redirectCause", atr.get("redirectCause"));
         }
@@ -91,21 +97,26 @@ public class HomeController {
     
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView searchingPage(@RequestParam("q") String q,
-                                      ModelAndView modelAndView,
-                                      HttpServletRequest request) {
-        
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
+    public ModelAndView searchingPage(@RequestParam("q") final String q,
+                                      final ModelAndView modelAndView,
+                                      final Authentication authentication) {
+
+        final User user = (authentication == null)
+                ? null
+                : userService.findByLogin(authentication.getName());
         
         modelAndView.addObject("authors", authorService.searchByName(q));
-        List<Album> albums = albumService.searchByTitle(q);
+        final List<Album> albums = albumService.searchByTitle(q);
         if (user != null) {
             setIsBought(albums, user);
+            System.out.println(authentication.getAuthorities());
         }
         modelAndView.addObject("albums", albums);
         modelAndView.addObject("tracks", trackService.searchByName(q));
         
         modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("user", user);
         
         modelAndView.setViewName("searchingResults");
         
@@ -114,13 +125,15 @@ public class HomeController {
     
     @RequestMapping(value = "/category", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public ModelAndView categoryPage(@RequestParam("gid") Integer gid, 
-                                     ModelAndView modelAndView,
-                                     HttpServletRequest request) {
+    public ModelAndView categoryPage(@RequestParam("gid") final Integer gid,
+                                     final ModelAndView modelAndView,
+                                     final Authentication authentication) {
+
+        final User user = (authentication == null)
+                ? null
+                : userService.findByLogin(authentication.getName());
         
-        User user = (User) request.getSession().getAttribute(AuthInspector.USER_ATTRIBUTE);
-        
-        Genre selectedGenre = genreService.findById(gid);
+        final Genre selectedGenre = genreService.findById(gid);
         if (selectedGenre == null) {
             throw new PageNotFoundException("Жанра с id" + gid + "не существует.");
         }
@@ -128,14 +141,14 @@ public class HomeController {
         modelAndView.addObject("selectedGenreId", selectedGenre.getId());
         modelAndView.addObject("pageContextStr", "index");
         
-        List<Album> lastAdded = albumService.getLastAddedByGenre(selectedGenre);
-        List<Album> topSales = albumService.getTopSalesByGenre(selectedGenre);
+        final List<Album> lastAdded = albumService.getLastAddedByGenre(selectedGenre);
+        final List<Album> topSales = albumService.getTopSalesByGenre(selectedGenre);
         if (user != null) {
             setIsBought(lastAdded, user);
             setIsBought(topSales, user);
         }
         
-        Map<String, List<Album>> map = new LinkedHashMap<>();
+        final Map<String, List<Album>> map = new LinkedHashMap<>();
         map.put("Последние добавленные - " + selectedGenre.getName(), lastAdded);
         map.put("Топ продаж - " + selectedGenre.getName(), topSales);
         modelAndView.addObject("dataMap", map);
@@ -143,12 +156,14 @@ public class HomeController {
         modelAndView.addObject("format", DEC_FORMAT);
         
         modelAndView.setViewName("index");
+        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("user", user);
         
         return modelAndView;
     }
     
-    private void setIsBought(List<Album> albums, User user) {
-        for (Album album : albums) {
+    private void setIsBought(final List<Album> albums, final User user) {
+        for (final Album album : albums) {
             if (user.hasAlbum(album)) {
                 album.setIsBought(true);
             }

@@ -1,11 +1,9 @@
 
 package com.dantonov.musicstore.entity;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,10 +17,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.GenericGenerator;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  *
@@ -41,7 +40,7 @@ public class User {
     @Column(name = "login", nullable = false, updatable = false, length = 16)
     private String login;
     
-    @Column(name = "pass", nullable = false, length = 32)
+    @Column(name = "pass", nullable = false, length = 64)
     private String password;
     
     @Column(name = "email", nullable = false, length = 32)
@@ -50,15 +49,12 @@ public class User {
     @Column(name = "wallet", columnDefinition = "DECIMAL(25,2)", scale = 2)
     private BigDecimal wallet;
     
-    @Column(name = "token", columnDefinition = "BINARY(16)")
-    private UUID token;
-    
     @Cascade(CascadeType.ALL)
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, targetEntity = Author.class)
     private Author author;
     
     @Cascade(CascadeType.ALL)
-    @ManyToMany(mappedBy = "users", targetEntity = Role.class/*, fetch = FetchType.EAGER*/)
+    @ManyToMany(mappedBy = "users", targetEntity = Role.class, fetch = FetchType.EAGER)
     private Set<Role> roles;
     
     @ManyToMany(targetEntity = Album.class)
@@ -106,8 +102,8 @@ public class User {
     public BigDecimal getWallet() { return wallet; }
     public void setWallet(BigDecimal wallet) {  this.wallet = wallet; }
 
-    public UUID getToken() { return token; }
-    public void setToken(UUID token) { this.token = token; }
+    public UUID getToken() { return null; }
+    public void setToken(UUID token) {}
     
     public Author getAuthor() { return author; }
     public void setAuthor(Author author) { this.author = author; }

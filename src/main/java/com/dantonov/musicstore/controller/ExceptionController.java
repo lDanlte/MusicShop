@@ -1,9 +1,6 @@
 package com.dantonov.musicstore.controller;
 
 import com.dantonov.musicstore.dto.ResponseMessageDto;
-
-import javax.servlet.http.HttpSession;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,25 +18,31 @@ public class ExceptionController {
     @RequestMapping(value = "/unauthorizedUserBody")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public ResponseMessageDto unauthorizedUserBodyHendler() {
+    public ResponseMessageDto unauthorizedUserBodyHandler() {
          return new ResponseMessageDto(HttpStatus.UNAUTHORIZED.value(), "Для доступа к ресурсу необходимо авторизоваться.");
     }
     
     @RequestMapping(value = "/unauthorizedUserPage")
-    public String unauthorizedUserPageHendler(RedirectAttributes redirectAttributes, HttpSession httpSession) {
+    public String unauthorizedUserPageHandler(final RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("redirectCause", "Для доступа к странице необходимо авторизоваться.");
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/failedToLogin")
+    public String failedToLoginHandler(final RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("redirectCause", "Неверно введен логин и/или пароль");
         return "redirect:/";
     }
     
     @RequestMapping(value = "/userHasNoRoleBody")
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
-    public ResponseMessageDto userHasNoRoleBodyHendler() {
+    public ResponseMessageDto userHasNoRoleBodyHandler() {
         return new ResponseMessageDto(HttpStatus.UNAUTHORIZED.value(), "Недостаточно прав для доступа к ресурсу.");
     }
     
     @RequestMapping(value = "/userHasNoRolePage")
-    public String userHasNoRolePageHendler(RedirectAttributes redirectAttributes, HttpSession httpSession) {
+    public String userHasNoRolePageHandler(final RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("redirectCause", "Недостаточно прав для доступа к странице.");
         return "redirect:/";
     }

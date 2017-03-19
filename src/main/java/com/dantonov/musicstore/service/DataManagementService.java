@@ -1,22 +1,19 @@
 package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.exception.RequestDataException;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -24,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 
 @Service
-@PropertySource("classpath:app.properties")
 public class DataManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataManagementService.class);
