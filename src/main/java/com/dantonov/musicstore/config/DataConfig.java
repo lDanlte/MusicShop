@@ -25,7 +25,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 @Configuration
 @ComponentScan(basePackages = {"com.dantonov.musicstore.entity"})
-@PropertySource("classpath:app.properties")
+@PropertySource("classpath:mysql_mac.properties")
 @EnableJpaRepositories(basePackages = "com.dantonov.musicstore.repository")
 public class DataConfig {
     

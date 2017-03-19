@@ -32,11 +32,11 @@ import org.hibernate.annotations.GenericGenerator;
  */
 
 @Entity
-@Table(name = "Albums")
+@Table(name = "albums")
 public class Album {
     
     @Id
-    @Column(name = "album_id", columnDefinition = "BINARY(16)")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
@@ -44,7 +44,7 @@ public class Album {
     @Column(name = "title", nullable = false, updatable = false, length = 48)
     private String title;
     
-    @Column(name = "price", columnDefinition = "money", nullable = false)
+    @Column(name = "price", columnDefinition = "DECIMAL(18,2)", nullable = false)
     private BigDecimal price;
     
     @Column(name = "release_date", columnDefinition = "datetime", nullable = false, updatable = false)

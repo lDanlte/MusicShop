@@ -1,3 +1,5 @@
 target/**
 desktop.ini
 nb-configuration.xml
+.idea/**
+MusicStore.iml
