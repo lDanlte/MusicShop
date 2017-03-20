@@ -52,13 +52,6 @@ import java.util.List;
 public class AlbumController {
     
     private static final Logger log = LoggerFactory.getLogger(AlbumController.class);
-    private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
-    static {
-        DEC_FORMAT.setMaximumFractionDigits(2);
-        DEC_FORMAT.setMinimumFractionDigits(2);
-        DEC_FORMAT.setGroupingUsed(false);
-    }
     
     
     @Autowired
@@ -72,6 +65,12 @@ public class AlbumController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private SimpleDateFormat dateFormat;
+
+    @Autowired
+    private DecimalFormat decimalFormat;
     
     
     
@@ -98,8 +97,8 @@ public class AlbumController {
         }
         
         modelAndView.addObject("album", album);
-        modelAndView.addObject("dateFormat", REQUEST_DATE_FORMAT);
-        modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("dateFormat", dateFormat);
+        modelAndView.addObject("format", decimalFormat);
         modelAndView.addObject("genres", genreService.findAll());
         modelAndView.addObject("user", user);
         
@@ -220,7 +219,7 @@ public class AlbumController {
         result.setqSold(0L);
         
         try {
-            result.setReleaseDate(REQUEST_DATE_FORMAT.parse(albumDto.getReleaseDate()));
+            result.setReleaseDate(dateFormat.parse(albumDto.getReleaseDate()));
         } catch (Exception ex) {
             log.warn("Не удалось сохранить альбом. Пользователь неверно задал дату ({}).", albumDto.getReleaseDate());
             throw new RequestDataException("Некорректно задана сумма.");
