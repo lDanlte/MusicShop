@@ -32,14 +32,7 @@ import java.util.Map;
 
 @Controller("HomeController")
 public class HomeController {
-    
-    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
-    static {
-        DEC_FORMAT.setMaximumFractionDigits(2);
-        DEC_FORMAT.setMinimumFractionDigits(2);
-        DEC_FORMAT.setGroupingUsed(false);
-    }
-    
+
     
     @Autowired
     private GenreService genreService;
@@ -55,9 +48,12 @@ public class HomeController {
 
     @Autowired
     private UserService userService;
-        
-    
-    
+
+    @Autowired
+    private DecimalFormat decimalFormat;
+
+
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView home(final ModelAndView modelAndView,
@@ -84,7 +80,7 @@ public class HomeController {
 
         modelAndView.addObject("genres", genreService.findAll());
         modelAndView.addObject("user", user);
-        modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("format", decimalFormat);
         
         final Map<String, ?> atr = redirectAttributes.getFlashAttributes();
         if (atr.containsKey("redirectCause")) {
@@ -114,7 +110,7 @@ public class HomeController {
         modelAndView.addObject("albums", albums);
         modelAndView.addObject("tracks", trackService.searchByName(q));
         
-        modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("format", decimalFormat);
         modelAndView.addObject("genres", genreService.findAll());
         modelAndView.addObject("user", user);
         
@@ -153,7 +149,7 @@ public class HomeController {
         map.put("Топ продаж - " + selectedGenre.getName(), topSales);
         modelAndView.addObject("dataMap", map);
         
-        modelAndView.addObject("format", DEC_FORMAT);
+        modelAndView.addObject("format", decimalFormat);
         
         modelAndView.setViewName("index");
         modelAndView.addObject("genres", genreService.findAll());
