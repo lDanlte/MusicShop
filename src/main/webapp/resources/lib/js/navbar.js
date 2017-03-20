@@ -1,4 +1,4 @@
-var MAIN_URL = "http://localhost:8084/MusicStore/";
+var MAIN_URL = $("#mainUrl").data("main-url");
 var EMAIL_REG_EXP = new RegExp("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$", "g");
 var popover = $("[data-toggle=popover]").popover({
     html: true, 

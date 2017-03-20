@@ -331,6 +331,8 @@
         </div>
     </div>
 
+    <div id="mainUrl" data-main-url="<c:url value="/"/>"></div>
+
     <!--/.fluid-container-->
     <!-- Placed at the end of the document so the pages load faster -->
     <script type="text/javascript" src="<c:url value="/lib/jquery/jquery-2.1.4.min.js"/>"></script>
