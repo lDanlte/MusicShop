@@ -5,7 +5,8 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -23,7 +24,10 @@
 </head>
 
 <body style="background-color: white;">
-    
+
+    <sec:authorize access="hasAuthority('admin')" var="isAdmin"/>
+    <sec:authorize access="hasAuthority('author')" var="isAuthor"/>
+
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -77,11 +81,11 @@
                     <li><a href="#history" data-toggle="tab">История покупок</a></li>
                     <li><a href="#addMoney" data-toggle="tab">Пополнить счет</a></li>
                     
-                    <c:if test="${isAdmin == true}">
+                    <c:if test="${isAdmin}">
                         <li><a href="#createAuthor" data-toggle="tab">Создать группу</a></li>
                     </c:if>
                         
-                    <c:if test="${isAuthor == true}">
+                    <c:if test="${isAuthor}">
                         <li><a href="#groupControl" data-toggle="tab">Группа</a></li>
                         <li><a href="#addAlbum" data-toggle="tab">Добавить альбом</a></li>
                         <li><a href="#statistics" data-toggle="tab">Статистика продаж</a></li>
@@ -174,12 +178,12 @@
                                       </tr>
                                       <tr>
                                           <td>21.10.2015 15:04:12</td>
-                                          <td>Покупка альбома <strong>AlbumName<strong></td>
+                                          <td>Покупка альбома <strong>AlbumName</strong></td>
                                           <td>49.00</td>
                                       </tr>
                                       <tr>
                                           <td>21.10.2015 15:09:45</td>
-                                          <td>Покупка альбома <strong>AlbumName<strong></td>
+                                          <td>Покупка альбома <strong>AlbumName</strong></td>
                                           <td>109.00</td>
                                       </tr>
                                   </tbody>
@@ -216,7 +220,7 @@
                       </div>
                     </div>
                     
-                    <c:if test="${isAdmin == true}">
+                    <c:if test="${isAdmin}">
                     
                         <div id="createAuthor" class="tab-pane fade">
                           <h3>Создание новой группы</h3>
@@ -271,7 +275,7 @@
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                        <label for="exampleInputFile">Постер группы</label>
+                                        <label for="authorCover">Постер группы</label>
                                         <input type="file" id="authorCover" accept="image/jpeg">
                                     </div>
 
@@ -283,7 +287,7 @@
                     </c:if>
                         
                     
-                    <c:if test="${isAuthor == true}">
+                    <c:if test="${isAuthor}">
                     
                         <c:set value="${user.author}" var="author"/>
                         
@@ -576,10 +580,10 @@
     <script type="text/javascript" src="<c:url value="/lib/datepicker/js/bootstrap-datepicker.ru.min.js"/>"></script>
     <script type="text/javascript" src="<c:url value="/lib/js/navbar.js"/>"></script>
     <script type="text/javascript" src="<c:url value="/lib/js/dashboard.js"/>"></script>
-    <c:if test="${isAdmin == true}">
+    <c:if test="${isAdmin}">
         <script type="text/javascript" src="<c:url value="/lib/js/dashboardAdmin.js"/>"></script>
     </c:if>
-    <c:if test="${isAuthor == true}">
+    <c:if test="${isAuthor}">
         <script type="text/javascript" src="<c:url value="/lib/js/dashboardAuthor.js"/>"></script>
     </c:if>
     

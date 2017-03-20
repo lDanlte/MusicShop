@@ -85,12 +85,7 @@ public class UserController {
                                   final Authentication authentication) {
 
         final User user = userService.findByLogin(authentication.getName());
-       
-        final boolean isAdmin  = user.hasRole(RoleEnum.ADMIN.getRole()),
-                      isAuthor = user.hasRole(RoleEnum.AUTHOR.getRole());
-        
-        modelAndView.addObject("isAdmin", isAdmin);
-        modelAndView.addObject("isAuthor", isAuthor);
+
         modelAndView.addObject("format", decimalFormat);
         modelAndView.addObject("genres", genreService.findAll());
         modelAndView.addObject("user", user);
