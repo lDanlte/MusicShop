@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,52 +53,58 @@ public class AlbumService {
     
     @Autowired
     private DataManagementService dataService;
+
+    private List<Album> lastAddedCache;
+    private List<Album> topSalesCache;
     
     
-    
-    public Album findById(UUID id) {
+    public Album findById(final UUID id) {
         return albumRepository.findOne(id);
     }
     
-    public List<Album> findByTitle(String title) {
+    public List<Album> findByTitle(final String title) {
         return albumRepository.findByTitleOrderByAuthor_NameAsc(title);
     }
     
-    public Album findByTitleAndAuthor(String title, String authorName) {
+    public Album findByTitleAndAuthor(final String title, final String authorName) {
         return albumRepository.findByTitleAndAuthor_Name(title, authorName);
     }
     
-    public List<Album> findNextPage(Pageable pageable) {
+    public List<Album> findNextPage(final Pageable pageable) {
         return albumRepository.findAll(pageable);
     }
     
-    public List<Album> getLastAdded() {
-        return albumRepository.findTop20ByOrderByAddDateDesc();
+    public List<Album> getLastAdded(final boolean useCache) {
+        return (useCache)
+                ? new ArrayList<>(lastAddedCache)
+                : albumRepository.findTop20ByOrderByAddDateDesc();
     }
     
-    public List<Album> getTopSales() {
-        return albumRepository.findTop20ByOrderByQSoldDesc();
+    public List<Album> getTopSales(final boolean useCache) {
+        return (useCache)
+                ? new ArrayList<>(topSalesCache)
+                : albumRepository.findTop20ByOrderByQSoldDesc();
     }
     
-    public List<Album> searchByTitle(String titlePattern) {
+    public List<Album> searchByTitle(final String titlePattern) {
         return albumRepository.findByTitleContainingIgnoreCase(titlePattern);
     }
     
-    public List<Album> getLastAddedByGenre(Genre genre) {
-        List<Genre> genres = new ArrayList<>();
+    public List<Album> getLastAddedByGenre(final Genre genre) {
+        final List<Genre> genres = new ArrayList<>();
         genres.add(genre);
         return albumRepository.findTop20ByGenresOrderByAddDateDesc(genres);
     }
     
-    public List<Album> getTopSalesByGenre(Genre genre) {
-        List<Genre> genres = new ArrayList<>();
+    public List<Album> getTopSalesByGenre(final Genre genre) {
+        final List<Genre> genres = new ArrayList<>();
         genres.add(genre);
         return albumRepository.findTop20ByGenresOrderByQSoldDesc(genres);
     }
     
     @Transactional
-    public User buy(Album album, User user, BigDecimal price) {
-        BigDecimal userWallet = user.getWallet();
+    public User buy(final Album album, User user, final BigDecimal price) {
+        final BigDecimal userWallet = user.getWallet();
         if (userWallet.compareTo(price) < 0) {
             throw new NotEnoughMoneyException("Недостаточно денег на счету.");
         }
@@ -107,11 +114,11 @@ public class AlbumService {
             user.getAlbums().add(album);
             user = userService.update(user);
 
-            User uAuthor = album.getAuthor().getUser();
+            final User uAuthor = album.getAuthor().getUser();
             uAuthor.setWallet(uAuthor.getWallet().add(price));
             userService.update(uAuthor);
             
-            TradeHistory history = new TradeHistory();
+            final TradeHistory history = new TradeHistory();
             history.setAlbum(album);
             history.setUser(user);
             history.setPrice(price);
@@ -134,21 +141,25 @@ public class AlbumService {
     }
     
     @Transactional
-    public void create(Album album, User user, MultipartFile cover, MultipartFile[] tracks, List<Genre> genres) {
-        
-        boolean afterSavengData = false;
+    public void create(final Album album,
+                       final User user,
+                       final MultipartFile cover,
+                       final MultipartFile[] tracks,
+                       final List<Genre> genres) {
+
+        boolean afterSavingData = false;
         try {
-            for(Genre genre: genres) {
+            for(final Genre genre: genres) {
                 genre.getAlbums().add(album);
             }
             album.setGenres(genres);
             save(album);
             dataService.saveAlbumData(album.getAuthor().getName(), album.getTitle(), cover, tracks);
-            afterSavengData = true;
+            afterSavingData = true;
             buy(album, user, BigDecimal.ZERO);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             log.warn("Ошибка при добавлении альбома.", ex);
-            if (afterSavengData) {
+            if (afterSavingData) {
                 try {
                     dataService.deleteAlbum(album.getAuthor().getName(), album.getTitle());
                 } catch (IOException ioex) { }
@@ -158,14 +169,24 @@ public class AlbumService {
         
     }
     
-    public Album save(Album album) {
+    public Album save(final Album album) {
         album.setqSold(0L);
         album.setAddDate(new Date());
         return albumRepository.save(album);
     }
     
-     public Album update(Album album) {
+     public Album update(final Album album) {
          return albumRepository.save(album);
+     }
+
+     @Scheduled(fixedDelay = 1000 * 60 * 60 * 2)
+     protected void updateLastAddedCache() {
+         lastAddedCache = getLastAdded(false);
+     }
+
+     @Scheduled(fixedDelay = 1000 * 60 * 60 * 2)
+     protected void updateTopSalesCache() {
+         topSalesCache = getTopSales(false);
      }
 
 }

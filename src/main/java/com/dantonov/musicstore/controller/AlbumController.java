@@ -99,7 +99,7 @@ public class AlbumController {
         modelAndView.addObject("album", album);
         modelAndView.addObject("dateFormat", dateFormat);
         modelAndView.addObject("format", decimalFormat);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         modelAndView.setViewName("album");

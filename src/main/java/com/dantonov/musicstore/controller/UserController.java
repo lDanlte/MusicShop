@@ -87,7 +87,7 @@ public class UserController {
         final User user = userService.findByLogin(authentication.getName());
 
         modelAndView.addObject("format", decimalFormat);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
 
         modelAndView.setViewName("dashboard");
@@ -118,7 +118,7 @@ public class UserController {
         
         modelAndView.addObject("dataMap", map);
         modelAndView.addObject("format", decimalFormat);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         modelAndView.setViewName("index");

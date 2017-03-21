@@ -67,8 +67,8 @@ public class HomeController {
         modelAndView.addObject("pageContextStr", "index");
        
         final Map<String, List<Album>> map = new LinkedHashMap<>();
-        final List<Album> lastAdded = albumService.getLastAdded();
-        final List<Album> topSales = albumService.getTopSales();
+        final List<Album> lastAdded = albumService.getLastAdded(true);
+        final List<Album> topSales = albumService.getTopSales(true);
         if (user != null) {
             setIsBought(lastAdded, user);
             setIsBought(topSales, user);
@@ -78,7 +78,7 @@ public class HomeController {
         map.put("Топ продаж", topSales);
         modelAndView.addObject("dataMap", map);
 
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         modelAndView.addObject("format", decimalFormat);
         
@@ -111,7 +111,7 @@ public class HomeController {
         modelAndView.addObject("tracks", trackService.searchByName(q));
         
         modelAndView.addObject("format", decimalFormat);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         modelAndView.setViewName("searchingResults");
@@ -152,7 +152,7 @@ public class HomeController {
         modelAndView.addObject("format", decimalFormat);
         
         modelAndView.setViewName("index");
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         return modelAndView;

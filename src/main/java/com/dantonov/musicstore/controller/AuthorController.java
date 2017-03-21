@@ -106,7 +106,7 @@ public class AuthorController {
         
         modelAndView.addObject("author", author);
         modelAndView.addObject("format", decimalFormat);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         modelAndView.setViewName("index");
