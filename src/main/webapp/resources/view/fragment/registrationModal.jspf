@@ -1,0 +1,55 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+
+<div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Регистрация</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <fieldset>
+                        <!-- Sign Up Form -->
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label class="control-label" for="Email">Email:</label>
+                            <div class="controls">
+                                <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label class="control-label" for="userid">Логин:</label>
+                            <div class="controls">
+                                <input id="userid" name="userid" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
+                            </div>
+                        </div>
+
+                        <!-- Password input-->
+                        <div class="control-group">
+                            <label class="control-label" for="password">Пароль:</label>
+                            <div class="controls">
+                                <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
+                            </div>
+                        </div>
+
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label class="control-label" for="reenterpassword">Повторите пароль:</label>
+                            <div class="controls">
+                                <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
+                            </div>
+                        </div>
+
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-info">Регистрация</button>
+            </div>
+        </div>
+    </div>
+</div>
