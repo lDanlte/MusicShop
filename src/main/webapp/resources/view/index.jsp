@@ -39,9 +39,9 @@
                                         <img class="img-thumbnail" src="<c:url value="/image/music.jpg"/>" style="height: 280px;">
                                     </div>
                                     <div class="col-lg-7 col-md-6 col-sm-5">
-                                        <h2>Добро пожаловать!</h2>
-                                        <p style="margin-bottom: 0px;"><em>Данный сервис является большой библиотека музыки.<small> В будущем, может быть :)</small></em></p>
-                                        <p style="margin-top: 0px;"><em>Слушайте любимые песни в одном месте.</em></p>
+                                        <h3>Добро пожаловать!</h3>
+                                        <p style="margin-top: 40px;"><small>Данный сервис является большой библиотека музыки</small></p>
+                                        <p ><small>Слушайте любимые песни в одном месте</small></p>
                                         <p><small><a href="#" data-toggle="modal" data-target="#myModal">Зарегестрируйтесь</a> и получите возможноть прослушивать любимые треки в любое время.</small></p>
                                 <!--/row-->
                                     </div>
@@ -128,11 +128,8 @@
          
         
     </div>
-        
-    <footer style="padding-left: 15px; padding-top: 30px;">
-        <hr>
-        <p>&copy; Денис Антонов 2015</p>
-    </footer>
+
+    <%@include file="fragment/footer.jspf"%>
 
     <%@include file="fragment/loginPopup.jspf"%>
 

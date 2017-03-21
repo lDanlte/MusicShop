@@ -201,15 +201,10 @@
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
         
-        
-         
-        
+
     </div>
-        
-     <footer style="padding-left: 15px; padding-top: 30px;">
-        <hr>
-        <p>&copy; Денис Антонов 2015</p>
-    </footer>
+
+    <%@include file="fragment/footer.jspf"%>
 
     <%@include file="fragment/loginPopup.jspf"%>
 

@@ -1,0 +1,6 @@
+<%@page contentType="text/html" pageEncoding="utf-8" %>
+
+<footer style="padding-left: 15px;">
+    <hr>
+    <p>&copy; Денис Антонов 2015</p>
+</footer>
