@@ -220,6 +220,8 @@
     <%@include file="fragment/modalInfo.jspf"%>
 
     <div id="mainUrl" data-main-url="<c:url value="/"/>"></div>
+    <div id="csrfheader" data-csrf-header="${_csrf.headerName}"></div>
+    <div id="csrfvalue" data-csrf-value="${_csrf.token}"></div>
 
     <!--/.fluid-container-->
     <!-- Placed at the end of the document so the pages load faster -->

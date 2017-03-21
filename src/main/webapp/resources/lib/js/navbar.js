@@ -1,4 +1,7 @@
 var MAIN_URL = $("#mainUrl").data("main-url");
+var CSRF_HEADER = $("#csrfheader").data("csrf-header");
+var CSRF_VALUE = $("#csrfvalue").data("csrf-value");
+
 var EMAIL_REG_EXP = new RegExp("^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$", "g");
 var popover = $("[data-toggle=popover]").popover({
     html: true, 
@@ -11,6 +14,11 @@ $(document).ready(function(){
    if (content.html() != "") {
        modal.modal();
    }
+   var headers = {};
+   headers[CSRF_HEADER] = CSRF_VALUE;
+   $.ajaxSetup({
+       headers: headers
+   });
 });
 
 
