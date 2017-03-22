@@ -201,120 +201,22 @@
                 <div class="col-lg-2 col-md-2 col-sm-1"></div>
             </div>
         
-        
-         
-        
-    </div>
-        
-     <footer style="padding-left: 15px; padding-top: 30px;">
-        <hr>
-        <p>&copy; Денис Антонов 2015</p>
-    </footer>
-    
-    <div <c:choose> <c:when test="${user == null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
-        <form action="<c:url value="/login"/>" role="form" method="POST">
-            <div class="form-group">
-                <label for="user">Логин</label>
-                <input type="text" class="form-control" id="user" name="login" placeholder="Логин" />
-                <label for="password">Пароль</label>
-                <input type="password" class="form-control" id="password" name="pass" placeholder="Пароль" />
-                <label for="rememberMe">Запомнить</label>
-                <input type="checkbox" id="rememberMe" name="remember-me"/>
-            </div>
-            <button type="submit" class="btn btn-default">Вход</button>
-        </form>
-    </div>
-    
-    <div <c:choose> <c:when test="${user != null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
-        <p style="margin-top: 10px;"><a href="<c:url value="/user"/>">Личный кабинет</a></p>
-        
-        <p><a href="<c:url value="/user/boughtAlbums"/>">Мои альбомы</a></p>
-        <div style="display: inline;">
-            <div style="display: inline-block;">
-                Баланс: 
-            </div>
-            <div id="wallet" style="display: inline-block;">
-                <c:if test="${user != null}">${format.format(user.wallet)}</c:if>
-            </div>
-            <div style="display: inline-block;">
-                р. 
-            </div>
-        </div>
-        <p>
-        <form action="<c:url value="/logout"/>" method="POST">
-            <button type="submit" class="btn btn-default" style="margin-top: 10px;">Выйти</button>
-        </form>
-    </div>
-    
-    
-    <div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-sm" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Регистрация</h4>
-            </div>
-            <div class="modal-body">
-              <form class="form-horizontal">
-                <fieldset>
-                    <!-- Sign Up Form -->
-                    <!-- Text input-->
-                    <div class="control-group">
-                      <label class="control-label" for="Email">Email:</label>
-                      <div class="controls">
-                        <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
-                      </div>
-                    </div>
 
-                    <!-- Text input-->
-                    <div class="control-group">
-                      <label class="control-label" for="userid">Логин:</label>
-                      <div class="controls">
-                        <input id="userid" name="userid" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
-                      </div>
-                    </div>
-
-                    <!-- Password input-->
-                    <div class="control-group">
-                      <label class="control-label" for="password">Пароль:</label>
-                      <div class="controls">
-                        <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
-                      </div>
-                    </div>
-
-                    <!-- Text input-->
-                    <div class="control-group">
-                      <label class="control-label" for="reenterpassword">Повторите пароль:</label>
-                      <div class="controls">
-                        <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
-                      </div>
-                    </div>
-
-                    </fieldset>
-                </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-              <button type="button" class="btn btn-info">Регистрация</button>
-            </div>
-          </div>
-        </div>
     </div>
-            
-    <div class="modal fade" id="modalInfo">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title"></h4>
-            </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-            </div>
-          </div>
-        </div>
-    </div>
+
+    <%@include file="fragment/footer.jspf"%>
+
+    <%@include file="fragment/loginPopup.jspf"%>
+
+    <%@include file="fragment/userInfo.jspf"%>
+
+    <%@include file="fragment/registrationModal.jspf"%>
+
+    <%@include file="fragment/modalInfo.jspf"%>
+
+    <div id="mainUrl" data-main-url="<c:url value="/"/>"></div>
+    <div id="csrfheader" data-csrf-header="${_csrf.headerName}"></div>
+    <div id="csrfvalue" data-csrf-value="${_csrf.token}"></div>
 
     <!--/.fluid-container-->
     <!-- Placed at the end of the document so the pages load faster -->

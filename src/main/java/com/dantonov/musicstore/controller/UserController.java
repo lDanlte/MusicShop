@@ -54,22 +54,15 @@ import java.util.regex.Pattern;
 public class UserController {
     
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private static final SimpleDateFormat REQUEST_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final Pattern EMAIL_REGEX = Pattern.compile("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$");
-    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
-    static {
-        DEC_FORMAT.setMaximumFractionDigits(2);
-        DEC_FORMAT.setMinimumFractionDigits(2);
-        DEC_FORMAT.setGroupingUsed(false);
-    }
     
     
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private RoleService roleService;
-    
+
     @Autowired
     private TradeHistoryService historyService;
 
@@ -78,23 +71,23 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
+    @Autowired
+    private SimpleDateFormat requestDateFormat;
+
+    @Autowired
+    private DecimalFormat decimalFormat;
     
 
-    @RequestMapping( method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView dashboard(final ModelAndView modelAndView,
                                   final Authentication authentication) {
 
         final User user = userService.findByLogin(authentication.getName());
-       
-        final boolean isAdmin  = user.hasRole(RoleEnum.ADMIN.getRole()),
-                      isAuthor = user.hasRole(RoleEnum.AUTHOR.getRole());
-        
-        modelAndView.addObject("isAdmin", isAdmin);
-        modelAndView.addObject("isAuthor", isAuthor);
-        modelAndView.addObject("format", DEC_FORMAT);
-        modelAndView.addObject("genres", genreService.findAll());
+
+        modelAndView.addObject("format", decimalFormat);
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
 
         modelAndView.setViewName("dashboard");
@@ -124,8 +117,8 @@ public class UserController {
         }
         
         modelAndView.addObject("dataMap", map);
-        modelAndView.addObject("format", DEC_FORMAT);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("format", decimalFormat);
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         modelAndView.setViewName("index");
@@ -202,7 +195,7 @@ public class UserController {
         }
         
         user = userService.addCash(user, bdValue);
-        return new UserDto(DEC_FORMAT.format(user.getWallet()));
+        return new UserDto(decimalFormat.format(user.getWallet()));
     }
 
     @RequestMapping(value = "/discountMoney", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -224,7 +217,7 @@ public class UserController {
        
        user = userService.discountCash(user, bdValue);
        
-       return new UserDto(DEC_FORMAT.format(user.getWallet()));
+       return new UserDto(decimalFormat.format(user.getWallet()));
         
     }
 
@@ -238,8 +231,8 @@ public class UserController {
         final User user = userService.findByLogin(authentication.getName());
        
         try {
-            final Date fromDate = REQUEST_DATE_FORMAT.parse(from),
-                         toDate = REQUEST_DATE_FORMAT.parse(to);
+            final Date fromDate = requestDateFormat.parse(from),
+                         toDate = requestDateFormat.parse(to);
 
             final List<TradeHistory> tradeHistories = historyService.findBetweenDays(user, fromDate, toDate);
             if (tradeHistories == null || tradeHistories.isEmpty()) {

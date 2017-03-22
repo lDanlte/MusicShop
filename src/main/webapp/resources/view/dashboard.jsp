@@ -5,7 +5,8 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -23,49 +24,11 @@
 </head>
 
 <body style="background-color: white;">
-    
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-            <a class="navbar-brand" href="<c:url value="/"/>">Music Store</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <div class="col-sm-6 col-md-6">
-                <form class="navbar-form" role="search">
-                    <div class="input-group col-sm-8 col-md-6">
-                        <input type="text" class="form-control" placeholder="Поиск по группам, альбомам, музыке" name="q">
-                        <div class="input-group-btn">
-                            <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-                        </div>
-                    </div>
-                    
-                    <select id="genreSelect" class="input-sm form-control" title="Категории">
-                        <option value="-1">Категории</option>
-                        <c:forEach items="${genres}" var="genre" varStatus="status">
-                            <option value="${genre.id}">${genre.name}</option>
-                        </c:forEach>
-                    </select>
-                    
-                </form>
-            </div>
-            <ul class="nav navbar-nav navbar-right" style="margin-right: 100px;">
-                <li><a href="#" data-toggle="modal" data-target="#myModal">Регистрация</a></li>
-                <li><a data-placement="bottom" data-toggle="popover" data-container="body" data-html="true" href="#" id="login">
-                    <c:choose>
-                        <c:when test="${user != null}">${user.login}</c:when>
-                        <c:otherwise>Вход</c:otherwise>
-                    </c:choose>
-                </a></li>
-            </ul>
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+
+    <sec:authorize access="hasAuthority('admin')" var="isAdmin"/>
+    <sec:authorize access="hasAuthority('author')" var="isAuthor"/>
+
+    <%@include file="fragment/navBar.jspf"%>
     
     
         <div class="conteiner-fluid" style="margin-top: 20px;">
@@ -77,11 +40,11 @@
                     <li><a href="#history" data-toggle="tab">История покупок</a></li>
                     <li><a href="#addMoney" data-toggle="tab">Пополнить счет</a></li>
                     
-                    <c:if test="${isAdmin == true}">
+                    <c:if test="${isAdmin}">
                         <li><a href="#createAuthor" data-toggle="tab">Создать группу</a></li>
                     </c:if>
                         
-                    <c:if test="${isAuthor == true}">
+                    <c:if test="${isAuthor}">
                         <li><a href="#groupControl" data-toggle="tab">Группа</a></li>
                         <li><a href="#addAlbum" data-toggle="tab">Добавить альбом</a></li>
                         <li><a href="#statistics" data-toggle="tab">Статистика продаж</a></li>
@@ -174,12 +137,12 @@
                                       </tr>
                                       <tr>
                                           <td>21.10.2015 15:04:12</td>
-                                          <td>Покупка альбома <strong>AlbumName<strong></td>
+                                          <td>Покупка альбома <strong>AlbumName</strong></td>
                                           <td>49.00</td>
                                       </tr>
                                       <tr>
                                           <td>21.10.2015 15:09:45</td>
-                                          <td>Покупка альбома <strong>AlbumName<strong></td>
+                                          <td>Покупка альбома <strong>AlbumName</strong></td>
                                           <td>109.00</td>
                                       </tr>
                                   </tbody>
@@ -216,7 +179,7 @@
                       </div>
                     </div>
                     
-                    <c:if test="${isAdmin == true}">
+                    <c:if test="${isAdmin}">
                     
                         <div id="createAuthor" class="tab-pane fade">
                           <h3>Создание новой группы</h3>
@@ -271,7 +234,7 @@
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                        <label for="exampleInputFile">Постер группы</label>
+                                        <label for="authorCover">Постер группы</label>
                                         <input type="file" id="authorCover" accept="image/jpeg">
                                     </div>
 
@@ -283,7 +246,7 @@
                     </c:if>
                         
                     
-                    <c:if test="${isAuthor == true}">
+                    <c:if test="${isAuthor}">
                     
                         <c:set value="${user.author}" var="author"/>
                         
@@ -456,117 +419,20 @@
             <div class="col-lg-4 col-md-3 col-sm-0"></div>
         </div>
     </div>
-    
 
-     <footer style="padding-left: 15px; padding-top: 30px;">
-        <hr>
-        <p>&copy; Денис Антонов 2015</p>
-    </footer>
-    
-    <div <c:choose> <c:when test="${user == null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
-        <form action="<c:url value="/login"/>" role="form" method="POST">
-            <div class="form-group">
-                <label for="user">Логин</label>
-                <input type="text" class="form-control" id="user" name="login" placeholder="Логин" />
-                <label for="password">Пароль</label>
-                <input type="password" class="form-control" id="password" name="pass" placeholder="Пароль" />
-                <label for="rememberMe">Запомнить</label>
-                <input type="checkbox" id="rememberMe" name="remember-me"/>
-            </div>
-            <button type="submit" class="btn btn-default">Вход</button>
-        </form>
-    </div>
-    
-    <div <c:choose> <c:when test="${user != null}"> id="popover-content" </c:when> <c:otherwise> id="popover-content-disable" </c:otherwise> </c:choose> class="hide">
-        <p style="margin-top: 10px;"><a href="<c:url value="/user"/>">Личный кабинет</a></p>
-        
-        <p><a href="<c:url value="/user/boughtAlbums"/>">Мои альбомы</a></p>
-        <div style="display: inline;">
-            <div style="display: inline-block;">
-                Баланс: 
-            </div>
-            <div id="wallet" style="display: inline-block;">
-                <c:if test="${user != null}">${format.format(user.wallet)}</c:if>
-            </div>
-            <div style="display: inline-block;">
-                р. 
-            </div>
-        </div>
-        <p>
-        <form id="logout" action="<c:url value="/logout"/>" method="POST">
-            <button type="submit" class="btn btn-default" style="margin-top: 10px;">Выйти</button>
-        </form>
-    </div>
-    
-    
-    <div class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-sm" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Регистрация</h4>
-            </div>
-            <div class="modal-body">
-              <form class="form-horizontal">
-                <fieldset>
-                    <!-- Sign Up Form -->
-                    <!-- Text input-->
-                    <div class="control-group">
-                      <label class="control-label" for="Email">Email:</label>
-                      <div class="controls">
-                        <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
-                      </div>
-                    </div>
+    <%@include file="fragment/footer.jspf"%>
 
-                    <!-- Text input-->
-                    <div class="control-group">
-                      <label class="control-label" for="userid">Логин:</label>
-                      <div class="controls">
-                        <input id="userid" name="userid" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
-                      </div>
-                    </div>
+    <%@include file="fragment/loginPopup.jspf"%>
 
-                    <!-- Password input-->
-                    <div class="control-group">
-                      <label class="control-label" for="password">Пароль:</label>
-                      <div class="controls">
-                        <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
-                      </div>
-                    </div>
+    <%@include file="fragment/userInfo.jspf"%>
 
-                    <!-- Text input-->
-                    <div class="control-group">
-                      <label class="control-label" for="reenterpassword">Повторите пароль:</label>
-                      <div class="controls">
-                        <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
-                      </div>
-                    </div>
+    <%@include file="fragment/registrationModal.jspf"%>
 
-                    </fieldset>
-                </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-              <button type="button" class="btn btn-info">Регистрация</button>
-            </div>
-          </div>
-        </div>
-    </div>
-            
-    <div class="modal fade" id="modalInfo">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title"></h4>
-            </div>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
-            </div>
-          </div>
-        </div>
-    </div>
+    <%@include file="fragment/modalInfo.jspf"%>
+
+    <div id="mainUrl" data-main-url="<c:url value="/"/>"></div>
+    <div id="csrfheader" data-csrf-header="${_csrf.headerName}"></div>
+    <div id="csrfvalue" data-csrf-value="${_csrf.token}"></div>
 
     <!--/.fluid-container-->
     <!-- Placed at the end of the document so the pages load faster -->
@@ -576,10 +442,10 @@
     <script type="text/javascript" src="<c:url value="/lib/datepicker/js/bootstrap-datepicker.ru.min.js"/>"></script>
     <script type="text/javascript" src="<c:url value="/lib/js/navbar.js"/>"></script>
     <script type="text/javascript" src="<c:url value="/lib/js/dashboard.js"/>"></script>
-    <c:if test="${isAdmin == true}">
+    <c:if test="${isAdmin}">
         <script type="text/javascript" src="<c:url value="/lib/js/dashboardAdmin.js"/>"></script>
     </c:if>
-    <c:if test="${isAuthor == true}">
+    <c:if test="${isAuthor}">
         <script type="text/javascript" src="<c:url value="/lib/js/dashboardAuthor.js"/>"></script>
     </c:if>
     

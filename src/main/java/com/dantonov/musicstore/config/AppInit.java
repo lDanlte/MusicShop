@@ -18,7 +18,7 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
     
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{ DataConfig.class, SecurityConfig.class};
+        return new Class<?>[]{ DataConfig.class, AppConfig.class, SecurityConfig.class};
     }
 
     @Override

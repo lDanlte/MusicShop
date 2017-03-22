@@ -159,11 +159,11 @@ function makeDateStr (date) {
         month   = date.getMonth() + 1,
         year    = date.getFullYear(),
         hours   = date.getHours(),
-        munutes = date.getMinutes(),
+        minutes = date.getMinutes(),
         seconds = date.getSeconds();
 
     return ((dated < 10) ? "0" : "") + dated + "." + ((month < 10) ? "0" : "") + month + "."
-            + year + " " + ((hours < 10) ? "0" : "") + hours + ":" + ((munutes < 10) ? "0" : "") + munutes
+            + year + " " + ((hours < 10) ? "0" : "") + hours + ":" + ((minutes < 10) ? "0" : "") + minutes
             + ":" + ((seconds < 10) ? "0" : "") + seconds;
 }
 

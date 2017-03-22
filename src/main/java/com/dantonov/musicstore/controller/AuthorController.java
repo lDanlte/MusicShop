@@ -51,12 +51,6 @@ import java.util.Set;
 public class AuthorController {
     
     private static final Logger log = LoggerFactory.getLogger(AuthorController.class);
-    private static final DecimalFormat DEC_FORMAT = new DecimalFormat();
-    static {
-        DEC_FORMAT.setMaximumFractionDigits(2);
-        DEC_FORMAT.setMinimumFractionDigits(2);
-        DEC_FORMAT.setGroupingUsed(false);
-    }
 
     
     @Autowired
@@ -64,10 +58,10 @@ public class AuthorController {
 
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private RoleService roleService;
-    
+
     @Autowired
     private AuthorService authorService;
 
@@ -76,9 +70,12 @@ public class AuthorController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
-    
-    
+
+    @Autowired
+    private  DecimalFormat decimalFormat;
+
+
+
     @RequestMapping(value = "/{name}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView getAuthor(@PathVariable("name") final  String authorName,
@@ -108,8 +105,8 @@ public class AuthorController {
         modelAndView.addObject("dataMap", map);
         
         modelAndView.addObject("author", author);
-        modelAndView.addObject("format", DEC_FORMAT);
-        modelAndView.addObject("genres", genreService.findAll());
+        modelAndView.addObject("format", decimalFormat);
+        modelAndView.addObject("genres", genreService.findAll(true));
         modelAndView.addObject("user", user);
         
         modelAndView.setViewName("index");
@@ -145,11 +142,9 @@ public class AuthorController {
             
             dataService.saveAuthorCover(authorDto.getName(), file);
             
-            return new ResponseMessageDto(HttpStatus.OK.value(), "Группа" + authorDto.getName() + " успешно добавлена.");
+            return new ResponseMessageDto(HttpStatus.OK.value(), "Группа " + authorDto.getName() + " успешно добавлена.");
                     
-        } catch (RequestDataException e) {
-            throw e;
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             log.warn("Ошибка при добавлении автора", ex);
             throw new RequestDataException("Ошибка при добавлении группы.");
         }

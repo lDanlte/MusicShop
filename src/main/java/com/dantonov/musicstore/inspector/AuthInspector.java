@@ -71,7 +71,7 @@ public class AuthInspector extends HandlerInterceptorAdapter {
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         Boolean tr = (Boolean) request.getSession().getAttribute(FILLDATA_ATTRIBUTE);
         if (response.getStatus() != 0 && tr ) {
-            modelAndView.addObject("genres", genreService.findAll());
+            modelAndView.addObject("genres", genreService.findAll(true));
             modelAndView.addObject("user", request.getSession().getAttribute(USER_ATTRIBUTE));
         }
         request.getSession().removeAttribute(USER_ATTRIBUTE);

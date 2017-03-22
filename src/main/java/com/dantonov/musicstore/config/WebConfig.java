@@ -2,7 +2,6 @@
 package com.dantonov.musicstore.config;
 
 import com.fasterxml.jackson.core.JsonEncoding;
-import com.mysql.jdbc.TimeUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @author Denis Antonov (den007230@gmail.com)
  */
 @Configuration
-@ComponentScan(basePackages = {"com.dantonov.musicstore.controller", "com.dantonov.musicstore.service"})
+@ComponentScan(basePackages = {"com.dantonov.musicstore.controller"})
 @EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
 
