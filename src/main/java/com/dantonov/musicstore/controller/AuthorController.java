@@ -142,7 +142,7 @@ public class AuthorController {
             
             dataService.saveAuthorCover(authorDto.getName(), file);
             
-            return new ResponseMessageDto(HttpStatus.OK.value(), "Группа" + authorDto.getName() + " успешно добавлена.");
+            return new ResponseMessageDto(HttpStatus.OK.value(), "Группа " + authorDto.getName() + " успешно добавлена.");
                     
         } catch (final IOException ex) {
             log.warn("Ошибка при добавлении автора", ex);

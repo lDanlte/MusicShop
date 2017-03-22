@@ -67,8 +67,8 @@ public class HomeController {
         modelAndView.addObject("pageContextStr", "index");
        
         final Map<String, List<Album>> map = new LinkedHashMap<>();
-        final List<Album> lastAdded = albumService.getLastAdded(true);
-        final List<Album> topSales = albumService.getTopSales(true);
+        final List<Album> lastAdded = albumService.getLastAdded();
+        final List<Album> topSales = albumService.getTopSales();
         if (user != null) {
             setIsBought(lastAdded, user);
             setIsBought(topSales, user);

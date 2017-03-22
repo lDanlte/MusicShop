@@ -53,9 +53,6 @@ public class AlbumService {
     
     @Autowired
     private DataManagementService dataService;
-
-    private List<Album> lastAddedCache;
-    private List<Album> topSalesCache;
     
     
     public Album findById(final UUID id) {
@@ -74,16 +71,12 @@ public class AlbumService {
         return albumRepository.findAll(pageable);
     }
     
-    public List<Album> getLastAdded(final boolean useCache) {
-        return (useCache)
-                ? new ArrayList<>(lastAddedCache)
-                : albumRepository.findTop20ByOrderByAddDateDesc();
+    public List<Album> getLastAdded() {
+        return albumRepository.findTop20ByOrderByAddDateDesc();
     }
     
-    public List<Album> getTopSales(final boolean useCache) {
-        return (useCache)
-                ? new ArrayList<>(topSalesCache)
-                : albumRepository.findTop20ByOrderByQSoldDesc();
+    public List<Album> getTopSales() {
+        return albumRepository.findTop20ByOrderByQSoldDesc();
     }
     
     public List<Album> searchByTitle(final String titlePattern) {
@@ -177,16 +170,6 @@ public class AlbumService {
     
      public Album update(final Album album) {
          return albumRepository.save(album);
-     }
-
-     @Scheduled(fixedDelay = 1000 * 60 * 60 * 2)
-     protected void updateLastAddedCache() {
-         lastAddedCache = getLastAdded(false);
-     }
-
-     @Scheduled(fixedDelay = 1000 * 60 * 60 * 2)
-     protected void updateTopSalesCache() {
-         topSalesCache = getTopSales(false);
      }
 
 }

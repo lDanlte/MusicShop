@@ -36,7 +36,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-2 col-md-2 col-sm-1"></div>
-            <div class="col-lg-6 col-md-8 col-sm-9">
+            <div class="col-lg-8 col-md-8 col-sm-10">
                 <div class="jumbotron carouset-content" style="padding: 5px;">
                     <div class="conteiner">
                         <div class="row">
@@ -63,7 +63,7 @@
                             <p style="margin-top: 40px;">
                             <h4><small class="margintext" style="color: #000; padding-right: 20px;">${album.desc}</small></h4>
                             <button type = "button" class="btn btn-info" onclick="buy();" style="position: absolute; bottom: 45px; right: 40px; 
-                                    <c:if test="${isBought == true}">cursor: default;</c:if>" <c:if test="${isBought == true}"> disabled="disabled"</c:if> >
+                                    <c:if test="${isBought == true}">cursor: default;</c:if>" <c:if test="${isBought == true or user == null}"> disabled="disabled"</c:if> >
                                 
                                 <c:choose>
                                     <c:when test="${isBought == true}">
@@ -83,18 +83,18 @@
                 </div>
                 <!--/span-->
             </div>
-            <div class="col-lg-4 col-md-2 col-sm-2"></div>
-        </div>
-                            
-        <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-1"></div>
-            <div class="col-lg-8 col-md-8 col-sm-10 content-category"><h3><strong>Треки</strong></h3></div>
             <div class="col-lg-2 col-md-2 col-sm-1"></div>
         </div>
                             
         <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-1"></div>
-            <div class="col-lg-6 col-md-7 col-sm-10  carouset-content" style="padding: 5px; margin-left: 15px;">
+            <div class="col-lg-4 col-md-3 col-sm-1"></div>
+            <div class="col-lg-6 col-md-6 col-sm-10 content-category"><h3><strong>Треки</strong></h3></div>
+            <div class="col-lg-4 col-md-3 col-sm-1"></div>
+        </div>
+                            
+        <div class="row">
+            <div class="col-lg-4 col-md-3 col-sm-1"></div>
+            <div class="col-lg-4 col-md-6 col-sm-10  carouset-content" style="padding: 5px; margin-left: 15px;">
 
                 <c:choose>
                     
@@ -166,7 +166,7 @@
                                             </div>
                                             <div class="jp-no-solution">
                                                     <span>Необходимо обновление</span>
-                                                    Для того, чтобы была возможеость проигрывания музыки вам нужна свежая версия <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+                                                    Для того, чтобы была возможность проигрывания музыки вам нужна свежая версия <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
                                             </div>
                                     </div>
                             </div>

@@ -34,7 +34,7 @@
 
                 </form>
             </div>
-            <ul class="nav navbar-nav navbar-right" style="margin-right: 100px;">
+            <ul class="nav navbar-nav navbar-right" style="margin-right: 40px;">
                 <li><a href="#" data-toggle="modal" data-target="#myModal">Регистрация</a></li>
                 <li><a data-placement="bottom" data-toggle="popover" data-container="body" data-html="true" href="#" id="login">
                     <c:choose>

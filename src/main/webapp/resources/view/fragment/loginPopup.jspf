@@ -4,9 +4,9 @@
         <div class="form-group">
             <label for="user">Логин</label>
             <input type="text" class="form-control" id="user" name="login" placeholder="Логин" />
-            <label for="password">Пароль</label>
+            <label for="password" style="margin-top: 10px;">Пароль</label>
             <input type="password" class="form-control" id="password" name="pass" placeholder="Пароль" />
-            <label for="rememberMe">Запомнить</label>
+            <label for="rememberMe" style="margin-top: 15px;">Запомнить</label>
             <input type="checkbox" id="rememberMe" name="remember-me"/>
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
         </div>
