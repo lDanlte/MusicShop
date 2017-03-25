@@ -56,7 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         webSecurity.ignoring().antMatchers(
                 "/lib/**",
                 "/image/**",
-                "/resource/**"
+                "/author/*/cover.jpg",
+                "/author/*/album/*/cover.jpg"
         );
     }
 

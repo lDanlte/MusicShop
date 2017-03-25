@@ -38,6 +38,9 @@ public class Author {
     
     @Column(name = "description")
     private String desc;
+
+    @Column(name = "cover_id", columnDefinition = "CHAR(24)")
+    private String coverId;
     
     @OneToOne(fetch = FetchType.LAZY, targetEntity = User.class)
     @JoinColumn(name = "user_id")
@@ -51,7 +54,7 @@ public class Author {
     
     public Author() { }
 
-    public Author(String name, String desc, User user) {
+    public Author(final String name, final String desc, final User user) {
         this.name = name;
         this.desc = desc;
         this.user = user;
@@ -59,31 +62,33 @@ public class Author {
     
 
     public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public void setId(final UUID id) { this.id = id; }
 
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setName(final String name) { this.name = name; }
 
     public String getDesc() { return desc; }
-    public void setDesc(String desc) { this.desc = desc; }
+    public void setDesc(final String desc) { this.desc = desc; }
+
+    public String getCoverId() { return coverId; }
+    public void setCoverId(final String coverId) { this.coverId = coverId; }
 
     public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    public void setUser(final User user) { this.user = user; }
 
     public List<Album> getAlbums() { return albums; }
-    public void setAlbums(List<Album> albums) { this.albums = albums; }
+    public void setAlbums(final List<Album> albums) { this.albums = albums; }
     
     
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) return false;
         if (obj == this) return true;
         if (!(obj instanceof Author)) return false;
         
-        Author author = (Author) obj;
-        if (! id.equals(author.getId())) return false;
-        
-        return true;
+        final Author author = (Author) obj;
+        return id.equals(author.getId());
+
     }
 
     @Override

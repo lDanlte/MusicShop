@@ -42,19 +42,38 @@ public class Genre {
     
     public Genre() {}
 
-    public Genre(String name) {
+    public Genre(final String name) {
         this.name = name;
     }
 
     
     public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public void setId(final Integer id) { this.id = id; }
 
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setName(final String name) { this.name = name; }
 
     public List<Album> getAlbums() { return albums; }
-    public void setAlbums(List<Album> albums) { this.albums = albums; }
-    
-    
+    public void setAlbums(final List<Album> albums) { this.albums = albums; }
+
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Genre genre = (Genre) o;
+
+        return id.equals(genre.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

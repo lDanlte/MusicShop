@@ -73,13 +73,13 @@ public class User {
     
     public User() {}
     
-    public User(String login, String password, String email) {
+    public User(final String login, final String password, final String email) {
         this.login = login;
         this.password = password;
         this.email = email;
     }
 
-    public User(String login, String password, String email, Set<Role> roles) {
+    public User(final String login, final String password, final String email, final Set<Role> roles) {
         this.login = login;
         this.password = password;
         this.email = email;
@@ -88,46 +88,44 @@ public class User {
 
      
     public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public void setId(final UUID id) { this.id = id; }
 
     public String getLogin() { return login; }
-    public void setLogin(String login) { this.login = login; }
+    public void setLogin(final String login) { this.login = login; }
 
     public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public void setPassword(final String password) { this.password = password; }
 
     public String getEmail() { return email; }
-    public void setEmail(String email) {  this.email = email; }
+    public void setEmail(final String email) {  this.email = email; }
 
     public BigDecimal getWallet() { return wallet; }
-    public void setWallet(BigDecimal wallet) {  this.wallet = wallet; }
+    public void setWallet(final BigDecimal wallet) {  this.wallet = wallet; }
 
     public UUID getToken() { return null; }
-    public void setToken(UUID token) {}
+    public void setToken(final UUID token) {}
     
     public Author getAuthor() { return author; }
-    public void setAuthor(Author author) { this.author = author; }
+    public void setAuthor(final Author author) { this.author = author; }
 
     public Set<Role> getRoles() { return roles; }
-    public void setRoles(Set<Role> roles) { this.roles = roles; }
+    public void setRoles(final Set<Role> roles) { this.roles = roles; }
 
     public List<Album> getAlbums() { return albums; }
-    public void setAlbums(List<Album> albums) { this.albums = albums; }
+    public void setAlbums(final List<Album> albums) { this.albums = albums; }
 
-    public void setHistorys(List<TradeHistory> historys) { this.historys = historys; }
+    public void setHistorys(final List<TradeHistory> historys) { this.historys = historys; }
     public List<TradeHistory> getHistorys() { return historys; }
     
     
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) return false;
         if (obj == this) return true;
         if (!(obj instanceof User)) return false;
         
-        User user = (User) obj;
-        if (! id.equals(user.getId())) return false;
-        
-        return true;
+        final User user = (User) obj;
+        return id.equals(user.getId());
     }
 
     @Override
@@ -137,26 +135,22 @@ public class User {
         return hash;
     }
     
-    public boolean hasRole(String roleName) {
-        
-        for (Role role : roles) {
+    public boolean hasRole(final String roleName) {
+        for (final Role role : roles) {
             if (roleName.equalsIgnoreCase(role.getRole())) {
                 return true;
             }
         }
-        
         return false;
     }
     
-    public boolean hasAlbum(Album album) {
-        
-        UUID uuid = album.getId();
-        for (Album a  : albums) {
+    public boolean hasAlbum(final Album album) {
+        final UUID uuid = album.getId();
+        for (final Album a : albums) {
             if (uuid.equals(a.getId())) {
                 return true;
             }
         }
-        
         return false;
     }
     

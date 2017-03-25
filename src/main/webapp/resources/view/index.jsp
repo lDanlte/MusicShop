@@ -62,7 +62,7 @@
                         <div class="jumbotron carouset-content" style="padding: 5px;">
                             <div class="conteiner">
                                 <div class="row">
-                                    <img class="img-rounded" src="<c:url value="/resource/${author.name}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
+                                    <img class="img-rounded" src="<c:url value="/author/${author.name}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
 
                                     <h4><strong class="margintext">${author.name}</strong></h4>
                                     <p><h4 style="padding-right: 25px;"><em><small class="margintext">${author.desc}</small></em></h4>
@@ -101,7 +101,7 @@
                                         <c:forEach items="${entry.value}" var="album">
                                             <li>
                                                 <div class="album" onclick="albumPage('${album.author.name}','${album.title}');">
-                                                    <img src="<c:url value="/resource/${album.author.name}/${album.title}/cover.jpg"/>" alt="${album.title}" width="160" height="160">
+                                                    <img src="<c:url value="/author/${album.author.name}/album/${album.title}/cover.jpg"/>" alt="${album.title}" width="160" height="160">
                                                     <h5 style="margin-top: 10px;">${album.title}</h5>
                                                     <h5 ><small><a href="<c:url value="/author/${album.author.name}"/>" style="color: #777;">${album.author.name}</a></small></h5>
                                                     <p class="text-right"><c:choose><c:when test="${album.isBought}">Куплено</c:when><c:otherwise>${format.format(album.price)} руб</c:otherwise></c:choose></p>

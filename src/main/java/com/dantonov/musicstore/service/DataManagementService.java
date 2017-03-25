@@ -31,89 +31,40 @@ public class DataManagementService {
     
     
     @Autowired
-    public DataManagementService(Environment env) {
+    public DataManagementService(final Environment env) {
         storagePath = env.getRequiredProperty("storage.path");
         storagePath = storagePath.replaceFirst("file:", "");
     }
     
-    public void saveAuthorCover(String authorName, MultipartFile file) throws IOException {
-        
-        if (!file.getContentType().equals(IMAGE_TYPE)) {
-            throw new RequestDataException("Неверный тип обложки. Должен быть .jpg.");
+    
+    public void saveAlbumData(final String authorName, final String albumTitle, final MultipartFile[] audioFiles) throws IOException {
+        for (byte i = 0; i < audioFiles.length; i++) {
+            if (!audioFiles[i].getContentType().equals(AUDIO_TYPE)) {
+                throw new RequestDataException("Неверный тип файла " + audioFiles[i].getOriginalFilename() + ". Должен быть mp3.");
+            }
         }
         
-        StringBuilder path = new StringBuilder(storagePath);
+        final StringBuilder path = new StringBuilder(storagePath);
         path.append(authorName);
-        
         File fileSys = new File(path.toString());
         if (!fileSys.exists()) {
             fileSys.mkdir();
         }
-        
-        path.append("/cover");
-        String fileType = file.getOriginalFilename();
-        fileType = fileType.substring(fileType.lastIndexOf('.'));
-        path.append(fileType);
-        
-        logger.info("Created Path = {}",  path);
+        path.append('/').append(albumTitle);
         fileSys = new File(path.toString());
-        
-        try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(fileSys))) {
-            buffStream.write(file.getBytes());
-        }
-        
-        logger.info("Получен файл: имя = {}; исходное имя = {}; тип = {};  размер = {} Кб.", file.getName(),
-                    file.getOriginalFilename(), file.getContentType(), file.getSize() >> 10);
-        
-    }
-    
-    
-    public void saveAlbumData(String authorName, String albumTitle,
-                              MultipartFile cover, MultipartFile[] audioFiles) {
-        
-        if (!cover.getContentType().equals(IMAGE_TYPE)) {
-            throw new RequestDataException("Неверный тип обложки. Должен быть .jpg.");
-        }
-        
-        for (byte i = 0; i < audioFiles.length; i++) {
-            if (!audioFiles[i].getContentType().equals(AUDIO_TYPE)) {
-            throw new RequestDataException("Неверный тип файла " + audioFiles[i].getOriginalFilename() + ". Должен быть mp3.");
-        }
-        }
-        
-        StringBuilder path = new StringBuilder(storagePath);
-        path.append(authorName).append('/').append(albumTitle);
-        
-        File fileSys = new File(path.toString());
         if (!fileSys.exists()) {
             fileSys.mkdir();
         }
         
         path.append("/%s%s");
-        String pathPattern = path.toString();
-        
-        
-        String fileType = cover.getOriginalFilename();
-        fileType = fileType.substring(fileType.lastIndexOf('.'));
-        String coverPath = String.format(pathPattern, "cover", fileType);
-        
-        try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(new File(coverPath)))) {
-            
-            buffStream.write(cover.getBytes());
-            logger.info("Получен файл: исходное имя = {}; тип = {};  размер = {} Кб.", 
-                    cover.getOriginalFilename(), cover.getContentType(), cover.getSize() >> 10);
-            
-        } catch (FileNotFoundException ex) {
-            logger.warn("Что-то пошло не так с сохранением обложки альбома", ex);
-        } catch (IOException ex) {
-             logger.warn("Что-то пошло не так с сохранением обложки альбома", ex);
-        }
-        
+        final String pathPattern = path.toString();
+
+        String fileType;
         for (byte i = 0; i < audioFiles.length; i++) {
-            MultipartFile audioFile =  audioFiles[i];
+            final MultipartFile audioFile =  audioFiles[i];
             fileType = audioFile.getOriginalFilename();
             fileType = fileType.substring(fileType.lastIndexOf('.'));
-            String audioPath = String.format(pathPattern, Byte.toString((byte) (i + 1)), fileType);
+            final String audioPath = String.format(pathPattern, Byte.toString((byte) (i + 1)), fileType);
             
             try(BufferedOutputStream buffStream = new BufferedOutputStream(new FileOutputStream(new File(audioPath)))) {
                 buffStream.write(audioFile.getBytes());
@@ -121,19 +72,20 @@ public class DataManagementService {
                     audioFile.getOriginalFilename(), audioFile.getContentType(), audioFile.getSize() >> 10);
             } catch (FileNotFoundException ex) {
                 logger.warn("Что-то пошло не так с сохранением аудио файла", ex);
+                throw ex;
             } catch (IOException ex) {
                  logger.warn("Что-то пошло не так с сохранением обложки аудио файла", ex);
+                throw ex;
             }
         }
         
     }
     
-    public void deleteAlbum(String authorName, String albumTitle) throws IOException {
-        
-        StringBuilder path = new StringBuilder(storagePath);
+    public void deleteAlbum(final String authorName, final String albumTitle) throws IOException {
+        final StringBuilder path = new StringBuilder(storagePath);
         path.append(authorName).append('/').append(albumTitle);
-        String pathStr = path.toString();
-        File dir = new File(pathStr);
+        final String pathStr = path.toString();
+        final File dir = new File(pathStr);
         if(dir.exists()) {
             try {
                 FileUtils.deleteDirectory(dir);
@@ -144,11 +96,9 @@ public class DataManagementService {
         }
     }
     
-    public File getTrack(String author, String album, String track) {
-        
-        StringBuilder path = new StringBuilder(storagePath);
+    public File getTrack(final String author, final String album, final String track) {
+        final StringBuilder path = new StringBuilder(storagePath);
         path.append(author).append('/').append(album).append('/').append(track).append(".mp3");
-        
         return new File(path.toString());
     }
     

@@ -18,7 +18,7 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
     
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[]{ DataConfig.class, AppConfig.class, SecurityConfig.class};
+        return new Class<?>[]{ DataConfig.class, MongoConfig.class, AppConfig.class, SecurityConfig.class};
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
         return new String[]{ "/" };
     }
     
-     @Override
+    @Override
     protected void registerDispatcherServlet(final ServletContext servletContext) {
         super.registerDispatcherServlet(servletContext);
         servletContext.setSessionTrackingModes(EnumSet.of(SessionTrackingMode.COOKIE));
