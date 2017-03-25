@@ -2,7 +2,6 @@
 package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.Album;
-import com.dantonov.musicstore.entity.Author;
 import com.dantonov.musicstore.entity.Genre;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
@@ -10,22 +9,22 @@ import com.dantonov.musicstore.exception.AppSQLException;
 import com.dantonov.musicstore.exception.NotEnoughMoneyException;
 import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.repository.AlbumRepository;
-import java.io.IOException;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -53,6 +52,9 @@ public class AlbumService {
     
     @Autowired
     private DataManagementService dataService;
+
+    @Autowired
+    private MongoDataStorageService storageService;
     
     
     public Album findById(final UUID id) {
@@ -141,17 +143,29 @@ public class AlbumService {
                        final List<Genre> genres) {
 
         boolean afterSavingData = false;
+        GridFSInputFile file = null;
         try {
             for(final Genre genre: genres) {
                 genre.getAlbums().add(album);
             }
             album.setGenres(genres);
+            file = storageService.save(
+                    cover.getInputStream(),
+                    album.getAuthor().getName() + " " + album.getTitle() + " album cover"
+                            + cover.getOriginalFilename().substring(cover.getOriginalFilename().lastIndexOf('.')),
+                    cover.getContentType(),
+                    null
+            );
+            album.setCoverId(file.getId().toString());
             save(album);
-            dataService.saveAlbumData(album.getAuthor().getName(), album.getTitle(), cover, tracks);
+            dataService.saveAlbumData(album.getAuthor().getName(), album.getTitle(), tracks);
             afterSavingData = true;
             buy(album, user, BigDecimal.ZERO);
         } catch (final Exception ex) {
             log.warn("Ошибка при добавлении альбома.", ex);
+            if (file != null) {
+                storageService.delete(file.getId().toString());
+            }
             if (afterSavingData) {
                 try {
                     dataService.deleteAlbum(album.getAuthor().getName(), album.getTitle());

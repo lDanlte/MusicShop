@@ -54,7 +54,8 @@ public class Track {
     public Track() {
     }
 
-    public Track(Album album, String name, Integer duration, Long size, Integer bitrate, Byte position) {
+    public Track(final Album album, final String name, final Integer duration,
+                 final Long size, final Integer bitrate, final Byte position) {
         this.name = name;
         this.duration = duration;
         this.size = size;
@@ -65,37 +66,36 @@ public class Track {
 
     
     public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public void setId(final UUID id) { this.id = id; }
 
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setName(final String name) { this.name = name; }
 
     public Integer getDuration() { return duration; }
-    public void setDuration(Integer duration) { this.duration = duration; }
+    public void setDuration(final Integer duration) { this.duration = duration; }
 
     public Long getSize() { return size; }
-    public void setSize(Long size) { this.size = size; }
+    public void setSize(final Long size) { this.size = size; }
 
     public Integer getBitrate() { return bitrate; }
-    public void setBitrate(Integer bitrate) { this.bitrate = bitrate; }
+    public void setBitrate(final Integer bitrate) { this.bitrate = bitrate; }
 
     public Byte getPosition() { return position; }
-    public void setPosition(Byte position) { this.position = position; }
+    public void setPosition(final Byte position) { this.position = position; }
 
     public Album getAlbum() { return album; }
-    public void setAlbum(Album album) { this.album = album; }
+    public void setAlbum(final Album album) { this.album = album; }
     
     
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) return false;
         if (obj == this) return true;
         if (!(obj instanceof Track)) return false;
         
-        Track track = (Track) obj;
-        if (! id.equals(track.getId())) return false;
-        
-        return true;
+        final Track track = (Track) obj;
+        return id.equals(track.getId());
+
     }
 
     @Override

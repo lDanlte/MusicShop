@@ -37,20 +37,39 @@ public class Action {
     public Action() {
     }
 
-    public Action(Integer id, String desc) {
+    public Action(final Integer id, final String desc) {
         this.id = id;
         this.desc = desc;
     }
 
     
     public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public void setId(final Integer id) { this.id = id; }
 
     public String getDesc() { return desc; }
-    public void setDesc(String desc) { this.desc = desc; }
+    public void setDesc(final String desc) { this.desc = desc; }
 
     public List<TradeHistory> getHistorys() { return historys; }
-    public void setHistorys(List<TradeHistory> historys) { this.historys = historys; }
-    
-    
+    public void setHistorys(final List<TradeHistory> historys) { this.historys = historys; }
+
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final Action action = (Action) o;
+
+        return id.equals(action.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

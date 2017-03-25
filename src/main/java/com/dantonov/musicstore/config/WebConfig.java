@@ -64,14 +64,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
                 .addResourceHandler("/image/**")
                 .addResourceLocations("/resources/image/")
                 .setCachePeriod((int) TimeUnit.DAYS.toSeconds(LONG_CACHE_PERIOD_IN_DAYS));
-        registry
-                .addResourceHandler("/resource/*/cover*")
-                .addResourceLocations(env.getRequiredProperty("storage.path"))
-                .setCachePeriod((int) TimeUnit.DAYS.toSeconds(LONG_CACHE_PERIOD_IN_DAYS));
-        registry
-                .addResourceHandler("/resource/*/*/cover*")
-                .addResourceLocations(env.getRequiredProperty("storage.path"))
-                .setCachePeriod((int) TimeUnit.DAYS.toSeconds(LONG_CACHE_PERIOD_IN_DAYS));
     }
 
     

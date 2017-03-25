@@ -24,7 +24,7 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = {"com.dantonov.musicstore.entity"})
-@PropertySource("classpath:mysql_mac.properties")
+@PropertySource("classpath:new_props.properties")
 @EnableJpaRepositories(basePackages = "com.dantonov.musicstore.repository")
 @EnableTransactionManagement
 public class DataConfig {

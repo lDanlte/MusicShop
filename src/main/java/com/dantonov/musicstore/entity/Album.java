@@ -61,6 +61,9 @@ public class Album {
     @Column(name = "q_sold", nullable = false)
     private Long qSold;
 
+    @Column(name = "cover_id", columnDefinition = "CHAR(24)")
+    private String coverId;
+
     @ManyToMany(mappedBy = "albums", targetEntity = User.class)
     private Set<User> users;
     
@@ -89,8 +92,8 @@ public class Album {
     public Album() {
     }
 
-    public Album(Author author, String title, List<Track> tracks, BigDecimal price,
-                 Date releaseDate) {
+    public Album(final Author author, final String title, final List<Track> tracks, final BigDecimal price,
+                 final Date releaseDate) {
         this.author = author;
         this.title = title;
         this.tracks = tracks;
@@ -100,8 +103,8 @@ public class Album {
         qSold = 0L;
     }
 
-    public Album(Author author, String title, List<Track> tracks, BigDecimal price,
-                 Date releaseDate, Date addDate, String desc) {
+    public Album(final Author author, final String title, final List<Track> tracks, final BigDecimal price,
+                 final Date releaseDate, final Date addDate, final String desc) {
         this.author = author;
         this.title = title;
         this.tracks = tracks;
@@ -115,56 +118,58 @@ public class Album {
     
     
     public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public void setId(final UUID id) { this.id = id; }
 
     public String getTitle() {  return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setTitle(final String title) { this.title = title; }
 
     public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public void setPrice(final BigDecimal price) { this.price = price; }
 
     public Date getReleaseDate() { return releaseDate; }
-    public void setReleaseDate(Date releaseDate) { this.releaseDate = releaseDate; }
+    public void setReleaseDate(final Date releaseDate) { this.releaseDate = releaseDate; }
 
     public Date getAddDate() { return addDate; }
-    public void setAddDate(Date addDate) { this.addDate = addDate; }
+    public void setAddDate(final Date addDate) { this.addDate = addDate; }
     
     public String getDesc() { return desc; }
-    public void setDesc(String desc) { this.desc = desc; }
+    public void setDesc(final String desc) { this.desc = desc; }
 
     public Long getqSold() { return qSold; }
-    public void setqSold(Long qSold) { this.qSold = qSold;  }
+    public void setqSold(final Long qSold) { this.qSold = qSold;  }
+
+    public String getCoverId() { return coverId; }
+    public void setCoverId(final String coverId) { this.coverId = coverId; }
     
     public Set<User> getUsers() { return users; }
-    public void setUsers(Set<User> users) { this.users = users; }
+    public void setUsers(final Set<User> users) { this.users = users; }
 
     public List<Genre> getGenres() { return genres; }
-    public void setGenres(List<Genre> genres) { this.genres = genres; }
+    public void setGenres(final List<Genre> genres) { this.genres = genres; }
 
     public Author getAuthor() { return author; }
-    public void setAuthor(Author author) { this.author = author; }
+    public void setAuthor(final Author author) { this.author = author; }
 
     public List<TradeHistory> getHistorys() { return historys; }
-    public void setHistorys(List<TradeHistory> historys) { this.historys = historys; }
+    public void setHistorys(final List<TradeHistory> historys) { this.historys = historys; }
 
     public List<Track> getTracks() { return tracks; }
-    public void setTracks(List<Track> tracks) { this.tracks = tracks; }
+    public void setTracks(final List<Track> tracks) { this.tracks = tracks; }
 
     public boolean getIsBought() { return isBought; }
-    public void setIsBought(boolean isBought) { this.isBought = isBought; }
+    public void setIsBought(final boolean isBought) { this.isBought = isBought; }
     
     
     
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) return false;
         if (obj == this) return true;
         if (!(obj instanceof Album)) return false;
         
-        Album album = (Album) obj;
-        if (! id.equals(album.getId())) return false;
-        
-        return true;
+        final Album album = (Album) obj;
+        return id.equals(album.getId());
+
     }
 
     @Override

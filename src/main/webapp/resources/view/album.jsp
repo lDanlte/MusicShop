@@ -40,7 +40,7 @@
                 <div class="jumbotron carouset-content" style="padding: 5px;">
                     <div class="conteiner">
                         <div class="row">
-                            <img class="img-rounded" src="<c:url value="/resource/${authorName}/${albumName}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
+                            <img class="img-rounded" src="<c:url value="/author/${authorName}/album/${albumName}/cover.jpg"/>" style="height: 280px; float: left; margin-left: 15px; margin-right: 15px;">
 
                             <h4><strong class="margintext" style="margin-top: 10px;">${albumName}</strong></h4>
 

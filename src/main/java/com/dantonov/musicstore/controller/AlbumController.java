@@ -16,15 +16,20 @@ import com.dantonov.musicstore.exception.UnauthorizedResourceException;
 import com.dantonov.musicstore.service.AlbumService;
 import com.dantonov.musicstore.service.DataManagementService;
 import com.dantonov.musicstore.service.GenreService;
+import com.dantonov.musicstore.service.MongoDataStorageService;
 import com.dantonov.musicstore.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.gridfs.GridFSDBFile;
 import org.jaudiotagger.audio.mp3.ByteArrayMP3AudioHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -42,6 +48,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -67,6 +74,9 @@ public class AlbumController {
     private UserService userService;
 
     @Autowired
+    private MongoDataStorageService storageService;
+
+    @Autowired
     private SimpleDateFormat dateFormat;
 
     @Autowired
@@ -77,11 +87,11 @@ public class AlbumController {
     @RequestMapping(value = "/{albumName}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public ModelAndView albumPage(@PathVariable("albumName") final String albumName,
-                                  @PathVariable("authorName") final String authotName,
+                                  @PathVariable("authorName") final String authorName,
                                   final ModelAndView modelAndView,
                                   final Authentication authentication) {
         
-        final Album album = albumService.findByTitleAndAuthor(albumName, authotName);
+        final Album album = albumService.findByTitleAndAuthor(albumName, authorName);
         if (album == null) {
             throw new PageNotFoundException();
         }
@@ -141,7 +151,6 @@ public class AlbumController {
 
         final User user = userService.findByLogin(authentication.getName());
 
-
         final Author author = user.getAuthor();
         if (author == null || !author.getName().equals(authorName)) {
             log.warn("Ошибка при добавлени альбома. Аккаунт с логином {} не является вадельцем группы.", user.getLogin());
@@ -149,12 +158,17 @@ public class AlbumController {
         }
 
         final ObjectMapper mapper = new ObjectMapper();
-        AlbumDto albumDto = null;
+        final AlbumDto albumDto;
         try {
             albumDto = mapper.readValue(albumDtoStr, AlbumDto.class);
         } catch (IOException ex) {
             log.warn("Ошибка при добавлени альбома. Неверные данные.", ex);
             throw new RequestDataException("Неверно введены данные.");
+        }
+
+        if (!MediaType.IMAGE_JPEG_VALUE.equals(cover.getContentType())) {
+            log.warn("Ошибка при добавлени альбома. Неверный формат обложки.");
+            throw  new RequestDataException("Тип обложки должен быть .jpg");
         }
         
         final Album album = createAlbum(albumDto);
@@ -197,12 +211,38 @@ public class AlbumController {
         }
         return trackResource;
     }
+
+    @RequestMapping(value = "/{albumName}/cover.jpg", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    @ResponseBody
+    public ResponseEntity<InputStreamResource> getCover(@PathVariable("authorName") final String author,
+                                                        @PathVariable("albumName") final String title,
+                                                        final WebRequest webRequest){
+        final Album album = albumService.findByTitleAndAuthor(title, author);
+        if (album == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        final GridFSDBFile cover = storageService.findById(album.getCoverId());
+        if (cover == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (webRequest.checkNotModified(cover.getUploadDate().getTime())) {
+            return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+        }
+
+        return ResponseEntity.ok()
+                .contentLength(cover.getLength())
+                .lastModified(cover.getUploadDate().getTime())
+                .contentType(MediaType.IMAGE_JPEG)
+                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
+                .body(new InputStreamResource(cover.getInputStream()));
+    }
     
     
     private Album createAlbum(final AlbumDto albumDto) {
         final Album result = new Album();
         
-        BigDecimal bdValue = null;
+        final BigDecimal bdValue;
         try {
             bdValue = new BigDecimal(albumDto.getPrice());
             if (bdValue.compareTo(BigDecimal.ZERO) <= 0) {

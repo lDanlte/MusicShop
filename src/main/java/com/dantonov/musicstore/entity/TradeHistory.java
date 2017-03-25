@@ -56,14 +56,14 @@ public class TradeHistory {
     
     public TradeHistory() {}
 
-    public TradeHistory(BigDecimal price, Date datetime, Action action, User user) {
+    public TradeHistory(final BigDecimal price, final Date datetime, final Action action, final User user) {
         this.price = price;
         this.datetime = datetime;
         this.action = action;
         this.user = user;
     }
 
-    public TradeHistory(BigDecimal price, Date datetime, Action action, User user, Album album) {
+    public TradeHistory(final BigDecimal price, final Date datetime, final Action action, final User user, final Album album) {
         this.price = price;
         this.datetime = datetime;
         this.action = action;
@@ -73,22 +73,40 @@ public class TradeHistory {
     
     
     public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
+    public void setId(final UUID id) { this.id = id; }
 
     public Date getDatetime() { return datetime; }
-    public void setDatetime(Date datetime) { this.datetime = datetime; }
+    public void setDatetime(final Date datetime) { this.datetime = datetime; }
 
     public BigDecimal getPrice() { return price; }
-    public void setPrice(BigDecimal price) { this.price = price; }
+    public void setPrice(final BigDecimal price) { this.price = price; }
 
     public Action getAction() { return action; }
-    public void setAction(Action action) { this.action = action; }
+    public void setAction(final Action action) { this.action = action; }
 
     public User getUser() { return user;}
-    public void setUser(User user) { this.user = user; }
+    public void setUser(final User user) { this.user = user; }
 
     public Album getAlbum() { return album; }
-    public void setAlbum(Album album) { this.album = album; }
-    
-    
+    public void setAlbum(final Album album) { this.album = album; }
+
+
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        final TradeHistory that = (TradeHistory) o;
+
+        return id.equals(that.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
