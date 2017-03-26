@@ -224,7 +224,7 @@
                         smoothPlayBar: true,
                         keyEnabled: true,
                         swfPath:"<c:url value="/lib/jplayer/js/jquery.jplayer.swf"/>",
-                        solution:"flash, html"
+                        solution:"html"
                 });
             
             });

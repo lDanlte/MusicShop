@@ -1,5 +1,6 @@
 package com.dantonov.musicstore.controller;
 
+import com.dantonov.musicstore.controller.urils.PartialContentSender;
 import com.dantonov.musicstore.dto.AlbumDto;
 import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
@@ -14,7 +15,6 @@ import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.exception.ResourceNotFoundException;
 import com.dantonov.musicstore.exception.UnauthorizedResourceException;
 import com.dantonov.musicstore.service.AlbumService;
-import com.dantonov.musicstore.service.DataManagementService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.MongoDataStorageService;
 import com.dantonov.musicstore.service.UserService;
@@ -24,7 +24,6 @@ import org.jaudiotagger.audio.mp3.ByteArrayMP3AudioHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -42,6 +41,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -63,9 +64,6 @@ public class AlbumController {
     
     @Autowired
     private GenreService genreService;
-    
-    @Autowired
-    private DataManagementService dataService;
     
     @Autowired
     private AlbumService albumService;
@@ -187,13 +185,14 @@ public class AlbumController {
         return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно добавлен.");
     }
 
-    @RequestMapping(value = "/{albumName}/track/{trackName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{albumName}/track/{trackName}.mp3", method = RequestMethod.GET, produces = "audio/mpeg")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public FileSystemResource getTrack(@PathVariable("authorName") final String author,
-                                       @PathVariable("albumName") final String albumTitle,
-                                       @PathVariable("trackName") final String track,
-                                       final Authentication authentication) {
+    public void getTrack(@PathVariable("authorName") final String author,
+                                        @PathVariable("albumName") final String albumTitle,
+                                        @PathVariable("trackName") final Byte trackNum,
+                                        final HttpServletRequest request,
+                                        final HttpServletResponse response,
+                                        final Authentication authentication) {
         final User user = userService.findByLogin(authentication.getName());
         
         final Album album = albumService.findByTitleAndAuthor(albumTitle, author);
@@ -204,12 +203,35 @@ public class AlbumController {
         if (!user.hasAlbum(album)) {
             throw new UnauthorizedResourceException("Альбом '" + albumTitle + "' не кулен");
         }
-        
-        final FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, albumTitle, track));
-        if (!trackResource.exists()) {
-            throw new ResourceNotFoundException("Трек '" + track + "' Альбома '" + albumTitle + "' группы '" + author + "' не найден.");
+
+        final Track track = album.getTracks().stream()
+                .filter(t -> t.getPosition().equals(trackNum))
+                .findFirst()
+                .orElse(null);
+        if (track == null) {
+            throw new ResourceNotFoundException("Трек под номером '" + trackNum + "' группы '" + author + "' не найден.");
         }
-        return trackResource;
+        final GridFSDBFile file = storageService.findById(track.getFileId());
+
+        try {
+            PartialContentSender
+                    .fromGridFSDBFile(file)
+                    .withMimeType("audio/mpeg")
+                    .withRequest(request)
+                    .withResponse(response)
+                    .serveResource();
+        } catch (final Exception ex) {
+            if (ex.getMessage().contains("Broken pipe")) {
+                log.info("Broken pipe");
+            } else {
+                log.warn("failed to write response", ex);
+                try {
+                    response.sendError(500, "failed to write response");
+                } catch (final IOException e) {
+                    log.warn("failed to write error response", e);
+                }
+            }
+        }
     }
 
     @RequestMapping(value = "/{albumName}/cover.jpg", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)

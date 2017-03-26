@@ -44,6 +44,9 @@ public class Track {
     
     @Column(name = "pos", nullable = false, updatable = false)
     private Byte position;
+
+    @Column(name = "file_id", columnDefinition = "CHAR(24)")
+    private String fileId;
     
     @ManyToOne(targetEntity = Album.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id", nullable = false, updatable = false)
@@ -83,6 +86,9 @@ public class Track {
     public Byte getPosition() { return position; }
     public void setPosition(final Byte position) { this.position = position; }
 
+    public String getFileId() { return fileId; }
+    public void setFileId(final String fileId) { this.fileId = fileId; }
+
     public Album getAlbum() { return album; }
     public void setAlbum(final Album album) { this.album = album; }
     
@@ -104,6 +110,5 @@ public class Track {
         hash = 97 * hash + Objects.hashCode(this.id);
         return hash;
     }
-    
     
 }
