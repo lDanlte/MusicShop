@@ -1,5 +1,6 @@
 package com.dantonov.musicstore.controller;
 
+import com.dantonov.musicstore.controller.urils.PartialContentSender;
 import com.dantonov.musicstore.dto.AlbumDto;
 import com.dantonov.musicstore.dto.ResponseMessageDto;
 import com.dantonov.musicstore.entity.Album;
@@ -40,6 +41,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -182,13 +185,14 @@ public class AlbumController {
         return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно добавлен.");
     }
 
-    @RequestMapping(value = "/{albumName}/track/{trackName}.mp3", method = RequestMethod.GET)
+    @RequestMapping(value = "/{albumName}/track/{trackName}.mp3", method = RequestMethod.GET, produces = "audio/mpeg")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public ResponseEntity<InputStreamResource> getTrack(@PathVariable("authorName") final String author,
-                                                        @PathVariable("albumName") final String albumTitle,
-                                                        @PathVariable("trackName") final Byte trackNum,
-                                                        final Authentication authentication) {
+    public void getTrack(@PathVariable("authorName") final String author,
+                                        @PathVariable("albumName") final String albumTitle,
+                                        @PathVariable("trackName") final Byte trackNum,
+                                        final HttpServletRequest request,
+                                        final HttpServletResponse response,
+                                        final Authentication authentication) {
         final User user = userService.findByLogin(authentication.getName());
         
         final Album album = albumService.findByTitleAndAuthor(albumTitle, author);
@@ -209,9 +213,25 @@ public class AlbumController {
         }
         final GridFSDBFile file = storageService.findById(track.getFileId());
 
-        return ResponseEntity.ok()
-                .lastModified(file.getUploadDate().getTime())
-                .body(new InputStreamResource(file.getInputStream()));
+        try {
+            PartialContentSender
+                    .fromGridFSDBFile(file)
+                    .withMimeType("audio/mpeg")
+                    .withRequest(request)
+                    .withResponse(response)
+                    .serveResource();
+        } catch (final Exception ex) {
+            if (ex.getMessage().contains("Broken pipe")) {
+                log.info("Broken pipe");
+            } else {
+                log.warn("failed to write response", ex);
+                try {
+                    response.sendError(500, "failed to write response");
+                } catch (final IOException e) {
+                    log.warn("failed to write error response", e);
+                }
+            }
+        }
     }
 
     @RequestMapping(value = "/{albumName}/cover.jpg", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
