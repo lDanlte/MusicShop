@@ -9,8 +9,8 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author denis.antonov
@@ -44,7 +44,7 @@ public class AppConfig implements SchedulingConfigurer {
     }
 
     @Bean(destroyMethod = "shutdown")
-    public Executor taskExecutor() {
+    public ScheduledExecutorService taskExecutor() {
         return Executors.newSingleThreadScheduledExecutor();
     }
 }

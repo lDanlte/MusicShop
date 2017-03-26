@@ -14,7 +14,6 @@ import com.dantonov.musicstore.exception.RequestDataException;
 import com.dantonov.musicstore.exception.ResourceNotFoundException;
 import com.dantonov.musicstore.exception.UnauthorizedResourceException;
 import com.dantonov.musicstore.service.AlbumService;
-import com.dantonov.musicstore.service.DataManagementService;
 import com.dantonov.musicstore.service.GenreService;
 import com.dantonov.musicstore.service.MongoDataStorageService;
 import com.dantonov.musicstore.service.UserService;
@@ -24,7 +23,6 @@ import org.jaudiotagger.audio.mp3.ByteArrayMP3AudioHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
@@ -63,9 +61,6 @@ public class AlbumController {
     
     @Autowired
     private GenreService genreService;
-    
-    @Autowired
-    private DataManagementService dataService;
     
     @Autowired
     private AlbumService albumService;
@@ -187,13 +182,13 @@ public class AlbumController {
         return new ResponseMessageDto(HttpStatus.OK.value(), "Альбом " + album.getTitle() + " успешно добавлен.");
     }
 
-    @RequestMapping(value = "/{albumName}/track/{trackName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{albumName}/track/{trackName}.mp3", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public FileSystemResource getTrack(@PathVariable("authorName") final String author,
-                                       @PathVariable("albumName") final String albumTitle,
-                                       @PathVariable("trackName") final String track,
-                                       final Authentication authentication) {
+    public ResponseEntity<InputStreamResource> getTrack(@PathVariable("authorName") final String author,
+                                                        @PathVariable("albumName") final String albumTitle,
+                                                        @PathVariable("trackName") final Byte trackNum,
+                                                        final Authentication authentication) {
         final User user = userService.findByLogin(authentication.getName());
         
         final Album album = albumService.findByTitleAndAuthor(albumTitle, author);
@@ -204,12 +199,19 @@ public class AlbumController {
         if (!user.hasAlbum(album)) {
             throw new UnauthorizedResourceException("Альбом '" + albumTitle + "' не кулен");
         }
-        
-        final FileSystemResource trackResource = new FileSystemResource(dataService.getTrack(author, albumTitle, track));
-        if (!trackResource.exists()) {
-            throw new ResourceNotFoundException("Трек '" + track + "' Альбома '" + albumTitle + "' группы '" + author + "' не найден.");
+
+        final Track track = album.getTracks().stream()
+                .filter(t -> t.getPosition().equals(trackNum))
+                .findFirst()
+                .orElse(null);
+        if (track == null) {
+            throw new ResourceNotFoundException("Трек под номером '" + trackNum + "' группы '" + author + "' не найден.");
         }
-        return trackResource;
+        final GridFSDBFile file = storageService.findById(track.getFileId());
+
+        return ResponseEntity.ok()
+                .lastModified(file.getUploadDate().getTime())
+                .body(new InputStreamResource(file.getInputStream()));
     }
 
     @RequestMapping(value = "/{albumName}/cover.jpg", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)

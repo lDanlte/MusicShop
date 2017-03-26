@@ -3,6 +3,7 @@ package com.dantonov.musicstore.service;
 
 import com.dantonov.musicstore.entity.Album;
 import com.dantonov.musicstore.entity.Genre;
+import com.dantonov.musicstore.entity.Track;
 import com.dantonov.musicstore.entity.TradeHistory;
 import com.dantonov.musicstore.entity.User;
 import com.dantonov.musicstore.exception.AppSQLException;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -49,9 +51,6 @@ public class AlbumService {
     
     @Autowired
     protected TradeHistoryService historyService;
-    
-    @Autowired
-    private DataManagementService dataService;
 
     @Autowired
     private MongoDataStorageService storageService;
@@ -142,8 +141,8 @@ public class AlbumService {
                        final MultipartFile[] tracks,
                        final List<Genre> genres) {
 
-        boolean afterSavingData = false;
         GridFSInputFile file = null;
+        List<String> savedFiles = null;
         try {
             for(final Genre genre: genres) {
                 genre.getAlbums().add(album);
@@ -157,19 +156,19 @@ public class AlbumService {
                     null
             );
             album.setCoverId(file.getId().toString());
+            savedFiles = saveAlbumData(album.getAuthor().getName(), album.getTracks().stream().map(Track::getName).collect(Collectors.toList()), tracks);
+            for (int i = 0; i < savedFiles.size(); i++) {
+                album.getTracks().get(i).setFileId(savedFiles.get(i));
+            }
             save(album);
-            dataService.saveAlbumData(album.getAuthor().getName(), album.getTitle(), tracks);
-            afterSavingData = true;
             buy(album, user, BigDecimal.ZERO);
         } catch (final Exception ex) {
             log.warn("Ошибка при добавлении альбома.", ex);
             if (file != null) {
                 storageService.delete(file.getId().toString());
             }
-            if (afterSavingData) {
-                try {
-                    dataService.deleteAlbum(album.getAuthor().getName(), album.getTitle());
-                } catch (IOException ioex) { }
+            if (savedFiles != null) {
+                savedFiles.forEach(storageService::delete);
             }
             throw new RequestDataException("Ошибка при добавлении альбома.");
         }
@@ -182,8 +181,28 @@ public class AlbumService {
         return albumRepository.save(album);
     }
     
-     public Album update(final Album album) {
+    public Album update(final Album album) {
          return albumRepository.save(album);
      }
+
+    private List<String> saveAlbumData(final String authorName, final List<String> audioNames, final MultipartFile[] audioFiles) throws IOException {
+        for (byte i = 0; i < audioFiles.length; i++) {
+            if (!"audio/mp3".equals(audioFiles[i].getContentType())) {
+                throw new RequestDataException("Неверный тип файла " + audioFiles[i].getOriginalFilename() + ". Должен быть mp3.");
+            }
+        }
+        final List<String> ids = new ArrayList<>();
+        for (byte i = 0; i < audioFiles.length; i++) {
+            final MultipartFile audioFile = audioFiles[i];
+            String fileType = audioFile.getOriginalFilename();
+            fileType = fileType.substring(fileType.lastIndexOf('.'));
+            final String newName = authorName + " - " + audioNames.get(i) + fileType;
+            final GridFSInputFile gridFSInputFile = storageService.save(audioFile.getInputStream(), newName, audioFile.getContentType(), null);
+            ids.add(gridFSInputFile.getId().toString());
+            log.info("Получен файл: имя = {}; тип = {}; размер = {} Кб.",
+                    newName, audioFile.getContentType(), audioFile.getSize() >> 10);
+        }
+        return ids;
+    }
 
 }
