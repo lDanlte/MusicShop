@@ -63,26 +63,26 @@
                                 <!-- Sign Up Form -->
                                 <!-- Text input-->
                                 <div class="control-group">
-                                  <label class="control-label" for="Email">Поменять email:</label>
+                                  <label class="control-label" for="updatedEmail">Поменять email:</label>
                                   <div class="controls">
-                                    <input id="newEmail" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
+                                    <input id="updatedEmail" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
                                   </div>
                                 </div>
 
                                 <!-- Password input-->
                                 
                                 <div class="control-group">
-                                  <label class="control-label" for="password">Новый пароль:</label>
+                                  <label class="control-label" for="updatedPassword">Новый пароль:</label>
                                   <div class="controls">
-                                    <input id="newPassword" name="password" class="form-control input-large" type="password" placeholder="********" required="">
+                                    <input id="updatedPassword" name="password" class="form-control input-large" type="password" placeholder="********" required="">
                                   </div>
                                 </div>
 
                                 <!-- Text input-->
                                 <div class="control-group">
-                                  <label class="control-label" for="reenterpassword">Повторите новый пароль:</label>
+                                  <label class="control-label" for="updatedReenterPassword">Повторите новый пароль:</label>
                                   <div class="controls">
-                                    <input id="newReenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
+                                    <input id="updatedReenterPassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
                                   </div>
                                 </div>
                                 
@@ -196,14 +196,14 @@
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                      <label class="control-label" for="Email">Email:</label>
+                                      <label class="control-label" for="authorEmail">Email:</label>
                                       <div class="controls">
                                         <input id="authorEmail" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
                                       </div>
                                     </div>
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                      <label class="control-label" for="login">Логин: </label>
+                                      <label class="control-label" for="authorLogin">Логин: </label>
                                       <div class="controls">
                                         <input id="authorLogin" name="login" class="form-control input-large" type="text" placeholder="Логин" required="">
                                       </div>
@@ -212,7 +212,7 @@
                                     <!-- Password input-->
 
                                     <div class="control-group" style="margin-top: 10px;">
-                                      <label class="control-label" for="password">Пароль:</label>
+                                      <label class="control-label" for="authorPassword">Пароль:</label>
                                       <div class="controls">
                                         <input id="authorPassword" name="password" class="form-control input-large" type="password" placeholder="********" required="">
                                       </div>
@@ -220,7 +220,7 @@
 
                                     <!-- Text input-->
                                     <div class="control-group" style="margin-top: 10px;">
-                                      <label class="control-label" for="reenterpassword">Повторите пароль:</label>
+                                      <label class="control-label" for="authorPasswordComf">Повторите пароль:</label>
                                       <div class="controls">
                                         <input id="authorPasswordComf" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
                                       </div>

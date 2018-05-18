@@ -40,7 +40,7 @@ function createAuthor() {
             email: email,
             pass: pass
         }
-    }
+    };
     
     var data = new FormData();
     data.append("author", JSON.stringify(author));

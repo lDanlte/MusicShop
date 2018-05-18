@@ -87,9 +87,9 @@ function addCash() {
 }
 
 function changeUserData() {
-    var email = $("#newEmail").val(),
-        pass = $("#newPassword").val(),
-        comfPass = $("#newReenterpassword").val();
+    var email = $("#updatedEmail").val(),
+        pass = $("#updatedPassword").val(),
+        comfPass = $("#updatedReenterPassword").val();
     if (email == "" && pass == "" && comfPass == "") {
         showMessage("Внимание", "Все поля пустые.");
         return;

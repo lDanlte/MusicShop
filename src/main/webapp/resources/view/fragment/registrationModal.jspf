@@ -13,33 +13,33 @@
                         <!-- Sign Up Form -->
                         <!-- Text input-->
                         <div class="control-group">
-                            <label class="control-label" for="Email">Email:</label>
+                            <label class="control-label" for="newEmail">Email:</label>
                             <div class="controls">
-                                <input id="Email" name="Email" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
+                                <input id="newEmail" name="newEmail" class="form-control input-large" type="text" placeholder="JoeSixpack@sixpacksrus.com" required="">
                             </div>
                         </div>
 
                         <!-- Text input-->
                         <div class="control-group">
-                            <label class="control-label" for="userid">Логин:</label>
+                            <label class="control-label" for="newLogin">Логин:</label>
                             <div class="controls">
-                                <input id="userid" name="userid" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
+                                <input id="newLogin" name="newLogin" class="form-control input-large" type="text" placeholder="JoeSixpack" required="">
                             </div>
                         </div>
 
                         <!-- Password input-->
                         <div class="control-group">
-                            <label class="control-label" for="password">Пароль:</label>
+                            <label class="control-label" for="newPass">Пароль:</label>
                             <div class="controls">
-                                <input id="password" name="password" class="form-control input-large" type="password" placeholder="********" required="">
+                                <input id="newPass" name="newPass" class="form-control input-large" type="password" placeholder="********" required="">
                             </div>
                         </div>
 
                         <!-- Text input-->
                         <div class="control-group">
-                            <label class="control-label" for="reenterpassword">Повторите пароль:</label>
+                            <label class="control-label" for="newPass2">Повторите пароль:</label>
                             <div class="controls">
-                                <input id="reenterpassword" class="form-control input-large" name="reenterpassword" type="password" placeholder="********" required="">
+                                <input id="newPass2" class="form-control input-large" name="newPass2" type="password" placeholder="********" required="">
                             </div>
                         </div>
 
@@ -48,7 +48,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-info">Регистрация</button>
+                <button type="button" class="btn btn-info" onclick="registration();">Регистрация</button>
             </div>
         </div>
     </div>

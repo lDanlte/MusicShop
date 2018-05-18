@@ -2,6 +2,7 @@
 package com.dantonov.musicstore.config;
 
 import com.dantonov.musicstore.security.config.SecurityConfig;
+import com.dantonov.musicstore.security.xss.XssFilter;
 import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
@@ -39,7 +40,10 @@ public class AppInit extends AbstractAnnotationConfigDispatcherServletInitialize
     
     @Override
     protected Filter[] getServletFilters() {
-       return new Filter[]{ new OpenEntityManagerInViewFilter() };
+       return new Filter[] {
+               new XssFilter(),
+               new OpenEntityManagerInViewFilter()
+       };
     }
 
 }

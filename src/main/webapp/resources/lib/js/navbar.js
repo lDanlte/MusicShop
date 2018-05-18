@@ -59,7 +59,7 @@ function registration() {
         login: login,
         email: email,
         pass: pass
-    }
+    };
     
     $.ajax({
         url: MAIN_URL + "user",
