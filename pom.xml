@@ -12,7 +12,7 @@
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.2.2.RELEASE</spring.version>
+        <spring.version>6.0.0</spring.version>
         <spring.security.version>4.2.2.RELEASE</spring.security.version>
         <spring.data.version>1.11.1.RELEASE</spring.data.version>
         <fasterxml.version>2.9.9</fasterxml.version>
